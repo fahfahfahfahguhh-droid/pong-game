@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        
+        .game-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: #7c3aed;
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+        }
+        
+        .game-preview {
+            height: 180px;
+            background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        
+        .game-info {
+            padding: 24px;
+        }
+        
+        .game-info h2 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+        
+        .game-info p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .game-tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .tag {
+            padding: 4px 12px;
+            background: rgba(124, 58, 237, 0.2);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #a78bfa;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #64748b;
+        }
+        
+        footer a {
+            color: #7c3aed;
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .coming-soon {
+            position: relative;
+            opacity: 0.6;
+        }
+        
+        .coming-soon::after {
+            content: 'Coming Soon';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            background: #f59e0b;
+            color: #000;
+            padding: 8px 16px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Games</h1>
+            <p>A collection of games I've built</p>
+        </header>
+        
+        <div class="games-grid">
+            <a href="./games/pong/index.html" class="game-card">
+                <div class="game-preview">🏓</div>
+                <div class="game-info">
+                    <h2>Pong</h2>
+                    <p>Classic Pong game - play against AI. First to 5 wins!</p>
+                    <div class="game-tags">
+                        <span class="tag">Arcade</span>
+                        <span class="tag">Single Player</span>
+                    </div>
+                </div>
+            </a>
+            
+            <div class="game-card coming-soon">
+                <div class="game-preview">🎮</div>
+                <div class="game-info">
+                    <h2>Next Game</h2>
+                    <p>Something exciting is in the works...</p>
+                    <div class="game-tags">
+                        <span class="tag">TBA</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-card coming-soon">
+                <div class="game-preview">🎲</div>
+                <div class="game-info">
+                    <h2>Another Game</h2>
+                    <p>More games coming soon!</p>
+                    <div class="game-tags">
+                        <span class="tag">TBA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Built with ❤️ • <a href="https://vercel.com">Deploy on Vercel</a></p>
+        </footer>
+    </div>
+</body>
+</html>
