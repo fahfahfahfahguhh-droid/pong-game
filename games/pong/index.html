@@ -81,7 +81,7 @@
         </div>
         <canvas id="pong" width="800" height="500"></canvas>
         <div id="message"></div>
-        <div id="instructions">Use Mouse to Move • First to 5 Wins</div>
+        <div id="instructions">Mouse to Move • SPACE to Pause • First to 5 Wins</div>
     </div>
 
     <script>
@@ -100,6 +100,18 @@
         let ai = { x: canvas.width - 35, y: canvas.height / 2 - PADDLE_HEIGHT / 2, score: 0, speed: 2.2 };
         let ball = { x: canvas.width / 2, y: canvas.height / 2, vx: 0, vy: 0, speed: 5 };
         let gameOver = false;
+        let paused = false;
+
+        function togglePause() {
+            if (gameOver) return;
+            paused = !paused;
+            if (paused) {
+                messageEl.innerHTML = 'PAUSED<br><span style="font-size: 18px">Press SPACE to Resume</span>';
+                messageEl.style.display = 'block';
+            } else {
+                messageEl.style.display = 'none';
+            }
+        }
 
         function resetBall() {
             ball.x = canvas.width / 2;
@@ -130,7 +142,7 @@
         });
 
         function update() {
-            if (gameOver) return;
+            if (gameOver || paused) return;
 
             ball.x += ball.vx;
             ball.y += ball.vy;
@@ -237,6 +249,13 @@
         canvas.addEventListener('click', () => {
             if (gameOver) {
                 resetGame();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePause();
             }
         });
 
