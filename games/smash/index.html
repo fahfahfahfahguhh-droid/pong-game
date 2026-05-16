@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smash Arena - You vs AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a0f;
+            font-family: 'Segoe UI', sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+        #backLink {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            z-index: 100;
+            transition: color 0.2s;
+        }
+        #backLink:hover { color: #fff; }
+        
+        .screen {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        /* Character Select */
+        #charSelect {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            padding: 30px;
+            overflow-y: auto;
+        }
+        #charSelect.hidden {
+            display: none;
+        }
+        #charSelect h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #charSelect .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 900px;
+            min-height: 400px;
+        }
+        .char-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .char-card:hover {
+            transform: translateY(-5px);
+            border-color: #feca57;
+            box-shadow: 0 10px 30px rgba(254,202,87,0.2);
+        }
+        .char-card.selected {
+            border-color: #48dbfb;
+            box-shadow: 0 0 30px rgba(72,219,251,0.4);
+        }
+        .char-icon {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+        .char-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .char-type {
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .char-stats {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.7rem;
+        }
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .stat-bar {
+            width: 30px;
+            height: 5px;
+            background: #333;
+            border-radius: 2px;
+            margin-top: 2px;
+            overflow: hidden;
+        }
+        .stat-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+        .special-move {
+            margin-top: 6px;
+            padding: 5px;
+            background: rgba(255,107,107,0.2);
+            border-radius: 4px;
+            font-size: 0.65rem;
+            color: #ff6b6b;
+        }
+        .select-btn {
+            margin-top: 40px;
+            padding: 15px 60px;
+            font-size: 1.2rem;
+            background: linear-gradient(90deg, #48dbfb, #5f27cd);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .select-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(72,219,251,0.4);
+        }
+        .select-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Map Select */
+        #mapSelect {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            padding: 40px;
+        }
+        #mapSelect.hidden {
+            display: none;
+        }
+        #mapSelect h1 {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: #fff;
+        }
+        .map-grid {
+            display: flex;
+            gap: 30px;
+            min-height: 300px;
+        }
+        .map-card {
+            width: 280px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .map-card:hover {
+            transform: translateY(-5px);
+            border-color: #1dd1a1;
+        }
+        .map-card.selected {
+            border-color: #1dd1a1;
+            box-shadow: 0 0 30px rgba(29,209,161,0.4);
+        }
+        .map-preview {
+            height: 160px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        .map-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .map-desc {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* Game Screen */
+        #gameScreen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0a0a0f;
+        }
+        #gameScreen.hidden {
+            display: none;
+        }
+        #gameCanvas {
+            display: block;
+            background: #1a1a2e;
+            border: 3px solid #636e72;
+            border-radius: 6px;
+        }
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+        }
+        .player-hud {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .player-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .player-name.p1 { color: #48dbfb; }
+        .player-name.p2 { color: #ff6b6b; }
+        .health-bar {
+            width: 250px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .health-fill {
+            height: 100%;
+            transition: width 0.2s;
+            border-radius: 8px;
+        }
+        .health-fill.p1 { background: linear-gradient(90deg, #48dbfb, #5f27cd); }
+        .health-fill.p2 { background: linear-gradient(90deg, #ff6b6b, #ee5a24); }
+        .percent {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #feca57;
+        }
+        .stock-display {
+            display: flex;
+            gap: 5px;
+        }
+        .stock {
+            width: 30px;
+            height: 30px;
+            background: #48dbfb;
+            border-radius: 50%;
+            border: 2px solid #fff;
+        }
+        .stock.lost { opacity: 0.3; }
+        #centerHUD {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        #gameMessage {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+            display: none;
+        }
+        #gameMessage.show { display: block; }
+        #gameControls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.2s; }
+    </style>
+</head>
+<body>
+    <a href="../../index.html" id="backLink">← Back to Games</a>
+
+    <!-- Character Select -->
+    <div id="charSelect" class="screen active">
+        <h1>Choose Your Fighter</h1>
+        <p class="subtitle">Select your character to battle • 18 Fighters</p>
+        <div class="char-grid" id="charGrid"></div>
+        <button class="select-btn" id="confirmChar" disabled>Continue →</button>
+    </div>
+
+    <!-- Map Select -->
+    <div id="mapSelect" class="screen hidden">
+        <h1>Select Arena</h1>
+        <div class="map-grid" id="mapGrid"></div>
+        <button class="select-btn" id="startGame" disabled>Start Battle!</button>
+    </div>
+
+    <!-- Game -->
+    <div id="gameScreen" class="hidden">
+        <canvas id="gameCanvas"></canvas>
+        <div id="hud">
+            <div class="player-hud">
+                <div class="player-name p1" id="p1Name">Player</div>
+                <div class="health-bar"><div class="health-fill p1" id="p1Health" style="width: 100%"></div></div>
+                <div class="percent" id="p1Percent">0%</div>
+                <div class="stock-display" id="p1Stock"></div>
+            </div>
+            <div class="player-hud" style="align-items: flex-end;">
+                <div class="player-name p2" id="p2Name">CPU</div>
+                <div class="health-bar"><div class="health-fill p2" id="p2Health" style="width: 100%"></div></div>
+                <div class="percent" id="p2Percent">0%</div>
+                <div class="stock-display" id="p2Stock"></div>
+            </div>
+        </div>
+        <div id="centerHUD">
+            <div id="gameMessage"></div>
+        </div>
+        <div id="gameControls">
+            WASD/Arrows: Move | J: Attack | K: Special | L: Jump | R: Restart
+        </div>
+    </div>
+
+    <script>
+        // Character Definitions
+        const CHARACTERS = [
+            {
+                id: 'mario', name: 'Mario', type: 'Balanced', icon: '🍄',
+                color: '#e74c3c',
+                stats: { speed: 5, power: 6, jump: 5 },
+                special: 'Fireball - Shoots a flaming projectile',
+                specialCooldown: 120,
+                description: 'The hero of the realm - well-rounded and reliable'
+            },
+            {
+                id: 'luigi', name: 'Luigi', type: 'Speed', icon: '🥬',
+                color: '#27ae60',
+                stats: { speed: 7, power: 5, jump: 6 },
+                special: 'Thunder Hand - Zaps nearby opponents',
+                specialCooldown: 100,
+                description: 'Mario\'s taller twin - faster and higher jumping'
+            },
+            {
+                id: 'koopa', name: 'Koopa', type: 'Defensive', icon: '🐢',
+                color: '#9b59b6',
+                stats: { speed: 4, power: 5, jump: 4 },
+                special: 'Shell Spin - Spins forward in protective shell',
+                specialCooldown: 150,
+                description: 'Tough turtle with a hard shell - great defense'
+            },
+            {
+                id: 'bowser', name: 'Bowser', type: 'Power', icon: '👑',
+                color: '#8e44ad',
+                stats: { speed: 3, power: 9, jump: 3 },
+                special: 'Fire Breath - Blasts flames forward',
+                specialCooldown: 180,
+                description: 'The Kooka King - massive power, slow but deadly'
+            },
+            {
+                id: 'peach', name: 'Peach', type: 'Tactical', icon: '👸',
+                color: '#ff69b4',
+                stats: { speed: 5, power: 4, jump: 5 },
+                special: 'Heart Pulse - Heals self and damages nearby',
+                specialCooldown: 200,
+                description: 'Royal grace - uses tricks and recovery abilities'
+            },
+            {
+                id: 'toad', name: 'Toad', type: 'Agile', icon: '🍄',
+                color: '#3498db',
+                stats: { speed: 8, power: 3, jump: 7 },
+                special: 'Spore Cloud - Confuses opponent temporarily',
+                specialCooldown: 140,
+                description: 'Fast mushroom scout - quick and slippery'
+            },
+            {
+                id: 'yoshi', name: 'Yoshi', type: 'Balanced', icon: '🥚',
+                color: '#2ecc71',
+                stats: { speed: 6, power: 5, jump: 6 },
+                special: 'Egg Lay - Lays egg that can be thrown',
+                specialCooldown: 130,
+                description: 'Friendly dino - can swallow enemies into eggs'
+            },
+            {
+                id: 'donkey', name: 'Donkey', type: 'Power', icon: '🍌',
+                color: '#d35400',
+                stats: { speed: 3, power: 8, jump: 4 },
+                special: 'Banana Slam - Ground pounds for heavy damage',
+                specialCooldown: 160,
+                description: 'Kong powerhouse - incredibly strong'
+            },
+            {
+                id: 'diddy', name: 'Diddy', type: 'Speed', icon: '🐵',
+                color: '#e67e22',
+                stats: { speed: 8, power: 4, jump: 7 },
+                special: 'Peanut Popgun - Shoots peanuts rapidly',
+                specialCooldown: 100,
+                description: 'Mini monkey - super fast with guns'
+            },
+            {
+                id: 'samus', name: 'Samus', type: 'Tactical', icon: '🤖',
+                color: '#c0392b',
+                stats: { speed: 5, power: 6, jump: 5 },
+                special: 'Charge Shot - Powerful energy beam',
+                specialCooldown: 150,
+                description: 'Bounty hunter - ranged fighter with armor'
+            },
+            {
+                id: 'kirby', name: 'Kirby', type: 'Balanced', icon: '💨',
+                color: '#ffb6c1',
+                stats: { speed: 6, power: 4, jump: 6 },
+                special: 'Inhale - Sucks in nearby opponents',
+                specialCooldown: 140,
+                description: 'Pink puffball - copies abilities and floats'
+            },
+            {
+                id: 'pikachu', name: 'Pikachu', type: 'Agile', icon: '⚡',
+                color: '#f1c40f',
+                stats: { speed: 9, power: 4, jump: 7 },
+                special: 'Thunder - Strikes all nearby with lightning',
+                specialCooldown: 120,
+                description: 'Electric mouse - fastest character in the game'
+            },
+            {
+                id: 'link', name: 'Link', type: 'Balanced', icon: '🗡️',
+                color: '#27ae60',
+                stats: { speed: 5, power: 7, jump: 5 },
+                special: 'Spin Attack - Spinning blade slash',
+                specialCooldown: 130,
+                description: 'Hero of time - sword master with spin attack'
+            },
+            {
+                id: 'zelda', name: 'Zelda', type: 'Tactical', icon: '✨',
+                color: '#9b59b6',
+                stats: { speed: 4, power: 5, jump: 4 },
+                special: 'Nayru\'s Love - Creates magical shield',
+                specialCooldown: 190,
+                description: 'Princess of wisdom - magical and defensive'
+            },
+            {
+                id: 'ganon', name: 'Ganon', type: 'Power', icon: '💀',
+                color: '#2c3e50',
+                stats: { speed: 4, power: 9, jump: 3 },
+                special: 'Warlock Punch - Powerful dark energy blast',
+                specialCooldown: 170,
+                description: 'Evil warlord - terrifying strength'
+            },
+            {
+                id: 'fox', name: 'Fox', type: 'Speed', icon: '🦊',
+                color: '#2980b9',
+                stats: { speed: 8, power: 4, jump: 6 },
+                special: 'Blaster - Shoots energy projectiles',
+                specialCooldown: 90,
+                description: 'Star Fox pilot - fast with ranged attacks'
+            },
+            {
+                id: 'falcon', name: 'Falcon', type: 'Balanced', icon: '🏍️',
+                color: '#3498db',
+                stats: { speed: 6, power: 6, jump: 6 },
+                special: 'Falcon Punch - Fiery falcon uppercut',
+                specialCooldown: 160,
+                description: 'F-Zero champion - balanced all-rounder'
+            },
+            {
+                id: 'ness', name: 'Ness', type: 'Tactical', icon: '🧢',
+                color: '#e74c3c',
+                stats: { speed: 5, power: 6, jump: 5 },
+                special: 'PK Thunder - Electric thunder bolt',
+                specialCooldown: 140,
+                description: 'PSI kid - uses psychic powers'
+            }
+        ];
+
+        const MAPS = [
+            {
+                id: 'training', name: 'Training Grounds', icon: '🏟️',
+                desc: 'Classic flat platform layout',
+                bgColor: '#2d3436',
+                platforms: [
+                    { x: 250, y: 450, w: 500, h: 25 },
+                    { x: 100, y: 580, w: 200, h: 25 },
+                    { x: 700, y: 580, w: 200, h: 25 }
+                ]
+            },
+            {
+                id: 'sky', name: 'Sky Tower', icon: '☁️',
+                desc: 'Vertical multi-tiered arena',
+                bgColor: '#0a3d62',
+                platforms: [
+                    { x: 300, y: 250, w: 400, h: 25 },
+                    { x: 180, y: 420, w: 250, h: 25 },
+                    { x: 570, y: 420, w: 250, h: 25 },
+                    { x: 400, y: 550, w: 200, h: 25 }
+                ]
+            },
+            {
+                id: 'volcano', name: 'Volcano Edge', icon: '🌋',
+                desc: 'Hazardous lava platforms',
+                bgColor: '#2c0a0a',
+                platforms: [
+                    { x: 100, y: 350, w: 220, h: 25 },
+                    { x: 400, y: 280, w: 200, h: 25 },
+                    { x: 680, y: 350, w: 220, h: 25 },
+                    { x: 250, y: 500, w: 200, h: 25 },
+                    { x: 550, y: 500, w: 200, h: 25 }
+                ]
+            }
+        ];
+
+        // Game State
+        let selectedChar = null;
+        let selectedMap = null;
+        let canvas, ctx;
+        let players = [];
+        let currentMap = null;
+        let gameRunning = false;
+
+        // Initialize
+        function init() {
+            createCharGrid();
+            createMapGrid();
+            
+            document.getElementById('confirmChar').addEventListener('click', () => {
+                document.getElementById('charSelect').classList.add('hidden');
+                document.getElementById('mapSelect').classList.remove('hidden');
+            });
+            
+            document.getElementById('startGame').addEventListener('click', startGame);
+            
+            window.addEventListener('keydown', handleKeyDown);
+            window.addEventListener('keyup', handleKeyUp);
+        }
+
+        function createCharGrid() {
+            const grid = document.getElementById('charGrid');
+            CHARACTERS.forEach((char, i) => {
+                const card = document.createElement('div');
+                card.className = 'char-card';
+                card.innerHTML = `
+                    <div class="char-icon">${char.icon}</div>
+                    <div class="char-name" style="color:${char.color}">${char.name}</div>
+                    <div class="char-type">${char.type}</div>
+                    <div class="char-stats">
+                        <div class="stat"><span>SPD</span><div class="stat-bar"><div class="stat-fill" style="width:${char.stats.speed * 10}%;background:${char.color}"></div></div></div>
+                        <div class="stat"><span>PWR</span><div class="stat-bar"><div class="stat-fill" style="width:${char.stats.power * 10}%;background:${char.color}"></div></div></div>
+                        <div class="stat"><span>JMP</span><div class="stat-bar"><div class="stat-fill" style="width:${char.stats.jump * 10}%;background:${char.color}"></div></div></div>
+                    </div>
+                    <div class="special-move">🎯 ${char.special}</div>
+                `;
+                card.addEventListener('click', () => selectChar(char, card));
+                grid.appendChild(card);
+            });
+        }
+
+        function selectChar(char, card) {
+            document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedChar = char;
+            document.getElementById('confirmChar').disabled = false;
+        }
+
+        function createMapGrid() {
+            const grid = document.getElementById('mapGrid');
+            MAPS.forEach((map, i) => {
+                const card = document.createElement('div');
+                card.className = 'map-card';
+                card.innerHTML = `
+                    <div class="map-preview" style="background: ${map.bgColor}">${map.icon}</div>
+                    <div class="map-name">${map.name}</div>
+                    <div class="map-desc">${map.desc}</div>
+                `;
+                card.addEventListener('click', () => selectMap(map, card));
+                grid.appendChild(card);
+            });
+        }
+
+        function selectMap(map, card) {
+            document.querySelectorAll('.map-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedMap = map;
+            document.getElementById('startGame').disabled = false;
+        }
+
+        function startGame() {
+            document.getElementById('mapSelect').classList.add('hidden');
+            const gameScreen = document.getElementById('gameScreen');
+            gameScreen.classList.remove('hidden');
+            
+            canvas = document.getElementById('gameCanvas');
+            canvas.width = 1000;
+            canvas.height = 650;
+            ctx = canvas.getContext('2d');
+            
+            currentMap = selectedMap;
+            
+            // Create players
+            const aiChar = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
+            players = [
+                createPlayer(selectedChar, true, selectedChar.color),
+                createPlayer(aiChar, false, aiChar.color)
+            ];
+            
+            players[0].x = 350;
+            players[0].y = 350;
+            players[1].x = 650;
+            players[1].y = 350;
+            
+            updateHUD();
+            createStockDisplay();
+            
+            gameRunning = true;
+            gameLoop();
+        }
+
+        function createPlayer(char, isPlayer, color) {
+            return {
+                char: char,
+                isPlayer: isPlayer,
+                color: color,
+                x: 400,
+                y: 300,
+                vx: 0,
+                vy: 0,
+                width: 40,
+                height: 50,
+                onGround: false,
+                facing: isPlayer ? 1 : -1,
+                health: 100,
+                percent: 0,
+                stocks: 3,
+                attacking: false,
+                attackFrame: 0,
+                specialCooldown: 0,
+                frozen: 0,
+                hasDoubleJump: true,
+                jumpCount: 0,
+                dashCooldown: 0,
+                keys: {},
+                ai: !isPlayer ? createAI(char) : null
+            };
+        }
+
+        function createAI(char) {
+            return {
+                reactionTime: 30,
+                timer: 0,
+                targetY: 300,
+                lastAction: 0
+            };
+        }
+
+        function createStockDisplay() {
+            const p1Stock = document.getElementById('p1Stock');
+            const p2Stock = document.getElementById('p2Stock');
+            p1Stock.innerHTML = '';
+            p2Stock.innerHTML = '';
+            
+            for(let i = 0; i < 3; i++) {
+                p1Stock.innerHTML += `<div class="stock" id="p1-stock-${i}"></div>`;
+                p2Stock.innerHTML += `<div class="stock" id="p2-stock-${i}"></div>`;
+            }
+        }
+
+        function updateStockDisplay() {
+            for(let i = 0; i < 3; i++) {
+                document.getElementById(`p1-stock-${i}`).classList.toggle('lost', i >= players[0].stocks);
+                document.getElementById(`p2-stock-${i}`).classList.toggle('lost', i >= players[1].stocks);
+            }
+        }
+
+        function updateHUD() {
+            document.getElementById('p1Name').textContent = players[0].char.name;
+            document.getElementById('p2Name').textContent = players[1].char.name;
+            document.getElementById('p1Health').style.width = players[0].health + '%';
+            document.getElementById('p2Health').style.width = players[1].health + '%';
+            document.getElementById('p1Percent').textContent = Math.floor(players[0].percent) + '%';
+            document.getElementById('p2Percent').textContent = Math.floor(players[1].percent) + '%';
+            updateStockDisplay();
+        }
+
+        let keys = {};
+        function handleKeyDown(e) {
+            keys[e.code] = true;
+            if (e.code === 'KeyR' && gameRunning) {
+                resetGame();
+            }
+            if (e.code === 'KeyJ' && players[0].attacking === false) {
+                players[0].attacking = true;
+                players[0].attackFrame = 15;
+            }
+            if (e.code === 'KeyK' && players[0].specialCooldown <= 0) {
+                useSpecialMove(players[0], players[1]);
+            }
+            if ((e.code === 'KeyL' || e.code === 'Space') && players[0].onGround) {
+                jump(players[0]);
+            }
+            if (e.code === 'KeyL' && !players[0].onGround && players[0].hasDoubleJump) {
+                players[0].hasDoubleJump = false;
+                players[0].vy = -12;
+            }
+        }
+        
+        function handleKeyUp(e) {
+            keys[e.code] = false;
+        }
+
+        function jump(player) {
+            player.vy = -12 - player.char.stats.jump;
+            player.onGround = false;
+            player.jumpCount++;
+        }
+
+        function useSpecialMove(user, target) {
+            user.specialCooldown = user.char.specialCooldown;
+            
+            const charId = user.char.id;
+            
+            if (charId === 'mario') {
+                projectiles.push({
+                    x: user.x + (user.facing * 30),
+                    y: user.y + 15,
+                    vx: user.facing * 12,
+                    owner: user,
+                    type: 'fireball',
+                    damage: 12,
+                    size: 12
+                });
+            } else if (charId === 'luigi') {
+                if (getDistance(user, target) < 100) {
+                    target.vx += user.facing * 15;
+                    target.vy -= 8;
+                    applyDamage(target, 10, user.facing);
+                }
+            } else if (charId === 'koopa') {
+                user.vx = user.facing * 18;
+                user.shellSpin = 30;
+                user.invulnerable = 30;
+            } else if (charId === 'bowser') {
+                for(let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        projectiles.push({
+                            x: user.x + (user.facing * 40),
+                            y: user.y + 10 + i * 10,
+                            vx: user.facing * 8,
+                            owner: user,
+                            type: 'fire',
+                            damage: 10,
+                            size: 20
+                        });
+                    }, i * 100);
+                }
+            } else if (charId === 'peach') {
+                user.health = Math.min(100, user.health + 15);
+                if (getDistance(user, target) < 120) {
+                    target.vx += user.facing * 5;
+                    applyDamage(target, 5, user.facing);
+                }
+            } else if (charId === 'toad') {
+                target.confused = 180;
+                if (getDistance(user, target) < 150) {
+                    target.vx += (user.x < target.x ? -1 : 1) * 8;
+                }
+            } else if (charId === 'yoshi') {
+                projectiles.push({
+                    x: user.x + (user.facing * 20),
+                    y: user.y + 20,
+                    vx: user.facing * 7,
+                    vy: -3,
+                    owner: user,
+                    type: 'egg',
+                    damage: 14,
+                    size: 18
+                });
+            } else if (charId === 'donkey') {
+                user.vy = 12;
+                user.diving = true;
+            } else if (charId === 'diddy') {
+                for(let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        projectiles.push({
+                            x: user.x + (user.facing * 30),
+                            y: user.y + 20,
+                            vx: user.facing * 15,
+                            owner: user,
+                            type: 'peanut',
+                            damage: 4,
+                            size: 6
+                        });
+                    }, i * 80);
+                }
+            } else if (charId === 'samus') {
+                projectiles.push({
+                    x: user.x + (user.facing * 40),
+                    y: user.y + 20,
+                    vx: user.facing * 15,
+                    owner: user,
+                    type: 'charge',
+                    damage: 18,
+                    size: 15
+                });
+            } else if (charId === 'kirby') {
+                if (getDistance(user, target) < 60) {
+                    target.vx = user.facing * 20;
+                    target.vy = -10;
+                    applyDamage(target, 8, user.facing);
+                }
+            } else if (charId === 'pikachu') {
+                players.forEach(p => {
+                    if (p !== user && getDistance(user, p) < 150) {
+                        p.vx += (p.x > user.x ? 1 : -1) * 10;
+                        p.vy -= 5;
+                        applyDamage(p, 12, p.x > user.x ? 1 : -1);
+                    }
+                });
+            } else if (charId === 'link') {
+                user.spinAttack = 20;
+                user.vx = 0;
+            } else if (charId === 'zelda') {
+                user.shield = 240;
+            } else if (charId === 'ganon') {
+                if (getDistance(user, target) < 80) {
+                    target.vx += user.facing * 25;
+                    target.vy -= 15;
+                    applyDamage(target, 20, user.facing);
+                }
+            } else if (charId === 'fox') {
+                projectiles.push({
+                    x: user.x + (user.facing * 30),
+                    y: user.y + 20,
+                    vx: user.facing * 14,
+                    owner: user,
+                    type: 'blaster',
+                    damage: 8,
+                    size: 8
+                });
+            } else if (charId === 'falcon') {
+                user.vy = -15;
+                user.vx = user.facing * 8;
+                setTimeout(() => {
+                    user.vy = 0;
+                    createShockwave(user.x, user.y + 40);
+                    if (getDistance(user, target) < 100) {
+                        applyDamage(target, 18, user.facing);
+                    }
+                }, 300);
+            } else if (charId === 'ness') {
+                for(let i = -1; i <= 1; i++) {
+                    setTimeout(() => {
+                        projectiles.push({
+                            x: user.x + (user.facing * 30),
+                            y: user.y + 15,
+                            vx: user.facing * 10,
+                            vy: i * 4,
+                            owner: user,
+                            type: 'pkthunder',
+                            damage: 10,
+                            size: 12
+                        });
+                    }, i * 50 + 100);
+                }
+            }
+        }
+
+        function checkDashHit(user, target) {
+            if (Math.abs(user.x - target.x) < 60 && Math.abs(user.y - target.y) < 50) {
+                applyDamage(target, 15, user.facing);
+            }
+        }
+
+        let projectiles = [];
+
+        function update() {
+            if (!gameRunning) return;
+            
+            // Update player input
+            if (players[0].frozen <= 0) {
+                let moveSpeed = 4 + players[0].char.stats.speed * 0.5;
+                players[0].vx = 0;
+                if (keys['KeyA'] || keys['ArrowLeft']) {
+                    players[0].vx = -moveSpeed;
+                    players[0].facing = -1;
+                }
+                if (keys['KeyD'] || keys['ArrowRight']) {
+                    players[0].vx = moveSpeed;
+                    players[0].facing = 1;
+                }
+            }
+            
+            // AI update
+            if (players[1].frozen <= 0) {
+                updateAI(players[1], players[0]);
+            }
+            
+            // Physics
+            players.forEach(p => {
+                if (p.frozen > 0) {
+                    p.frozen--;
+                    return;
+                }
+                
+                // Gravity
+                p.vy += 0.6;
+                
+                // Apply velocity
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // Friction
+                p.vx *= 0.9;
+                
+                // Handle diving
+                if (p.diving && p.vy > 0) {
+                    p.diving = false;
+                    if (currentMap && currentMap.platforms) {
+                        currentMap.platforms.forEach(plat => {
+                            if (checkPlatformCollision(p, plat) && p.vy > 5) {
+                                // Spike damage based on fall
+                                const spikeDamage = Math.min(25, p.vy * 1.5);
+                                applyDamage(players[0] === p ? players[1] : players[0], spikeDamage, p.vx > 0 ? 1 : -1);
+                                createShockwave(p.x, p.y + 25);
+                            }
+                        });
+                    }
+                }
+                
+                // Shield decay
+                if (p.shield > 0) p.shield--;
+                
+                // Shell spin (Koopa)
+                if (p.shellSpin > 0) {
+                    p.shellSpin--;
+                    if (p.shellSpin > 0) {
+                        const other = players[0] === p ? players[1] : players[0];
+                        if (Math.abs(p.x - other.x) < 50 && Math.abs(p.y - other.y) < 50 && p.shellSpin % 5 === 0) {
+                            applyDamage(other, 8, p.facing);
+                        }
+                    }
+                }
+                
+                // Spin attack (Link)
+                if (p.spinAttack > 0) {
+                    p.spinAttack--;
+                    const other = players[0] === p ? players[1] : players[0];
+                    if (Math.abs(p.x - other.x) < 60 && Math.abs(p.y - other.y) < 60 && p.spinAttack > 5) {
+                        applyDamage(other, 6, p.facing);
+                    }
+                }
+                
+                // Confused (Toad)
+                if (p.confused > 0) {
+                    p.confused--;
+                    p.vx += (Math.random() - 0.5) * 2;
+                }
+                
+                // Reset jump on ground
+                p.onGround = false;
+                if (currentMap && currentMap.platforms) {
+                    currentMap.platforms.forEach(plat => {
+                        if (checkPlatformCollision(p, plat)) {
+                            p.onGround = true;
+                            p.hasDoubleJump = true;
+                            p.jumpCount = 0;
+                            if (p.diving) {
+                                p.diving = false;
+                                createShockwave(p.x, p.y + p.height);
+                            }
+                        }
+                    });
+                }
+                
+                // Bounds
+                if (p.x < 0) p.x = 0;
+                if (p.x > canvas.width - p.width) p.x = canvas.width - p.width;
+                // More forgiving death boundary
+                if (p.y > canvas.height + 50) {
+                    p.y = canvas.height + 50;
+                    p.vy = 0;
+                    // Don't kill, just respawn on platform
+                    p.x = canvas.width / 2;
+                    p.y = 100;
+                }
+                
+                // Attack logic
+                if (p.attacking) {
+                    p.attackFrame--;
+                    if (p.attackFrame === 8) {
+                        // Hit frame
+                        const other = players[0] === p ? players[1] : players[0];
+                        if (Math.abs(p.x - other.x) < 60 && Math.abs(p.y - other.y) < 50) {
+                            const damage = 8 + p.char.stats.power;
+                            const knockback = 8 + p.percent * 0.1;
+                            applyDamage(other, damage, p.facing * knockback);
+                        }
+                    }
+                    if (p.attackFrame <= 0) {
+                        p.attacking = false;
+                    }
+                }
+                
+                // Cooldowns
+                if (p.specialCooldown > 0) p.specialCooldown--;
+                if (p.dashCooldown > 0) p.dashCooldown--;
+                if (p.invulnerable > 0) p.invulnerable--;
+            });
+            
+            // Update projectiles
+            projectiles = projectiles.filter(proj => {
+                if (proj.vy === undefined) proj.vy = 0;
+                proj.x += proj.vx;
+                proj.y += proj.vy;
+                
+                // Check collision with players
+                let hit = false;
+                players.forEach(p => {
+                    if (p === proj.owner || p.shield > 0) return;
+                    if (Math.abs(proj.x - p.x) < 30 && Math.abs(proj.y - p.y) < 30) {
+                        applyDamage(p, proj.damage, proj.vx > 0 ? 1 : -1);
+                        hit = true;
+                    }
+                });
+                if (hit) return false;
+                
+                return proj.x > -50 && proj.x < canvas.width + 50 && proj.y > -50 && proj.y < canvas.height + 100;
+            });
+            
+            updateHUD();
+        }
+
+        function updateAI(ai, player) {
+            const char = ai.char;
+            const speed = 3 + char.stats.speed * 0.4;
+            
+            // Simple AI behavior
+            const targetX = player.x;
+            const targetY = player.y;
+            
+            // Move towards player
+            if (ai.x < targetX - 30) {
+                ai.vx = speed;
+                ai.facing = 1;
+            } else if (ai.x > targetX + 30) {
+                ai.vx = -speed;
+                ai.facing = -1;
+            }
+            
+            // Jump if player is above
+            if (targetY < ai.y - 50 && ai.onGround && Math.random() < 0.05) {
+                jump(ai);
+            }
+            
+            // Attack if close
+            if (Math.abs(ai.x - player.x) < 60 && Math.abs(ai.y - player.y) < 50 && !ai.attacking && Math.random() < 0.1) {
+                ai.attacking = true;
+                ai.attackFrame = 15;
+            }
+            
+            // Use special
+            if (ai.specialCooldown <= 0 && Math.random() < 0.02) {
+                useSpecialMove(ai, player);
+            }
+            
+            // Recovery AI - go to center if too close to edge
+            if (ai.x < 100 || ai.x > canvas.width - 100) {
+                if (ai.onGround && Math.random() < 0.1) {
+                    jump(ai);
+                }
+                if (ai.x < 100) ai.vx = speed;
+                else ai.vx = -speed;
+            }
+        }
+
+        function applyDamage(victim, damage, knockback) {
+            victim.health -= damage * 0.3;
+            victim.percent += damage;
+            
+            victim.vx += knockback;
+            victim.vy -= 5;
+            
+            // Shake effect
+            document.getElementById('gameCanvas').classList.add('shake');
+            setTimeout(() => document.getElementById('gameCanvas').classList.remove('shake'), 200);
+            
+            if (victim.health <= 0) {
+                victim.health = 100;
+                victim.stocks--;
+                if (victim.stocks <= 0) {
+                    endGame(players[0] === victim ? players[1] : players[0]);
+                } else {
+                    respawn(victim);
+                }
+            }
+        }
+
+        function respawn(player) {
+            player.x = canvas.width / 2;
+            player.y = 100;
+            player.vx = 0;
+            player.vy = 0;
+            player.health = 100;
+            player.percent = 0;
+            player.invulnerable = 180;
+            
+            const msg = document.getElementById('gameMessage');
+            msg.textContent = `${player.char.name} respawning!`;
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 1500);
+        }
+
+        function getDistance(p1, p2) {
+            return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+        }
+
+        function checkPlatformCollision(player, platform) {
+            const wasAbove = player.y + player.height - player.vy <= platform.y;
+            const nowBelow = player.y + player.height >= platform.y;
+            const horizontallyAligned = player.x + player.width > platform.x && player.x < platform.x + platform.w;
+            
+            if (wasAbove && nowBelow && horizontallyAligned) {
+                player.y = platform.y - player.height;
+                player.vy = 0;
+                return true;
+            }
+            return false;
+        }
+
+        function createShockwave(x, y) {
+            // Visual effect only
+        }
+
+        function draw() {
+            // Background
+            ctx.fillStyle = currentMap ? currentMap.bgColor : '#2d3436';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Platforms
+            if (currentMap && currentMap.platforms) {
+                ctx.fillStyle = '#8e44ad';
+                currentMap.platforms.forEach(plat => {
+                    ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
+                });
+            }
+            
+            // Players
+            players.forEach(p => {
+                ctx.save();
+                
+                // Invulnerability flash
+                if (p.invulnerable && Math.floor(p.invulnerable / 5) % 2 === 0) {
+                    ctx.globalAlpha = 0.5;
+                }
+                
+                // Shield effect
+                if (p.shield > 0) {
+                    ctx.strokeStyle = '#1dd1a1';
+                    ctx.lineWidth = 3;
+                    ctx.globalAlpha = p.shield / 200;
+                    ctx.beginPath();
+                    ctx.arc(p.x + p.width/2, p.y + p.height/2, 40, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+                
+                // Frozen effect
+                if (p.frozen > 0) {
+                    ctx.fillStyle = 'rgba(72,219,251,0.5)';
+                    ctx.fillRect(p.x - 5, p.y - 5, p.width + 10, p.height + 10);
+                }
+                
+                // Shell spin effect (Koopa)
+                if (p.shellSpin > 0) {
+                    ctx.strokeStyle = '#9b59b6';
+                    ctx.lineWidth = 3;
+                    ctx.globalAlpha = 0.6;
+                    ctx.beginPath();
+                    ctx.arc(p.x + p.width/2, p.y + p.height/2, 30, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+                
+                // Spin attack effect (Link)
+                if (p.spinAttack > 0) {
+                    ctx.strokeStyle = '#27ae60';
+                    ctx.lineWidth = 4;
+                    ctx.globalAlpha = 0.7;
+                    ctx.beginPath();
+                    ctx.arc(p.x + p.width/2, p.y + p.height/2, 35 + (20 - p.spinAttack), 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+                
+                // Confused effect (Toad)
+                if (p.confused > 0) {
+                    ctx.fillStyle = 'rgba(155,89,182,0.4)';
+                    ctx.fillRect(p.x - 5, p.y - 5, p.width + 10, p.height + 10);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '14px Arial';
+                    ctx.fillText('?', p.x + p.width/2, p.y - 10);
+                }
+                
+                // Body
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+                // Border
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(p.x, p.y, p.width, p.height);
+                
+                // Face
+                ctx.fillStyle = '#000';
+                const eyeX = p.facing > 0 ? p.x + 25 : p.x + 8;
+                ctx.fillRect(eyeX, p.y + 12, 8, 8);
+                
+                // Character icon above head
+                ctx.font = '24px Arial';
+                ctx.fillStyle = p.color;
+                ctx.textAlign = 'center';
+                ctx.fillText(p.char.icon, p.x + p.width/2, p.y - 15);
+                
+                // Attack visual
+                if (p.attacking && p.attackFrame > 8) {
+                    ctx.fillStyle = '#fff';
+                    const attackX = p.facing > 0 ? p.x + p.width : p.x - 30;
+                    ctx.fillRect(attackX, p.y + 15, 30, 20);
+                }
+                
+                ctx.restore();
+            });
+            
+            // Projectiles
+            projectiles.forEach(proj => {
+                if (proj.type === 'fireball' || proj.type === 'fire') {
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.beginPath();
+                    ctx.arc(proj.x, proj.y, proj.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#f39c12';
+                    ctx.beginPath();
+                    ctx.arc(proj.x, proj.y, proj.size * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (proj.type === 'lightning' || proj.type === 'pkthunder') {
+                    ctx.fillStyle = '#f1c40f';
+                    ctx.fillRect(proj.x - 5, proj.y - 3, 25, 6);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(proj.x, proj.y - 1, 20, 2);
+                } else if (proj.type === 'egg') {
+                    ctx.fillStyle = '#2ecc71';
+                    ctx.beginPath();
+                    ctx.ellipse(proj.x, proj.y, proj.size * 0.7, proj.size, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#27ae60';
+                    ctx.beginPath();
+                    ctx.ellipse(proj.x, proj.y - 3, proj.size * 0.3, proj.size * 0.4, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (proj.type === 'peanut') {
+                    ctx.fillStyle = '#d35400';
+                    ctx.beginPath();
+                    ctx.ellipse(proj.x, proj.y, proj.size, proj.size * 0.5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (proj.type === 'charge') {
+                    ctx.fillStyle = '#3498db';
+                    ctx.beginPath();
+                    ctx.ellipse(proj.x, proj.y, proj.size * 1.5, proj.size * 0.6, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.ellipse(proj.x, proj.y, proj.size, proj.size * 0.3, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (proj.type === 'blaster') {
+                    ctx.fillStyle = '#2980b9';
+                    ctx.fillRect(proj.x - 3, proj.y - 2, 15, 4);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(proj.x, proj.y - 1, 10, 2);
+                }
+            });
+        }
+
+        function gameLoop() {
+            if (gameRunning) {
+                update();
+                draw();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame(winner) {
+            gameRunning = false;
+            const msg = document.getElementById('gameMessage');
+            msg.innerHTML = `${winner.char.name} Wins!<br><span style="font-size:16px">Press R to restart</span>`;
+            msg.classList.add('show');
+        }
+
+        function resetGame() {
+            players[0].x = 200;
+            players[0].y = 300;
+            players[0].health = 100;
+            players[0].percent = 0;
+            players[0].stocks = 3;
+            players[0].vx = 0;
+            players[0].vy = 0;
+            
+            players[1].x = 600;
+            players[1].y = 300;
+            players[1].health = 100;
+            players[1].percent = 0;
+            players[1].stocks = 3;
+            players[1].vx = 0;
+            players[1].vy = 0;
+            
+            projectiles = [];
+            
+            document.getElementById('gameMessage').classList.remove('show');
+            createStockDisplay();
+            updateHUD();
+            gameRunning = true;
+        }
+
+        init();
+    </script>
+</body>
+</html>
