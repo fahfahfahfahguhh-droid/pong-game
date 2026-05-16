@@ -646,8 +646,8 @@
             players[1].x = 650;
             players[1].y = 350;
             
-            updateHUD();
             createStockDisplay();
+            updateHUD();
             
             gameRunning = true;
             gameLoop();
@@ -704,8 +704,11 @@
 
         function updateStockDisplay() {
             for(let i = 0; i < 3; i++) {
-                document.getElementById(`p1-stock-${i}`).classList.toggle('lost', i >= players[0].stocks);
-                document.getElementById(`p2-stock-${i}`).classList.toggle('lost', i >= players[1].stocks);
+                const p1Stock = document.getElementById(`p1-stock-${i}`);
+                const p2Stock = document.getElementById(`p2-stock-${i}`);
+                if (!p1Stock || !p2Stock) continue;
+                p1Stock.classList.toggle('lost', i >= players[0].stocks);
+                p2Stock.classList.toggle('lost', i >= players[1].stocks);
             }
         }
 
@@ -725,6 +728,7 @@
             if (e.code === 'KeyR' && gameRunning) {
                 resetGame();
             }
+            if (!gameRunning || players.length < 2) return;
             if (e.code === 'KeyJ' && players[0].attacking === false) {
                 players[0].attacking = true;
                 players[0].attackFrame = 15;
