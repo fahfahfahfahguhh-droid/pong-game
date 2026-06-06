@@ -63,10 +63,10 @@
         }
         .char-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
             max-width: 900px;
-            min-height: 400px;
+            min-height: 300px;
         }
         .char-card {
             background: rgba(255,255,255,0.05);
@@ -326,7 +326,7 @@
     <!-- Character Select -->
     <div id="charSelect" class="screen active">
         <h1>Choose Your Fighter</h1>
-        <p class="subtitle">Select your character to battle • 18 Fighters</p>
+        <p class="subtitle">Select your character to battle • 6 Fighters</p>
         <div class="char-grid" id="charGrid"></div>
         <button class="select-btn" id="confirmChar" disabled>Continue →</button>
     </div>
@@ -359,7 +359,7 @@
             <div id="gameMessage"></div>
         </div>
         <div id="gameControls">
-            WASD/Arrows: Move | J: Attack | K: Special | L: Jump | R: Restart
+            WASD/Arrows: Move | J: Attack | K: Special | L/Space: Jump | R: Restart
         </div>
     </div>
 
@@ -370,145 +370,49 @@
                 id: 'mario', name: 'Mario', type: 'Balanced', icon: '🍄',
                 color: '#e74c3c',
                 stats: { speed: 5, power: 6, jump: 5 },
-                special: 'Fireball - Shoots a flaming projectile',
-                specialCooldown: 120,
-                description: 'The hero of the realm - well-rounded and reliable'
-            },
-            {
-                id: 'luigi', name: 'Luigi', type: 'Speed', icon: '🥬',
-                color: '#27ae60',
-                stats: { speed: 7, power: 5, jump: 6 },
-                special: 'Thunder Hand - Zaps nearby opponents',
-                specialCooldown: 100,
-                description: 'Mario\'s taller twin - faster and higher jumping'
-            },
-            {
-                id: 'koopa', name: 'Koopa', type: 'Defensive', icon: '🐢',
-                color: '#9b59b6',
-                stats: { speed: 4, power: 5, jump: 4 },
-                special: 'Shell Spin - Spins forward in protective shell',
-                specialCooldown: 150,
-                description: 'Tough turtle with a hard shell - great defense'
+                special: 'Fireball - Shoots bouncing fireballs',
+                specialCooldown: 80,
+                description: 'The iconic hero - well-rounded and reliable'
             },
             {
                 id: 'bowser', name: 'Bowser', type: 'Power', icon: '👑',
                 color: '#8e44ad',
                 stats: { speed: 3, power: 9, jump: 3 },
-                special: 'Fire Breath - Blasts flames forward',
-                specialCooldown: 180,
-                description: 'The Kooka King - massive power, slow but deadly'
-            },
-            {
-                id: 'peach', name: 'Peach', type: 'Tactical', icon: '👸',
-                color: '#ff69b4',
-                stats: { speed: 5, power: 4, jump: 5 },
-                special: 'Heart Pulse - Heals self and damages nearby',
-                specialCooldown: 200,
-                description: 'Royal grace - uses tricks and recovery abilities'
-            },
-            {
-                id: 'toad', name: 'Toad', type: 'Agile', icon: '🍄',
-                color: '#3498db',
-                stats: { speed: 8, power: 3, jump: 7 },
-                special: 'Spore Cloud - Confuses opponent temporarily',
-                specialCooldown: 140,
-                description: 'Fast mushroom scout - quick and slippery'
-            },
-            {
-                id: 'yoshi', name: 'Yoshi', type: 'Balanced', icon: '🥚',
-                color: '#2ecc71',
-                stats: { speed: 6, power: 5, jump: 6 },
-                special: 'Egg Lay - Lays egg that can be thrown',
-                specialCooldown: 130,
-                description: 'Friendly dino - can swallow enemies into eggs'
-            },
-            {
-                id: 'donkey', name: 'Donkey', type: 'Power', icon: '🍌',
-                color: '#d35400',
-                stats: { speed: 3, power: 8, jump: 4 },
-                special: 'Banana Slam - Ground pounds for heavy damage',
-                specialCooldown: 160,
-                description: 'Kong powerhouse - incredibly strong'
-            },
-            {
-                id: 'diddy', name: 'Diddy', type: 'Speed', icon: '🐵',
-                color: '#e67e22',
-                stats: { speed: 8, power: 4, jump: 7 },
-                special: 'Peanut Popgun - Shoots peanuts rapidly',
-                specialCooldown: 100,
-                description: 'Mini monkey - super fast with guns'
-            },
-            {
-                id: 'samus', name: 'Samus', type: 'Tactical', icon: '🤖',
-                color: '#c0392b',
-                stats: { speed: 5, power: 6, jump: 5 },
-                special: 'Charge Shot - Powerful energy beam',
+                special: 'Fire Breath - Stream of growing flames',
                 specialCooldown: 150,
-                description: 'Bounty hunter - ranged fighter with armor'
-            },
-            {
-                id: 'kirby', name: 'Kirby', type: 'Balanced', icon: '💨',
-                color: '#ffb6c1',
-                stats: { speed: 6, power: 4, jump: 6 },
-                special: 'Inhale - Sucks in nearby opponents',
-                specialCooldown: 140,
-                description: 'Pink puffball - copies abilities and floats'
-            },
-            {
-                id: 'pikachu', name: 'Pikachu', type: 'Agile', icon: '⚡',
-                color: '#f1c40f',
-                stats: { speed: 9, power: 4, jump: 7 },
-                special: 'Thunder - Strikes all nearby with lightning',
-                specialCooldown: 120,
-                description: 'Electric mouse - fastest character in the game'
+                description: 'The Koopa King - massive power, slow but deadly'
             },
             {
                 id: 'link', name: 'Link', type: 'Balanced', icon: '🗡️',
                 color: '#27ae60',
                 stats: { speed: 5, power: 7, jump: 5 },
-                special: 'Spin Attack - Spinning blade slash',
-                specialCooldown: 130,
-                description: 'Hero of time - sword master with spin attack'
-            },
-            {
-                id: 'zelda', name: 'Zelda', type: 'Tactical', icon: '✨',
-                color: '#9b59b6',
-                stats: { speed: 4, power: 5, jump: 4 },
-                special: 'Nayru\'s Love - Creates magical shield',
-                specialCooldown: 190,
-                description: 'Princess of wisdom - magical and defensive'
-            },
-            {
-                id: 'ganon', name: 'Ganon', type: 'Power', icon: '💀',
-                color: '#2c3e50',
-                stats: { speed: 4, power: 9, jump: 3 },
-                special: 'Warlock Punch - Powerful dark energy blast',
-                specialCooldown: 170,
-                description: 'Evil warlord - terrifying strength'
-            },
-            {
-                id: 'fox', name: 'Fox', type: 'Speed', icon: '🦊',
-                color: '#2980b9',
-                stats: { speed: 8, power: 4, jump: 6 },
-                special: 'Blaster - Shoots energy projectiles',
+                special: 'Spin Attack - Spinning blade slash that pushes forward',
                 specialCooldown: 90,
-                description: 'Star Fox pilot - fast with ranged attacks'
+                description: 'Hero of Hyrule - sword master with spin attack'
             },
             {
-                id: 'falcon', name: 'Falcon', type: 'Balanced', icon: '🏍️',
-                color: '#3498db',
-                stats: { speed: 6, power: 6, jump: 6 },
-                special: 'Falcon Punch - Fiery falcon uppercut',
-                specialCooldown: 160,
-                description: 'F-Zero champion - balanced all-rounder'
-            },
-            {
-                id: 'ness', name: 'Ness', type: 'Tactical', icon: '🧢',
-                color: '#e74c3c',
+                id: 'samus', name: 'Samus', type: 'Tactical', icon: '🤖',
+                color: '#d35400',
                 stats: { speed: 5, power: 6, jump: 5 },
-                special: 'PK Thunder - Electric thunder bolt',
-                specialCooldown: 140,
-                description: 'PSI kid - uses psychic powers'
+                special: 'Charge Shot - Fast, powerful energy beam',
+                specialCooldown: 100,
+                description: 'Bounty hunter - long-range specialist'
+            },
+            {
+                id: 'kirby', name: 'Kirby', type: 'Balanced', icon: '💨',
+                color: '#ffb6c1',
+                stats: { speed: 6, power: 4, jump: 6 },
+                special: 'Inhale - Sucks in nearby opponents and spits them away',
+                specialCooldown: 80,
+                description: 'Pink puffball - can float with up to 4 jumps'
+            },
+            {
+                id: 'pikachu', name: 'Pikachu', type: 'Agile', icon: '⚡',
+                color: '#f1c40f',
+                stats: { speed: 9, power: 4, jump: 7 },
+                special: 'Thunder - Strikes opponents from above with lightning',
+                specialCooldown: 110,
+                description: 'Electric mouse - incredibly fast and agile'
             }
         ];
 
@@ -518,9 +422,9 @@
                 desc: 'Classic flat platform layout',
                 bgColor: '#2d3436',
                 platforms: [
-                    { x: 250, y: 450, w: 500, h: 25 },
-                    { x: 100, y: 580, w: 200, h: 25 },
-                    { x: 700, y: 580, w: 200, h: 25 }
+                    { x: 300, y: 520, w: 600, h: 25 },
+                    { x: 100, y: 640, w: 250, h: 25 },
+                    { x: 850, y: 640, w: 250, h: 25 }
                 ]
             },
             {
@@ -528,10 +432,10 @@
                 desc: 'Vertical multi-tiered arena',
                 bgColor: '#0a3d62',
                 platforms: [
-                    { x: 300, y: 250, w: 400, h: 25 },
-                    { x: 180, y: 420, w: 250, h: 25 },
-                    { x: 570, y: 420, w: 250, h: 25 },
-                    { x: 400, y: 550, w: 200, h: 25 }
+                    { x: 400, y: 280, w: 400, h: 25 },
+                    { x: 200, y: 460, w: 300, h: 25 },
+                    { x: 700, y: 460, w: 300, h: 25 },
+                    { x: 450, y: 620, w: 300, h: 25 }
                 ]
             },
             {
@@ -539,11 +443,11 @@
                 desc: 'Hazardous lava platforms',
                 bgColor: '#2c0a0a',
                 platforms: [
-                    { x: 100, y: 350, w: 220, h: 25 },
-                    { x: 400, y: 280, w: 200, h: 25 },
-                    { x: 680, y: 350, w: 220, h: 25 },
-                    { x: 250, y: 500, w: 200, h: 25 },
-                    { x: 550, y: 500, w: 200, h: 25 }
+                    { x: 475, y: 280, w: 250, h: 25 },
+                    { x: 150, y: 380, w: 250, h: 25 },
+                    { x: 800, y: 380, w: 250, h: 25 },
+                    { x: 300, y: 520, w: 250, h: 25 },
+                    { x: 650, y: 520, w: 250, h: 25 }
                 ]
             }
         ];
@@ -553,8 +457,33 @@
         let selectedMap = null;
         let canvas, ctx;
         let players = [];
+        let projectiles = [];
+        let shockwaves = [];
+        let particles = [];
+        let specialEffects = [];
+        let screenFlash = { color: '', frames: 0 };
+        let gameTimeouts = [];
         let currentMap = null;
         let gameRunning = false;
+
+        let bgClouds = [
+            { x: 100, y: 100, speed: 0.2, size: 60 },
+            { x: 400, y: 180, speed: 0.15, size: 80 },
+            { x: 800, y: 80, speed: 0.25, size: 50 },
+            { x: 250, y: 400, speed: 0.1, size: 70 },
+            { x: 700, y: 300, speed: 0.18, size: 90 }
+        ];
+
+        let bgLavaBubbles = [];
+        for (let i = 0; i < 15; i++) {
+            bgLavaBubbles.push({
+                x: Math.random() * 1200,
+                y: 700 + Math.random() * 50,
+                vy: -0.5 - Math.random() * 1,
+                size: 4 + Math.random() * 8,
+                alpha: 0.5 + Math.random() * 0.5
+            });
+        }
 
         // Initialize
         function init() {
@@ -574,6 +503,7 @@
 
         function createCharGrid() {
             const grid = document.getElementById('charGrid');
+            grid.innerHTML = '';
             CHARACTERS.forEach((char, i) => {
                 const card = document.createElement('div');
                 card.className = 'char-card';
@@ -602,6 +532,7 @@
 
         function createMapGrid() {
             const grid = document.getElementById('mapGrid');
+            grid.innerHTML = '';
             MAPS.forEach((map, i) => {
                 const card = document.createElement('div');
                 card.className = 'map-card';
@@ -622,17 +553,23 @@
             document.getElementById('startGame').disabled = false;
         }
 
+        function clearGameTimeouts() {
+            gameTimeouts.forEach(t => clearTimeout(t));
+            gameTimeouts = [];
+        }
+
         function startGame() {
             document.getElementById('mapSelect').classList.add('hidden');
             const gameScreen = document.getElementById('gameScreen');
             gameScreen.classList.remove('hidden');
             
             canvas = document.getElementById('gameCanvas');
-            canvas.width = 1000;
-            canvas.height = 650;
+            canvas.width = 1200;
+            canvas.height = 750;
             ctx = canvas.getContext('2d');
             
             currentMap = selectedMap;
+            clearGameTimeouts();
             
             // Create players
             const aiChar = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
@@ -641,10 +578,16 @@
                 createPlayer(aiChar, false, aiChar.color)
             ];
             
-            players[0].x = 350;
-            players[0].y = 350;
-            players[1].x = 650;
-            players[1].y = 350;
+            players[0].x = 400;
+            players[0].y = 400;
+            players[1].x = 800;
+            players[1].y = 400;
+            
+            projectiles = [];
+            shockwaves = [];
+            particles = [];
+            specialEffects = [];
+            screenFlash = { color: '', frames: 0 };
             
             updateHUD();
             createStockDisplay();
@@ -654,6 +597,7 @@
         }
 
         function createPlayer(char, isPlayer, color) {
+            const isBowser = char.id === 'bowser';
             return {
                 char: char,
                 isPlayer: isPlayer,
@@ -662,8 +606,8 @@
                 y: 300,
                 vx: 0,
                 vy: 0,
-                width: 40,
-                height: 50,
+                width: isBowser ? 50 : 40,
+                height: isBowser ? 60 : 50,
                 onGround: false,
                 facing: isPlayer ? 1 : -1,
                 health: 100,
@@ -673,9 +617,10 @@
                 attackFrame: 0,
                 specialCooldown: 0,
                 frozen: 0,
-                hasDoubleJump: true,
                 jumpCount: 0,
-                dashCooldown: 0,
+                diving: false,
+                spinAttack: 0,
+                invulnerable: 0,
                 keys: {},
                 ai: !isPlayer ? createAI(char) : null
             };
@@ -704,16 +649,19 @@
 
         function updateStockDisplay() {
             for(let i = 0; i < 3; i++) {
-                document.getElementById(`p1-stock-${i}`).classList.toggle('lost', i >= players[0].stocks);
-                document.getElementById(`p2-stock-${i}`).classList.toggle('lost', i >= players[1].stocks);
+                const s1 = document.getElementById(`p1-stock-${i}`);
+                const s2 = document.getElementById(`p2-stock-${i}`);
+                if (s1) s1.classList.toggle('lost', i >= players[0].stocks);
+                if (s2) s2.classList.toggle('lost', i >= players[1].stocks);
             }
         }
 
         function updateHUD() {
+            if (players.length < 2) return;
             document.getElementById('p1Name').textContent = players[0].char.name;
             document.getElementById('p2Name').textContent = players[1].char.name;
-            document.getElementById('p1Health').style.width = players[0].health + '%';
-            document.getElementById('p2Health').style.width = players[1].health + '%';
+            document.getElementById('p1Health').style.width = Math.max(0, players[0].health) + '%';
+            document.getElementById('p2Health').style.width = Math.max(0, players[1].health) + '%';
             document.getElementById('p1Percent').textContent = Math.floor(players[0].percent) + '%';
             document.getElementById('p2Percent').textContent = Math.floor(players[1].percent) + '%';
             updateStockDisplay();
@@ -722,22 +670,26 @@
         let keys = {};
         function handleKeyDown(e) {
             keys[e.code] = true;
-            if (e.code === 'KeyR' && gameRunning) {
+            if (e.code === 'KeyR' && players.length === 2) {
                 resetGame();
             }
-            if (e.code === 'KeyJ' && players[0].attacking === false) {
+            if (e.code === 'KeyJ' && players[0].attacking === false && players[0].frozen <= 0) {
                 players[0].attacking = true;
                 players[0].attackFrame = 15;
             }
-            if (e.code === 'KeyK' && players[0].specialCooldown <= 0) {
+            if (e.code === 'KeyK' && players[0].specialCooldown <= 0 && players[0].frozen <= 0) {
                 useSpecialMove(players[0], players[1]);
             }
-            if ((e.code === 'KeyL' || e.code === 'Space') && players[0].onGround) {
-                jump(players[0]);
-            }
-            if (e.code === 'KeyL' && !players[0].onGround && players[0].hasDoubleJump) {
-                players[0].hasDoubleJump = false;
-                players[0].vy = -12;
+            if ((e.code === 'KeyL' || e.code === 'Space') && players[0].frozen <= 0) {
+                if (players[0].onGround) {
+                    jump(players[0]);
+                } else {
+                    const maxJumps = players[0].char.id === 'kirby' ? 4 : 2;
+                    if (players[0].jumpCount < maxJumps) {
+                        players[0].vy = -11;
+                        players[0].jumpCount++;
+                    }
+                }
             }
         }
         
@@ -746,172 +698,250 @@
         }
 
         function jump(player) {
-            player.vy = -12 - player.char.stats.jump;
+            player.vy = -12 - player.char.stats.jump * 0.4;
             player.onGround = false;
-            player.jumpCount++;
+            player.jumpCount = 1;
+            
+            // Spawn jump dust particles
+            for (let i = 0; i < 5; i++) {
+                createParticle(
+                    player.x + player.width / 2, 
+                    player.y + player.height, 
+                    '#fff', 
+                    3 + Math.random() * 2, 
+                    (Math.random() - 0.5) * 3, 
+                    -Math.random() * 1.5, 
+                    15
+                );
+            }
+        }
+
+        function triggerSpecialEffect(player, text, color) {
+            specialEffects.push({
+                x: player.x + player.width/2,
+                y: player.y - 40,
+                text: text,
+                color: color,
+                life: 50,
+                maxLife: 50
+            });
+        }
+
+        function triggerFlash(color, frames) {
+            screenFlash.color = color;
+            screenFlash.frames = frames;
+        }
+
+        function createParticle(x, y, color, size, vx, vy, life) {
+            particles.push({
+                x: x,
+                y: y,
+                color: color,
+                size: size,
+                vx: vx,
+                vy: vy,
+                life: life,
+                maxLife: life
+            });
         }
 
         function useSpecialMove(user, target) {
             user.specialCooldown = user.char.specialCooldown;
-            
             const charId = user.char.id;
             
             if (charId === 'mario') {
+                triggerSpecialEffect(user, '🔥 FIREBALL! 🔥', '#e74c3c');
+                triggerFlash('rgba(231, 76, 60, 0.25)', 3);
                 projectiles.push({
                     x: user.x + (user.facing * 30),
                     y: user.y + 15,
-                    vx: user.facing * 12,
+                    vx: user.facing * 9,
+                    vy: 1,
                     owner: user,
                     type: 'fireball',
-                    damage: 12,
-                    size: 12
+                    damage: 10,
+                    size: 10
                 });
-            } else if (charId === 'luigi') {
-                if (getDistance(user, target) < 100) {
-                    target.vx += user.facing * 15;
-                    target.vy -= 8;
-                    applyDamage(target, 10, user.facing);
-                }
-            } else if (charId === 'koopa') {
-                user.vx = user.facing * 18;
-                user.shellSpin = 30;
-                user.invulnerable = 30;
             } else if (charId === 'bowser') {
-                for(let i = 0; i < 3; i++) {
-                    setTimeout(() => {
+                triggerSpecialEffect(user, '🔥 FIRE BREATH! 🔥', '#e67e22');
+                triggerFlash('rgba(230, 126, 34, 0.25)', 3);
+                const fireTimer = (delay, index) => {
+                    gameTimeouts.push(setTimeout(() => {
+                        if (!gameRunning) return;
                         projectiles.push({
                             x: user.x + (user.facing * 40),
-                            y: user.y + 10 + i * 10,
-                            vx: user.facing * 8,
+                            y: user.y + 15,
+                            vx: user.facing * 7,
+                            vy: (Math.random() - 0.5) * 1.5,
                             owner: user,
                             type: 'fire',
-                            damage: 10,
-                            size: 20
-                        });
-                    }, i * 100);
-                }
-            } else if (charId === 'peach') {
-                user.health = Math.min(100, user.health + 15);
-                if (getDistance(user, target) < 120) {
-                    target.vx += user.facing * 5;
-                    applyDamage(target, 5, user.facing);
-                }
-            } else if (charId === 'toad') {
-                target.confused = 180;
-                if (getDistance(user, target) < 150) {
-                    target.vx += (user.x < target.x ? -1 : 1) * 8;
-                }
-            } else if (charId === 'yoshi') {
-                projectiles.push({
-                    x: user.x + (user.facing * 20),
-                    y: user.y + 20,
-                    vx: user.facing * 7,
-                    vy: -3,
-                    owner: user,
-                    type: 'egg',
-                    damage: 14,
-                    size: 18
-                });
-            } else if (charId === 'donkey') {
-                user.vy = 12;
-                user.diving = true;
-            } else if (charId === 'diddy') {
-                for(let i = 0; i < 5; i++) {
-                    setTimeout(() => {
-                        projectiles.push({
-                            x: user.x + (user.facing * 30),
-                            y: user.y + 20,
-                            vx: user.facing * 15,
-                            owner: user,
-                            type: 'peanut',
                             damage: 4,
-                            size: 6
+                            size: 12 + index * 4
                         });
-                    }, i * 80);
+                    }, delay));
+                };
+                for (let i = 0; i < 4; i++) {
+                    fireTimer(i * 100, i);
                 }
+            } else if (charId === 'link') {
+                triggerSpecialEffect(user, '🌀 SPIN ATTACK! 🌀', '#2ecc71');
+                triggerFlash('rgba(46, 204, 113, 0.25)', 3);
+                user.spinAttack = 25;
+                user.vx = user.facing * 6;
             } else if (charId === 'samus') {
+                triggerSpecialEffect(user, '⚡ CHARGE SHOT! ⚡', '#3498db');
+                triggerFlash('rgba(52, 152, 219, 0.25)', 3);
                 projectiles.push({
                     x: user.x + (user.facing * 40),
                     y: user.y + 20,
-                    vx: user.facing * 15,
+                    vx: user.facing * 14,
+                    vy: 0,
                     owner: user,
                     type: 'charge',
                     damage: 18,
-                    size: 15
+                    size: 16
                 });
             } else if (charId === 'kirby') {
-                if (getDistance(user, target) < 60) {
-                    target.vx = user.facing * 20;
-                    target.vy = -10;
-                    applyDamage(target, 8, user.facing);
+                triggerSpecialEffect(user, '🌪️ INHALE! 🌪️', '#ffb6c1');
+                triggerFlash('rgba(255, 182, 193, 0.25)', 3);
+                // Create vacuum particle lines moving towards Kirby
+                for (let i = 0; i < 8; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = 60 + Math.random() * 60;
+                    const px = user.x + user.width/2 + Math.cos(angle) * dist;
+                    const py = user.y + user.height/2 + Math.sin(angle) * dist;
+                    createParticle(
+                        px, 
+                        py, 
+                        'rgba(255,255,255,0.4)', 
+                        2, 
+                        (user.x + user.width/2 - px) / 10, 
+                        (user.y + user.height/2 - py) / 10, 
+                        10
+                    );
+                }
+                if (getDistance(user, target) < 85) {
+                    const kbDir = user.facing;
+                    const kbStrength = 10 + target.percent * 0.08;
+                    applyDamage(target, 12, kbDir * kbStrength);
+                    createShockwave(user.x + user.facing * 40, user.y + 20);
                 }
             } else if (charId === 'pikachu') {
-                players.forEach(p => {
-                    if (p !== user && getDistance(user, p) < 150) {
-                        p.vx += (p.x > user.x ? 1 : -1) * 10;
-                        p.vy -= 5;
-                        applyDamage(p, 12, p.x > user.x ? 1 : -1);
-                    }
-                });
-            } else if (charId === 'link') {
-                user.spinAttack = 20;
-                user.vx = 0;
-            } else if (charId === 'zelda') {
-                user.shield = 240;
-            } else if (charId === 'ganon') {
-                if (getDistance(user, target) < 80) {
-                    target.vx += user.facing * 25;
-                    target.vy -= 15;
-                    applyDamage(target, 20, user.facing);
-                }
-            } else if (charId === 'fox') {
+                triggerSpecialEffect(user, '⚡ THUNDER! ⚡', '#f1c40f');
+                triggerFlash('rgba(241, 196, 15, 0.35)', 4);
+                const strikeX = target.x + target.width/2;
                 projectiles.push({
-                    x: user.x + (user.facing * 30),
-                    y: user.y + 20,
-                    vx: user.facing * 14,
+                    x: strikeX,
+                    y: 0,
+                    vx: 0,
+                    vy: 16,
                     owner: user,
-                    type: 'blaster',
-                    damage: 8,
-                    size: 8
+                    type: 'lightning',
+                    damage: 14,
+                    size: 12
                 });
-            } else if (charId === 'falcon') {
-                user.vy = -15;
-                user.vx = user.facing * 8;
-                setTimeout(() => {
-                    user.vy = 0;
-                    createShockwave(user.x, user.y + 40);
-                    if (getDistance(user, target) < 100) {
-                        applyDamage(target, 18, user.facing);
-                    }
-                }, 300);
-            } else if (charId === 'ness') {
-                for(let i = -1; i <= 1; i++) {
-                    setTimeout(() => {
-                        projectiles.push({
-                            x: user.x + (user.facing * 30),
-                            y: user.y + 15,
-                            vx: user.facing * 10,
-                            vy: i * 4,
-                            owner: user,
-                            type: 'pkthunder',
-                            damage: 10,
-                            size: 12
-                        });
-                    }, i * 50 + 100);
+                createShockwave(strikeX, target.y + target.height);
+            }
+        }
+
+        function applyDamage(victim, damage, knockback) {
+            if (victim.invulnerable > 0) return;
+            victim.health -= damage * 0.35;
+            victim.percent += damage;
+            
+            victim.vx += knockback;
+            victim.vy -= 4 + damage * 0.08;
+            
+            // Spawn hit sparks
+            for (let i = 0; i < 8; i++) {
+                createParticle(
+                    victim.x + victim.width / 2, 
+                    victim.y + victim.height / 2, 
+                    victim.color, 
+                    2 + Math.random() * 3, 
+                    (Math.random() - 0.5) * 6, 
+                    (Math.random() - 0.5) * 6, 
+                    15
+                );
+            }
+            
+            // Shake effect
+            document.getElementById('gameCanvas').classList.add('shake');
+            setTimeout(() => document.getElementById('gameCanvas').classList.remove('shake'), 200);
+            
+            if (victim.health <= 0) {
+                victim.health = 100;
+                victim.stocks--;
+                if (victim.stocks <= 0) {
+                    endGame(players[0] === victim ? players[1] : players[0]);
+                } else {
+                    respawn(victim);
                 }
             }
         }
 
-        function checkDashHit(user, target) {
-            if (Math.abs(user.x - target.x) < 60 && Math.abs(user.y - target.y) < 50) {
-                applyDamage(target, 15, user.facing);
-            }
+        function respawn(player) {
+            player.x = canvas.width / 2;
+            player.y = 150;
+            player.vx = 0;
+            player.vy = 0;
+            player.health = 100;
+            player.percent = 0;
+            player.invulnerable = 180;
+            
+            const msg = document.getElementById('gameMessage');
+            msg.textContent = `${player.char.name} respawning!`;
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 1500);
         }
 
-        let projectiles = [];
+        function getDistance(p1, p2) {
+            return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+        }
+
+        function checkPlatformCollision(player, platform) {
+            const wasAbove = player.y + player.height - player.vy <= platform.y;
+            const nowBelow = player.y + player.height >= platform.y;
+            const horizontallyAligned = player.x + player.width > platform.x && player.x < platform.x + platform.w;
+            
+            if (wasAbove && nowBelow && horizontallyAligned) {
+                player.y = platform.y - player.height;
+                player.vy = 0;
+                return true;
+            }
+            return false;
+        }
+
+        function createShockwave(x, y) {
+            shockwaves.push({
+                x: x,
+                y: y,
+                radius: 10,
+                alpha: 1
+            });
+        }
 
         function update() {
             if (!gameRunning) return;
+            
+            // Update map background details (clouds, lava bubbles)
+            if (currentMap) {
+                if (currentMap.id === 'sky') {
+                    bgClouds.forEach(c => {
+                        c.x += c.speed;
+                        if (c.x > canvas.width + 100) c.x = -100;
+                    });
+                } else if (currentMap.id === 'volcano') {
+                    bgLavaBubbles.forEach(b => {
+                        b.y += b.vy;
+                        if (b.y < 680) {
+                            b.y = 750;
+                            b.x = Math.random() * canvas.width;
+                            b.vy = -0.5 - Math.random() * 1;
+                        }
+                    });
+                }
+            }
             
             // Update player input
             if (players[0].frozen <= 0) {
@@ -949,76 +979,77 @@
                 // Friction
                 p.vx *= 0.9;
                 
-                // Handle diving
-                if (p.diving && p.vy > 0) {
-                    p.diving = false;
-                    if (currentMap && currentMap.platforms) {
-                        currentMap.platforms.forEach(plat => {
-                            if (checkPlatformCollision(p, plat) && p.vy > 5) {
-                                // Spike damage based on fall
-                                const spikeDamage = Math.min(25, p.vy * 1.5);
-                                applyDamage(players[0] === p ? players[1] : players[0], spikeDamage, p.vx > 0 ? 1 : -1);
-                                createShockwave(p.x, p.y + 25);
-                            }
-                        });
+                // Movement trail particles
+                if (Math.abs(p.vx) > 0.5 && p.onGround) {
+                    if (Math.random() < 0.25) {
+                        createParticle(p.x + p.width/2, p.y + p.height, '#fff', 3, (Math.random() - 0.5) * 1, -Math.random() * 0.5, 12);
                     }
                 }
                 
-                // Shield decay
-                if (p.shield > 0) p.shield--;
-                
-                // Shell spin (Koopa)
-                if (p.shellSpin > 0) {
-                    p.shellSpin--;
-                    if (p.shellSpin > 0) {
-                        const other = players[0] === p ? players[1] : players[0];
-                        if (Math.abs(p.x - other.x) < 50 && Math.abs(p.y - other.y) < 50 && p.shellSpin % 5 === 0) {
-                            applyDamage(other, 8, p.facing);
-                        }
+                // Character specific visual trails
+                if (p.char.id === 'pikachu') {
+                    if (Math.random() < 0.15) {
+                        createParticle(p.x + Math.random() * p.width, p.y + Math.random() * p.height, '#f1c40f', 2, (Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 1.5, 15);
+                    }
+                } else if (p.char.id === 'mario') {
+                    if (Math.random() < 0.08) {
+                        createParticle(p.x + Math.random() * p.width, p.y + Math.random() * p.height, '#e74c3c', 2, 0, -0.4, 12);
                     }
                 }
                 
                 // Spin attack (Link)
                 if (p.spinAttack > 0) {
                     p.spinAttack--;
+                    // Slashing sparks around Link
+                    createParticle(
+                        p.x + p.width/2 + (Math.random() - 0.5) * 80, 
+                        p.y + p.height/2 + (Math.random() - 0.5) * 80, 
+                        '#2ecc71', 
+                        2, 
+                        0, 
+                        0, 
+                        10
+                    );
                     const other = players[0] === p ? players[1] : players[0];
-                    if (Math.abs(p.x - other.x) < 60 && Math.abs(p.y - other.y) < 60 && p.spinAttack > 5) {
-                        applyDamage(other, 6, p.facing);
+                    if (Math.abs(p.x - other.x) < 65 && Math.abs(p.y - other.y) < 60 && p.spinAttack > 5) {
+                        const kbStrength = 3 + other.percent * 0.04;
+                        applyDamage(other, 3, p.facing * kbStrength);
                     }
                 }
                 
-                // Confused (Toad)
-                if (p.confused > 0) {
-                    p.confused--;
-                    p.vx += (Math.random() - 0.5) * 2;
-                }
-                
-                // Reset jump on ground
+                // Reset jump on ground & platform collisions
                 p.onGround = false;
                 if (currentMap && currentMap.platforms) {
                     currentMap.platforms.forEach(plat => {
+                        const preColVy = p.vy;
                         if (checkPlatformCollision(p, plat)) {
                             p.onGround = true;
-                            p.hasDoubleJump = true;
                             p.jumpCount = 0;
+                            
+                            // If the player was diving
                             if (p.diving) {
                                 p.diving = false;
-                                createShockwave(p.x, p.y + p.height);
+                                const other = players[0] === p ? players[1] : players[0];
+                                if (getDistance(p, other) < 120) {
+                                    const spikeDamage = Math.min(25, preColVy * 1.5);
+                                    applyDamage(other, spikeDamage, (other.x > p.x ? 1 : -1) * (6 + other.percent * 0.05));
+                                }
+                                createShockwave(p.x + p.width/2, p.y + p.height);
                             }
                         }
                     });
                 }
                 
-                // Bounds
-                if (p.x < 0) p.x = 0;
-                if (p.x > canvas.width - p.width) p.x = canvas.width - p.width;
-                // More forgiving death boundary
-                if (p.y > canvas.height + 50) {
-                    p.y = canvas.height + 50;
-                    p.vy = 0;
-                    // Don't kill, just respawn on platform
-                    p.x = canvas.width / 2;
-                    p.y = 100;
+                // Blast zones (death boundaries)
+                if (p.x < -120 || p.x > canvas.width + 120 || p.y > canvas.height + 120) {
+                    p.health = 100;
+                    p.percent = 0;
+                    p.stocks--;
+                    if (p.stocks <= 0) {
+                        endGame(players[0] === p ? players[1] : players[0]);
+                    } else {
+                        respawn(p);
+                    }
                 }
                 
                 // Attack logic
@@ -1029,7 +1060,7 @@
                         const other = players[0] === p ? players[1] : players[0];
                         if (Math.abs(p.x - other.x) < 60 && Math.abs(p.y - other.y) < 50) {
                             const damage = 8 + p.char.stats.power;
-                            const knockback = 8 + p.percent * 0.1;
+                            const knockback = 8 + other.percent * 0.1;
                             applyDamage(other, damage, p.facing * knockback);
                         }
                     }
@@ -1040,29 +1071,91 @@
                 
                 // Cooldowns
                 if (p.specialCooldown > 0) p.specialCooldown--;
-                if (p.dashCooldown > 0) p.dashCooldown--;
                 if (p.invulnerable > 0) p.invulnerable--;
             });
             
             // Update projectiles
             projectiles = projectiles.filter(proj => {
                 if (proj.vy === undefined) proj.vy = 0;
+                
+                // Add bounce and gravity behavior for Mario's fireball
+                if (proj.type === 'fireball') {
+                    proj.vy += 0.4;
+                    if (currentMap && currentMap.platforms) {
+                        currentMap.platforms.forEach(plat => {
+                            if (proj.x > plat.x && proj.x < plat.x + plat.w &&
+                                proj.y + proj.size >= plat.y && proj.y - proj.size <= plat.y + plat.h) {
+                                // bounce
+                                proj.y = plat.y - proj.size;
+                                proj.vy = -6;
+                            }
+                        });
+                    }
+                }
+                
+                // Spawn trailing particles
+                if (proj.type === 'fireball' || proj.type === 'fire') {
+                    if (Math.random() < 0.35) {
+                        createParticle(proj.x, proj.y, '#e67e22', proj.size * 0.5, (Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 1.5, 10);
+                    }
+                } else if (proj.type === 'charge') {
+                    if (Math.random() < 0.45) {
+                        createParticle(proj.x, proj.y, '#3498db', proj.size * 0.4, (Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2, 12);
+                    }
+                } else if (proj.type === 'lightning') {
+                    if (Math.random() < 0.6) {
+                        createParticle(proj.x, proj.y + Math.random() * 40, '#f1c40f', 3, (Math.random() - 0.5) * 2, 0, 10);
+                    }
+                }
+                
                 proj.x += proj.vx;
                 proj.y += proj.vy;
                 
                 // Check collision with players
                 let hit = false;
                 players.forEach(p => {
-                    if (p === proj.owner || p.shield > 0) return;
+                    if (p === proj.owner || p.invulnerable > 0) return;
                     if (Math.abs(proj.x - p.x) < 30 && Math.abs(proj.y - p.y) < 30) {
-                        applyDamage(p, proj.damage, proj.vx > 0 ? 1 : -1);
+                        const kbDirection = proj.vx >= 0 ? 1 : -1;
+                        if (proj.type === 'lightning') {
+                            applyDamage(p, proj.damage, (p.x > proj.x ? 1 : -1) * (6 + p.percent * 0.08));
+                        } else {
+                            applyDamage(p, proj.damage, kbDirection * (5 + p.percent * 0.08));
+                        }
                         hit = true;
                     }
                 });
                 if (hit) return false;
                 
-                return proj.x > -50 && proj.x < canvas.width + 50 && proj.y > -50 && proj.y < canvas.height + 100;
+                return proj.x > -100 && proj.x < canvas.width + 100 && proj.y > -100 && proj.y < canvas.height + 150;
             });
+            
+            // Update particles
+            particles = particles.filter(part => {
+                part.x += part.vx;
+                part.y += part.vy;
+                part.life--;
+                return part.life > 0;
+            });
+            
+            // Update shockwaves
+            shockwaves = shockwaves.filter(s => {
+                s.radius += 4;
+                s.alpha -= 0.04;
+                return s.alpha > 0;
+            });
+            
+            // Update special text effects
+            specialEffects = specialEffects.filter(eff => {
+                eff.y -= 1.2;
+                eff.life--;
+                return eff.life > 0;
+            });
+            
+            // Update screen flash
+            if (screenFlash.frames > 0) {
+                screenFlash.frames--;
+            }
             
             updateHUD();
         }
@@ -1071,26 +1164,31 @@
             const char = ai.char;
             const speed = 3 + char.stats.speed * 0.4;
             
-            // Simple AI behavior
             const targetX = player.x;
             const targetY = player.y;
             
             // Move towards player
-            if (ai.x < targetX - 30) {
+            if (ai.x < targetX - 40) {
                 ai.vx = speed;
                 ai.facing = 1;
-            } else if (ai.x > targetX + 30) {
+            } else if (ai.x > targetX + 40) {
                 ai.vx = -speed;
                 ai.facing = -1;
             }
             
             // Jump if player is above
-            if (targetY < ai.y - 50 && ai.onGround && Math.random() < 0.05) {
-                jump(ai);
+            const maxJumps = ai.char.id === 'kirby' ? 4 : 2;
+            if (targetY < ai.y - 60 && Math.random() < 0.06) {
+                if (ai.onGround) {
+                    jump(ai);
+                } else if (ai.jumpCount < maxJumps) {
+                    ai.vy = -11;
+                    ai.jumpCount++;
+                }
             }
             
             // Attack if close
-            if (Math.abs(ai.x - player.x) < 60 && Math.abs(ai.y - player.y) < 50 && !ai.attacking && Math.random() < 0.1) {
+            if (Math.abs(ai.x - player.x) < 60 && Math.abs(ai.y - player.y) < 50 && !ai.attacking && Math.random() < 0.08) {
                 ai.attacking = true;
                 ai.attackFrame = 15;
             }
@@ -1100,78 +1198,110 @@
                 useSpecialMove(ai, player);
             }
             
-            // Recovery AI - go to center if too close to edge
-            if (ai.x < 100 || ai.x > canvas.width - 100) {
+            // Recovery AI - go to center if too far left or right
+            if (ai.x < 150 || ai.x > canvas.width - 150) {
                 if (ai.onGround && Math.random() < 0.1) {
                     jump(ai);
                 }
-                if (ai.x < 100) ai.vx = speed;
+                if (!ai.onGround && ai.vy > 1 && ai.jumpCount < maxJumps && Math.random() < 0.1) {
+                    ai.vy = -11;
+                    ai.jumpCount++;
+                }
+                if (ai.x < 150) ai.vx = speed;
                 else ai.vx = -speed;
             }
         }
 
-        function applyDamage(victim, damage, knockback) {
-            victim.health -= damage * 0.3;
-            victim.percent += damage;
-            
-            victim.vx += knockback;
-            victim.vy -= 5;
-            
-            // Shake effect
-            document.getElementById('gameCanvas').classList.add('shake');
-            setTimeout(() => document.getElementById('gameCanvas').classList.remove('shake'), 200);
-            
-            if (victim.health <= 0) {
-                victim.health = 100;
-                victim.stocks--;
-                if (victim.stocks <= 0) {
-                    endGame(players[0] === victim ? players[1] : players[0]);
-                } else {
-                    respawn(victim);
-                }
-            }
-        }
-
-        function respawn(player) {
-            player.x = canvas.width / 2;
-            player.y = 100;
-            player.vx = 0;
-            player.vy = 0;
-            player.health = 100;
-            player.percent = 0;
-            player.invulnerable = 180;
-            
-            const msg = document.getElementById('gameMessage');
-            msg.textContent = `${player.char.name} respawning!`;
-            msg.classList.add('show');
-            setTimeout(() => msg.classList.remove('show'), 1500);
-        }
-
-        function getDistance(p1, p2) {
-            return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-        }
-
-        function checkPlatformCollision(player, platform) {
-            const wasAbove = player.y + player.height - player.vy <= platform.y;
-            const nowBelow = player.y + player.height >= platform.y;
-            const horizontallyAligned = player.x + player.width > platform.x && player.x < platform.x + platform.w;
-            
-            if (wasAbove && nowBelow && horizontallyAligned) {
-                player.y = platform.y - player.height;
-                player.vy = 0;
-                return true;
-            }
-            return false;
-        }
-
-        function createShockwave(x, y) {
-            // Visual effect only
-        }
-
         function draw() {
             // Background
-            ctx.fillStyle = currentMap ? currentMap.bgColor : '#2d3436';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (currentMap) {
+                if (currentMap.id === 'training') {
+                    let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    grad.addColorStop(0, '#111122');
+                    grad.addColorStop(1, '#2d3436');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Cyberspace Stadium Grid lines
+                    ctx.strokeStyle = 'rgba(72, 219, 251, 0.08)';
+                    ctx.lineWidth = 1;
+                    for (let x = 0; x < canvas.width; x += 50) {
+                        ctx.beginPath();
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x, canvas.height);
+                        ctx.stroke();
+                    }
+                    for (let y = 0; y < canvas.height; y += 50) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(canvas.width, y);
+                        ctx.stroke();
+                    }
+                } else if (currentMap.id === 'sky') {
+                    let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    grad.addColorStop(0, '#0f3057');
+                    grad.addColorStop(1, '#00587a');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Floating clouds
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+                    bgClouds.forEach(c => {
+                        ctx.beginPath();
+                        ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+                        ctx.arc(c.x + c.size * 0.5, c.y - c.size * 0.2, c.size * 0.8, 0, Math.PI * 2);
+                        ctx.arc(c.x - c.size * 0.5, c.y - c.size * 0.2, c.size * 0.8, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                } else if (currentMap.id === 'volcano') {
+                    let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                    grad.addColorStop(0, '#150505');
+                    grad.addColorStop(0.7, '#2c0a0a');
+                    grad.addColorStop(1, '#ff3300');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Lava bottom
+                    ctx.fillStyle = '#ff3300';
+                    ctx.fillRect(0, 700, canvas.width, 50);
+                    
+                    // Lava rising bubbles
+                    ctx.fillStyle = '#ff9900';
+                    bgLavaBubbles.forEach(b => {
+                        ctx.save();
+                        ctx.globalAlpha = b.alpha;
+                        ctx.beginPath();
+                        ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                    });
+                }
+            } else {
+                ctx.fillStyle = '#2d3436';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            // Draw particles
+            particles.forEach(part => {
+                ctx.save();
+                ctx.globalAlpha = part.life / part.maxLife;
+                ctx.fillStyle = part.color;
+                ctx.beginPath();
+                ctx.arc(part.x, part.y, part.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+            
+            // Draw shockwaves
+            shockwaves.forEach(s => {
+                ctx.save();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${s.alpha})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            });
             
             // Platforms
             if (currentMap && currentMap.platforms) {
@@ -1180,6 +1310,34 @@
                     ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
                 });
             }
+            
+            // Projectiles
+            projectiles.forEach(proj => {
+                if (proj.type === 'fireball' || proj.type === 'fire') {
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.beginPath();
+                    ctx.arc(proj.x, proj.y, proj.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#f39c12';
+                    ctx.beginPath();
+                    ctx.arc(proj.x, proj.y, proj.size * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (proj.type === 'lightning') {
+                    ctx.fillStyle = '#f1c40f';
+                    ctx.fillRect(proj.x - 4, proj.y, 8, 40);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(proj.x - 2, proj.y, 4, 40);
+                } else if (proj.type === 'charge') {
+                    ctx.fillStyle = '#3498db';
+                    ctx.beginPath();
+                    ctx.ellipse(proj.x, proj.y, proj.size * 1.4, proj.size * 0.8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.ellipse(proj.x, proj.y, proj.size * 0.8, proj.size * 0.4, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
             
             // Players
             players.forEach(p => {
@@ -1190,32 +1348,10 @@
                     ctx.globalAlpha = 0.5;
                 }
                 
-                // Shield effect
-                if (p.shield > 0) {
-                    ctx.strokeStyle = '#1dd1a1';
-                    ctx.lineWidth = 3;
-                    ctx.globalAlpha = p.shield / 200;
-                    ctx.beginPath();
-                    ctx.arc(p.x + p.width/2, p.y + p.height/2, 40, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.globalAlpha = 1;
-                }
-                
                 // Frozen effect
                 if (p.frozen > 0) {
                     ctx.fillStyle = 'rgba(72,219,251,0.5)';
                     ctx.fillRect(p.x - 5, p.y - 5, p.width + 10, p.height + 10);
-                }
-                
-                // Shell spin effect (Koopa)
-                if (p.shellSpin > 0) {
-                    ctx.strokeStyle = '#9b59b6';
-                    ctx.lineWidth = 3;
-                    ctx.globalAlpha = 0.6;
-                    ctx.beginPath();
-                    ctx.arc(p.x + p.width/2, p.y + p.height/2, 30, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.globalAlpha = 1;
                 }
                 
                 // Spin attack effect (Link)
@@ -1224,32 +1360,66 @@
                     ctx.lineWidth = 4;
                     ctx.globalAlpha = 0.7;
                     ctx.beginPath();
-                    ctx.arc(p.x + p.width/2, p.y + p.height/2, 35 + (20 - p.spinAttack), 0, Math.PI * 2);
+                    ctx.arc(p.x + p.width/2, p.y + p.height/2, 35 + (25 - p.spinAttack), 0, Math.PI * 2);
                     ctx.stroke();
                     ctx.globalAlpha = 1;
                 }
                 
-                // Confused effect (Toad)
-                if (p.confused > 0) {
-                    ctx.fillStyle = 'rgba(155,89,182,0.4)';
-                    ctx.fillRect(p.x - 5, p.y - 5, p.width + 10, p.height + 10);
-                    ctx.fillStyle = '#fff';
-                    ctx.font = '14px Arial';
-                    ctx.fillText('?', p.x + p.width/2, p.y - 10);
+                // Character specific visual drawings
+                if (p.char.id === 'kirby') {
+                    // Kirby cute round body
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x + p.width/2, p.y + p.height/2, p.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Red feet
+                    ctx.fillStyle = '#ff2a70';
+                    ctx.beginPath();
+                    ctx.ellipse(p.x + p.width * 0.25, p.y + p.height - 2, p.width * 0.2, 5, 0, 0, Math.PI * 2);
+                    ctx.ellipse(p.x + p.width * 0.75, p.y + p.height - 2, p.width * 0.2, 5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    // Box body
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(p.x, p.y, p.width, p.height);
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(p.x, p.y, p.width, p.height);
                 }
                 
-                // Body
-                ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, p.width, p.height);
-                // Border
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(p.x, p.y, p.width, p.height);
+                // Samus arm cannon
+                if (p.char.id === 'samus') {
+                    ctx.fillStyle = '#f1c40f';
+                    const armX = p.facing > 0 ? p.x + p.width - 5 : p.x - 10;
+                    ctx.fillRect(armX, p.y + p.height * 0.4, 15, 10);
+                    ctx.strokeStyle = '#fff';
+                    ctx.strokeRect(armX, p.y + p.height * 0.4, 15, 10);
+                }
                 
-                // Face
+                // Link's sword
+                if (p.char.id === 'link') {
+                    ctx.strokeStyle = '#bdc3c7';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    if (p.facing > 0) {
+                        ctx.moveTo(p.x + p.width - 5, p.y + p.height * 0.5);
+                        ctx.lineTo(p.x + p.width + 12, p.y + p.height * 0.15);
+                    } else {
+                        ctx.moveTo(p.x + 5, p.y + p.height * 0.5);
+                        ctx.lineTo(p.x - 12, p.y + p.height * 0.15);
+                    }
+                    ctx.stroke();
+                }
+                
+                // Face (Eye) - adjusted for Bowser scale
                 ctx.fillStyle = '#000';
-                const eyeX = p.facing > 0 ? p.x + 25 : p.x + 8;
-                ctx.fillRect(eyeX, p.y + 12, 8, 8);
+                const eyeX = p.facing > 0 ? p.x + p.width * 0.65 : p.x + p.width * 0.2;
+                ctx.fillRect(eyeX, p.y + p.height * 0.25, p.width * 0.15, p.height * 0.12);
                 
                 // Character icon above head
                 ctx.font = '24px Arial';
@@ -1267,52 +1437,25 @@
                 ctx.restore();
             });
             
-            // Projectiles
-            projectiles.forEach(proj => {
-                if (proj.type === 'fireball' || proj.type === 'fire') {
-                    ctx.fillStyle = '#e74c3c';
-                    ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, proj.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#f39c12';
-                    ctx.beginPath();
-                    ctx.arc(proj.x, proj.y, proj.size * 0.6, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (proj.type === 'lightning' || proj.type === 'pkthunder') {
-                    ctx.fillStyle = '#f1c40f';
-                    ctx.fillRect(proj.x - 5, proj.y - 3, 25, 6);
-                    ctx.fillStyle = '#fff';
-                    ctx.fillRect(proj.x, proj.y - 1, 20, 2);
-                } else if (proj.type === 'egg') {
-                    ctx.fillStyle = '#2ecc71';
-                    ctx.beginPath();
-                    ctx.ellipse(proj.x, proj.y, proj.size * 0.7, proj.size, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#27ae60';
-                    ctx.beginPath();
-                    ctx.ellipse(proj.x, proj.y - 3, proj.size * 0.3, proj.size * 0.4, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (proj.type === 'peanut') {
-                    ctx.fillStyle = '#d35400';
-                    ctx.beginPath();
-                    ctx.ellipse(proj.x, proj.y, proj.size, proj.size * 0.5, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (proj.type === 'charge') {
-                    ctx.fillStyle = '#3498db';
-                    ctx.beginPath();
-                    ctx.ellipse(proj.x, proj.y, proj.size * 1.5, proj.size * 0.6, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#fff';
-                    ctx.beginPath();
-                    ctx.ellipse(proj.x, proj.y, proj.size, proj.size * 0.3, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (proj.type === 'blaster') {
-                    ctx.fillStyle = '#2980b9';
-                    ctx.fillRect(proj.x - 3, proj.y - 2, 15, 4);
-                    ctx.fillStyle = '#fff';
-                    ctx.fillRect(proj.x, proj.y - 1, 10, 2);
-                }
+            // Draw special rising text effects
+            specialEffects.forEach(eff => {
+                ctx.save();
+                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = eff.color;
+                ctx.textAlign = 'center';
+                ctx.shadowColor = '#000';
+                ctx.shadowBlur = 4;
+                ctx.fillText(eff.text, eff.x, eff.y);
+                ctx.restore();
             });
+            
+            // Draw screen flash
+            if (screenFlash.frames > 0) {
+                ctx.save();
+                ctx.fillStyle = screenFlash.color;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.restore();
+            }
         }
 
         function gameLoop() {
@@ -1331,23 +1474,36 @@
         }
 
         function resetGame() {
-            players[0].x = 200;
-            players[0].y = 300;
+            clearGameTimeouts();
+            players[0].x = 400;
+            players[0].y = 400;
             players[0].health = 100;
             players[0].percent = 0;
             players[0].stocks = 3;
             players[0].vx = 0;
             players[0].vy = 0;
+            players[0].jumpCount = 0;
+            players[0].diving = false;
+            players[0].spinAttack = 0;
+            players[0].invulnerable = 0;
             
-            players[1].x = 600;
-            players[1].y = 300;
+            players[1].x = 800;
+            players[1].y = 400;
             players[1].health = 100;
             players[1].percent = 0;
             players[1].stocks = 3;
             players[1].vx = 0;
             players[1].vy = 0;
+            players[1].jumpCount = 0;
+            players[1].diving = false;
+            players[1].spinAttack = 0;
+            players[1].invulnerable = 0;
             
             projectiles = [];
+            shockwaves = [];
+            particles = [];
+            specialEffects = [];
+            screenFlash = { color: '', frames: 0 };
             
             document.getElementById('gameMessage').classList.remove('show');
             createStockDisplay();
