@@ -1,0 +1,2408 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Brawl Stars - Playable 3v3 HTML5 Mini-Game</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brawlYellow: '#FFCB05',
+                        brawlYellowDark: '#E5A900',
+                        brawlBlue: '#00A2E8',
+                        brawlPurple: '#7A1C8F',
+                        brawlOrange: '#FF5E00',
+                        brawlDarkBg: '#090514',
+                        brawlCard: '#18122C',
+                    },
+                    fontFamily: {
+                        brawl: ['"Lilita One"', 'sans-serif'],
+                        body: ['"Outfit"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .stroke-black-3 {
+            -webkit-text-stroke: 3px #000;
+        }
+        .stroke-black-4 {
+            -webkit-text-stroke: 4px #000;
+        }
+        .text-shadow-brawl {
+            text-shadow: 4px 4px 0px #000;
+        }
+        
+        /* 3D Button Style */
+        .btn-3d {
+            box-shadow: 0 8px 0 #000, 0 12px 20px rgba(0,0,0,0.4);
+            transform: translateY(0);
+            transition: all 0.1s ease-out;
+        }
+        .btn-3d:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #000, 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        /* Spinning Character Animation on click */
+        .spin-brawler {
+            animation: spinBrawler 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes spinBrawler {
+            0% { transform: scale(0.3) rotateY(0deg); opacity: 0; }
+            100% { transform: scale(1) rotateY(360deg); opacity: 1; }
+        }
+
+        /* Bobbing float animation */
+        @keyframes bob {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-8px) scale(1.03); }
+        }
+        .animate-bob {
+            animation: bob 3s ease-in-out infinite;
+        }
+
+        /* Glowing Super Circle */
+        @keyframes superGlow {
+            0%, 100% { box-shadow: 0 0 15px #FFCB05, inset 0 0 10px #FFCB05; }
+            50% { box-shadow: 0 0 30px #FF5E00, inset 0 0 20px #FF5E00; }
+        }
+        .super-glowing {
+            animation: superGlow 1.5s infinite;
+        }
+
+        /* Prevent double tap zoom on mobile */
+        html, body {
+            touch-action: manipulation;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body class="font-body bg-brawlDarkBg text-white overflow-hidden w-screen h-screen flex flex-col justify-between">
+
+    <!-- 1. SOUND SYSTEM & TOP BAR -->
+    <div class="w-full bg-brawlCard border-b-4 border-black px-4 py-2 flex justify-between items-center z-40 relative">
+        <div class="flex items-center gap-3">
+            <span class="font-brawl text-2xl text-brawlYellow stroke-black-3 text-shadow-brawl tracking-wide">BRAWL STARS 2D</span>
+            <span class="bg-red-500 font-brawl text-[10px] px-2 py-0.5 rounded border border-black text-shadow-brawl rotate-2">MINI-GAME</span>
+        </div>
+        
+        <!-- Trophy & Audio Controls -->
+        <div class="flex items-center gap-4">
+            <div class="bg-slate-900 border-2 border-black rounded-lg px-3 py-1 flex items-center gap-2">
+                <span class="text-lg">🏆</span>
+                <span id="player-trophies" class="font-brawl text-brawlYellow text-shadow-brawl">150</span>
+            </div>
+            
+            <button id="music-btn" onclick="toggleMusic()" class="bg-slate-700 hover:bg-slate-600 border-2 border-black rounded-lg p-2 flex items-center justify-center transition">
+                <span id="music-icon" class="text-lg">🔊</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER FOR SCREENS -->
+    <div class="flex-1 w-full relative flex items-center justify-center">
+
+        <!-- ================= Lobby & Character Selection Screen ================= -->
+        <div id="lobby-screen" class="absolute inset-0 bg-gradient-to-br from-indigo-950 via-brawlDarkBg to-slate-950 flex flex-col md:flex-row p-4 md:p-8 gap-6 z-30 transition-all duration-300">
+            
+            <!-- Left Side: Roster Selection Grid -->
+            <div class="flex-1 flex flex-col justify-between">
+                <div>
+                    <h2 id="lobby-title-container" class="font-brawl text-2xl md:text-3xl text-white uppercase tracking-wider mb-2 stroke-black-3 text-shadow-brawl">BRAWLERS <span class="text-brawlBlue">11 / 88</span></h2>
+                    <div class="grid grid-cols-5 gap-3 max-h-[60vh] overflow-y-auto pr-2" id="roster-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 bg-slate-950/80 border-2 border-black rounded-xl text-xs md:text-sm text-slate-400 space-y-1">
+                    <p class="font-bold text-white mb-1">🎮 GAME CONTROLS:</p>
+                    <p>• Move: <strong class="text-brawlYellow">WASD</strong> / <strong class="text-brawlYellow">Arrow Keys</strong></p>
+                    <p>• Aim/Shoot: <strong class="text-brawlYellow">Move Mouse & Left-Click</strong> (Or click target direction to auto-aim)</p>
+                    <p>• Super Attack: Press <strong class="text-brawlYellow">Spacebar</strong> / <strong class="text-brawlYellow">Shift</strong>, then click to fire!</p>
+                    <p class="md:hidden">• Mobile: Drag Left Joystick to move, Drag Right Joystick to aim & release to shoot. Tap Super button!</p>
+                </div>
+            </div>
+
+            <!-- Right Side: Selected Brawler Detail Card -->
+            <div class="w-full md:w-[400px] flex flex-col justify-between border-4 border-black bg-brawlCard p-6 rounded-3xl shadow-2xl relative overflow-hidden">
+                <!-- Rarity Banner Background glow -->
+                <div id="lobby-card-rarity-glow" class="absolute inset-0 opacity-15 pointer-events-none transition-all duration-300"></div>
+                
+                <div class="relative z-10 flex flex-col items-center">
+                    
+                    <!-- Brawler Portrait Showcase -->
+                    <div id="lobby-portrait-container" class="w-44 h-44 flex items-center justify-center bg-slate-900/60 rounded-3xl border-4 border-black shadow-inner animate-bob overflow-hidden">
+                        <!-- Large SVG loaded dynamically -->
+                    </div>
+
+                    <!-- Name and Rarity -->
+                    <h3 id="lobby-brawler-name" class="font-brawl text-4xl text-brawlYellow stroke-black-3 text-shadow-brawl uppercase mt-4 select-none">Shelly</h3>
+                    <span id="lobby-brawler-rarity" class="bg-purple-600 text-white font-brawl text-xs px-3 py-1 border-2 border-black rounded-lg uppercase mt-1 tracking-wider">Common</span>
+                    
+                    <!-- Stats panel -->
+                    <div class="w-full mt-4 space-y-2">
+                        <!-- Stat 1: Health -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-slate-300 mb-0.5">
+                                <span>🛡️ Health (Survivability)</span>
+                                <span id="lobby-stat-health-txt">75%</span>
+                            </div>
+                            <div class="w-full bg-slate-950 border border-black rounded-full h-3.5 overflow-hidden">
+                                <div id="lobby-stat-health-bar" class="bg-green-500 h-full rounded-full transition-all duration-300" style="width: 75%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Stat 2: Attack Damage -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-slate-300 mb-0.5">
+                                <span>⚔️ Damage</span>
+                                <span id="lobby-stat-attack-txt">65%</span>
+                            </div>
+                            <div class="w-full bg-slate-950 border border-black rounded-full h-3.5 overflow-hidden">
+                                <div id="lobby-stat-attack-bar" class="bg-red-500 h-full rounded-full transition-all duration-300" style="width: 65%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Stat 3: Super Ability description -->
+                        <div class="bg-slate-950/70 p-3 rounded-xl border border-black mt-3">
+                            <span class="font-brawl text-xs text-brawlOrange block uppercase">Super Attack</span>
+                            <span id="lobby-super-title" class="font-bold text-sm text-white block">Super Shell</span>
+                            <p id="lobby-super-desc" class="text-xs text-slate-400 mt-1 leading-relaxed">
+                                A massive heavy blast that obliterates walls and knocks back enemies.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Brawl button -->
+                <button onclick="startGame()" class="btn-3d w-full bg-brawlOrange hover:bg-brawlOrangeDark text-white font-brawl text-2xl py-4 border-4 border-black rounded-2xl text-shadow-brawl mt-6 uppercase tracking-wider">
+                    Brawl!
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ================= Gameplay Screen (Canvas) ================= -->
+        <div id="game-container" class="absolute inset-0 hidden w-full h-full bg-[#1b5e20] select-none z-10">
+            
+            <!-- Score & Match HUD -->
+            <div class="absolute top-4 left-0 right-0 flex justify-center items-center pointer-events-none z-20">
+                <!-- Gem Grab score board -->
+                <div class="bg-black/80 border-4 border-black rounded-2xl flex items-center p-3 gap-6 shadow-2xl">
+                    <!-- Blue Team (Player) -->
+                    <div class="flex flex-col items-center">
+                        <span class="font-brawl text-brawlBlue text-shadow-brawl text-lg">BLUE TEAM</span>
+                        <div class="flex items-center gap-1">
+                            <span class="text-xl">💎</span>
+                            <span id="hud-gems-blue" class="font-brawl text-2xl text-white">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Middle Countdown/Status -->
+                    <div class="flex flex-col items-center justify-center border-x border-slate-700 px-4 min-w-[100px]">
+                        <span id="hud-match-timer" class="font-brawl text-2xl text-brawlYellow text-shadow-brawl">2:00</span>
+                        <span id="hud-countdown-text" class="text-[9px] font-bold text-red-500 uppercase tracking-widest hidden animate-pulse">MATCH COUNTDOWN</span>
+                    </div>
+
+                    <!-- Red Team (Enemies) -->
+                    <div class="flex flex-col items-center">
+                        <span class="font-brawl text-red-500 text-shadow-brawl text-lg">RED TEAM</span>
+                        <div class="flex items-center gap-1">
+                            <span class="text-xl">💎</span>
+                            <span id="hud-gems-red" class="font-brawl text-2xl text-white">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In-game Big Countdown Overlay -->
+            <div id="countdown-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-center pointer-events-none z-20 hidden">
+                <span id="countdown-banner" class="font-brawl text-5xl md:text-8xl text-brawlYellow stroke-black-4 text-shadow-brawl uppercase animate-bounce">
+                    BLUE TEAM COUNTDOWN: 15
+                </span>
+                <span class="text-lg font-bold text-white bg-black/70 px-4 py-2 border-2 border-black rounded-xl mt-4">
+                    KILL THE CARRIERS TO STOP THE COUNTDOWN!
+                </span>
+            </div>
+
+            <!-- The HTML5 Game Canvas -->
+            <canvas id="game-canvas" class="w-full h-full block"></canvas>
+
+            <!-- MOBILE VIRTUAL JOYSTICKS & SUPER BUTTON OVERLAY -->
+            <div id="mobile-controls" class="absolute inset-0 pointer-events-none flex justify-between items-end p-8 select-none z-30">
+                <!-- Left: Movement Joystick Area -->
+                <div class="pointer-events-auto w-36 h-36 relative flex items-center justify-center" id="mobile-joy-move">
+                    <div class="w-28 h-28 rounded-full bg-slate-900/60 border-4 border-black/80 flex items-center justify-center shadow-2xl">
+                        <!-- Stick head -->
+                        <div id="mobile-joy-move-stick" class="w-12 h-12 rounded-full bg-brawlBlue border-2 border-black absolute shadow-lg transition-transform duration-75"></div>
+                    </div>
+                </div>
+
+                <!-- Right: Shoot Joystick & Super Button Area -->
+                <div class="flex flex-col items-end gap-6 pointer-events-auto">
+                    <!-- Super Button -->
+                    <button id="mobile-super-btn" class="w-16 h-16 rounded-full bg-slate-900 border-4 border-black/80 flex items-center justify-center relative shadow-2xl hover:scale-105 active:scale-95 transition">
+                        <div id="mobile-super-btn-fill" class="absolute inset-0 rounded-full bg-gradient-to-tr from-brawlOrange to-brawlYellow opacity-0 transition-opacity duration-300"></div>
+                        <span class="font-brawl text-xl text-white text-shadow-brawl z-10">☠️</span>
+                    </button>
+
+                    <!-- Shoot Joystick -->
+                    <div class="w-36 h-36 relative flex items-center justify-center" id="mobile-joy-shoot">
+                        <div class="w-28 h-28 rounded-full bg-slate-900/60 border-4 border-black/80 flex items-center justify-center shadow-2xl">
+                            <!-- Stick head -->
+                            <div id="mobile-joy-shoot-stick" class="w-12 h-12 rounded-full bg-red-600 border-2 border-black absolute shadow-lg transition-transform duration-75"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= Result / Match Over Screen ================= -->
+        <div id="result-screen" class="absolute inset-0 hidden bg-black/95 flex flex-col items-center justify-center p-6 text-center z-30 select-none">
+            <!-- Big Banner -->
+            <h1 id="result-title" class="font-brawl text-6xl md:text-8xl text-brawlYellow stroke-black-4 text-shadow-brawl-lg uppercase tracking-wider animate-bob">
+                Victory
+            </h1>
+            
+            <div id="result-brawler-showcase" class="w-40 h-40 flex items-center justify-center bg-slate-900 border-4 border-black rounded-3xl shadow-2xl my-6 animate-bounce">
+                <!-- SVG dynamically loaded -->
+            </div>
+
+            <!-- Trophy adjustment detail -->
+            <div class="bg-slate-900 border-4 border-black p-6 rounded-2xl flex items-center gap-4 max-w-sm w-full mb-8 shadow-inner">
+                <span class="text-4xl">🏆</span>
+                <div class="text-left flex-1">
+                    <span id="result-trophy-change" class="font-brawl text-3xl text-green-400 stroke-black-3 text-shadow-brawl">+8 Trophies</span>
+                    <p class="text-xs text-slate-400">Your total is now <strong id="result-total-trophies" class="text-white">158</strong></p>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-4 w-full max-w-sm">
+                <button onclick="playAgain()" class="btn-3d w-1/2 bg-brawlOrange text-white font-brawl text-lg py-3 border-4 border-black rounded-xl text-shadow-brawl uppercase tracking-wide">
+                    Play Again
+                </button>
+                <button onclick="exitLobby()" class="btn-3d w-1/2 bg-slate-600 text-white font-brawl text-lg py-3 border-4 border-black rounded-xl text-shadow-brawl uppercase tracking-wide">
+                    Main Menu
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ================= JAVASCRIPT GAME ENGINE ================= -->
+    <script>
+        // Web Audio Synth setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let soundEnabled = true;
+        let bgMusicInterval = null;
+
+        function toggleMusic() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('music-btn');
+            const icon = document.getElementById('music-icon');
+            if (soundEnabled) {
+                btn.className = "bg-slate-700 hover:bg-slate-600 border-2 border-black rounded-lg p-2 flex items-center justify-center transition";
+                icon.textContent = "🔊";
+                startBgMusic();
+            } else {
+                btn.className = "bg-slate-800 border-2 border-black rounded-lg p-2 flex items-center justify-center transition opacity-60";
+                icon.textContent = "🔇";
+                stopBgMusic();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'shoot') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(450, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'hit') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc.frequency.linearRampToValueAtTime(50, now + 0.08);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'gem') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(650, now);
+                    osc.frequency.setValueAtTime(950, now + 0.08);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'super_ready') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(280, now);
+                    osc.frequency.exponentialRampToValueAtTime(850, now + 0.35);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'break') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(90, now);
+                    osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else if (type === 'heal') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(550, now + 0.2);
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                }
+            } catch (e) {}
+        }
+
+        function startBgMusic() {
+            if (bgMusicInterval) clearInterval(bgMusicInterval);
+            if (!soundEnabled) return;
+            let note = 0;
+            const melody = [
+                261.63, 293.66, 329.63, 392.00, 329.63, 392.00, 440.00, 392.00,
+                349.23, 329.63, 293.66, 261.63, 293.66, 329.63, 293.66, 261.63
+            ];
+            bgMusicInterval = setInterval(() => {
+                if (!soundEnabled) return;
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(melody[note % melody.length], audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.22);
+                    note++;
+                } catch(e){}
+            }, 250);
+        }
+
+        function stopBgMusic() {
+            if (bgMusicInterval) clearInterval(bgMusicInterval);
+        }
+
+        // -------------------------------------------------------------
+        // ROSTER DATA (10 CHARACTER SPECIFICATIONS)
+        // -------------------------------------------------------------
+        const roster = {
+            shelly: {
+                id: "shelly", name: "Shelly", rarity: "Common", health: 75, attack: 65,
+                superTitle: "Super Shell", superDesc: "Fires a giant shotgun blast that destroys walls and deals heavy damage.",
+                color: "#8B5CF6",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#8B5CF6" stroke="#000" stroke-width="4"/>
+                        <ellipse cx="50" cy="48" rx="22" ry="22" fill="#F472B6" stroke="#000" stroke-width="4"/>
+                        <path d="M25 38 Q38 10 50 15 Q62 10 75 38" fill="#7C3AED" stroke="#000" stroke-width="4"/>
+                        <rect x="35" y="32" width="10" height="20" transform="rotate(-30 40 40)" fill="#F59E0B" stroke="#000" stroke-width="2"/>
+                        <circle cx="42" cy="45" r="4" fill="#000" /> <circle cx="58" cy="45" r="4" fill="#000" />
+                        <path d="M44 58 Q50 63 56 58" stroke="#000" stroke-width="3" fill="none"/>
+                      </svg>`
+            },
+            colt: {
+                id: "colt", name: "Colt", rarity: "Rare", health: 40, attack: 85,
+                superTitle: "Bullet Storm", superDesc: "A longer, piercing, high-damage storm of bullets that shreds cover.",
+                color: "#00A2E8",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#00A2E8" stroke="#000" stroke-width="4"/>
+                        <ellipse cx="50" cy="46" rx="20" ry="20" fill="#F59E0B" stroke="#000" stroke-width="4"/>
+                        <path d="M25 38 Q38 8 50 12 Q62 8 75 38" fill="#EF4444" stroke="#000" stroke-width="4"/>
+                        <circle cx="44" cy="46" r="4" fill="#000" /> <circle cx="56" cy="46" r="4" fill="#000" />
+                        <path d="M44 58 Q50 63 56 58" stroke="#000" stroke-width="3" fill="none"/>
+                      </svg>`
+            },
+            el_primo: {
+                id: "el_primo", name: "El Primo", rarity: "Rare", health: 95, attack: 55,
+                superTitle: "Flying Elbow Drop", superDesc: "Leaps into the air and crashes down, crushing walls and slamming enemies.",
+                color: "#10B981",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#10B981" stroke="#000" stroke-width="4"/>
+                        <circle cx="50" cy="48" r="21" fill="#3B82F6" stroke="#000" stroke-width="4"/>
+                        <polygon points="50,28 53,36 62,36 55,41 57,49 50,44 43,49 45,41 38,36 47,36" fill="#FACC15" stroke="#000" stroke-width="1.5"/>
+                        <ellipse cx="40" cy="46" rx="5" ry="7" fill="#FFF" stroke="#000" stroke-width="2"/>
+                        <ellipse cx="60" cy="46" rx="5" ry="7" fill="#FFF" stroke="#000" stroke-width="2"/>
+                        <circle cx="40" cy="46" r="2.5" fill="#000" /> <circle cx="60" cy="46" r="2.5" fill="#000" />
+                        <path d="M42 58 Q50 63 58 58" stroke="#000" stroke-width="3" fill="none"/>
+                      </svg>`
+            },
+            poco: {
+                id: "poco", name: "Poco", rarity: "Super Rare", health: 60, attack: 50,
+                superTitle: "Encore", superDesc: "Heals himself and teammates in a massive musical radius.",
+                color: "#F59E0B",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#F59E0B" stroke="#000" stroke-width="4"/>
+                        <circle cx="50" cy="48" r="21" fill="#ECEFF1" stroke="#000" stroke-width="4"/>
+                        <ellipse cx="40" cy="44" rx="6" ry="6" fill="#D32F2F" stroke="#000" stroke-width="2"/>
+                        <ellipse cx="60" cy="44" rx="6" ry="6" fill="#D32F2F" stroke="#000" stroke-width="2"/>
+                        <line x1="42" y1="58" x2="58" y2="58" stroke="#000" stroke-width="3"/>
+                        <line x1="46" y1="54" x2="46" y2="62" stroke="#000" stroke-width="2"/>
+                        <line x1="54" y1="54" x2="54" y2="62" stroke="#000" stroke-width="2"/>
+                        <path d="M35 25 Q50 15 65 25" fill="#37474F" stroke="#000" stroke-width="4"/>
+                      </svg>`
+            },
+            edgar: {
+                id: "edgar", name: "Edgar", rarity: "Epic", health: 50, attack: 75,
+                superTitle: "Vault Leap", superDesc: "Jumps over walls. Recharges automatically. Grants a speed boost on landing.",
+                color: "#F43F5E",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#EF4444" stroke="#000" stroke-width="4"/>
+                        <ellipse cx="50" cy="45" rx="18" ry="18" fill="#FDA4AF" stroke="#000" stroke-width="4"/>
+                        <path d="M25 28 Q48 5 75 25 C60 25, 45 35, 40 52 C38 40, 32 35, 25 28" fill="#1E1B4B" stroke="#000" stroke-width="4"/>
+                        <path d="M22 62 C22 50, 78 50, 78 62 L72 78 C60 72, 40 72, 28 78 Z" fill="#6366F1" stroke="#000" stroke-width="4"/>
+                        <circle cx="58" cy="44" r="4" fill="#000" />
+                      </svg>`
+            },
+            piper: {
+                id: "piper", name: "Piper", rarity: "Epic", health: 30, attack: 95,
+                superTitle: "Poppin' Grenades", superDesc: "Leaps back to escape, leaving behind four explosive grenades.",
+                color: "#EC4899",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#EC4899" stroke="#000" stroke-width="4"/>
+                        <ellipse cx="50" cy="45" rx="18" ry="18" fill="#FDE047" stroke="#000" stroke-width="4"/>
+                        <path d="M25 35 Q48 10 75 35 C70 28, 65 18, 50 18 C35 18, 30 28, 25 35" fill="#FACC15" stroke="#000" stroke-width="4"/>
+                        <circle cx="44" cy="45" r="4" fill="#000" /> <circle cx="56" cy="45" r="4" fill="#000" />
+                      </svg>`
+            },
+            mortis: {
+                id: "mortis", name: "Mortis", rarity: "Mythic", health: 60, attack: 70,
+                superTitle: "Life Drain Bats", superDesc: "Summons bats in a straight line that drain life and heal Mortis.",
+                color: "#A78BFA",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#4B5563" stroke="#000" stroke-width="4"/>
+                        <ellipse cx="50" cy="48" rx="18" ry="18" fill="#E2E8F0" stroke="#000" stroke-width="4"/>
+                        <path d="M20 30 Q50 -5 80 30" fill="#1F2937" stroke="#000" stroke-width="4"/>
+                        <rect x="25" y="24" width="50" height="8" rx="4" fill="#6B7280" stroke="#000" stroke-width="3"/>
+                        <path d="M25 65 C30 50, 70 50, 75 65" fill="#6B21A8" stroke="#000" stroke-width="3"/>
+                        <circle cx="42" cy="46" r="4" fill="#EF4444" /> <circle cx="58" cy="46" r="4" fill="#EF4444" />
+                      </svg>`
+            },
+            spike: {
+                id: "spike", name: "Spike", rarity: "Legendary", health: 35, attack: 90,
+                superTitle: "Needle Field", superDesc: "Throws a bomb that slows down and damages targets in a large circle.",
+                color: "#10B981",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#15803D" stroke="#000" stroke-width="4"/>
+                        <ellipse cx="50" cy="48" rx="20" ry="20" fill="#4ADE80" stroke="#000" stroke-width="4"/>
+                        <circle cx="42" cy="45" r="5" fill="#000" /> <circle cx="58" cy="45" r="5" fill="#000" />
+                        <ellipse cx="50" cy="58" rx="7" ry="5" fill="#000" />
+                        <path d="M40 22 Q50 8 60 22 Q50 16 40 22" fill="#EF4444" stroke="#000" stroke-width="2"/>
+                      </svg>`
+            },
+            leon: {
+                id: "leon", name: "Leon", rarity: "Legendary", health: 50, attack: 80,
+                superTitle: "Smoke Bomb", superDesc: "Grants absolute invisibility for 6 seconds. Attacks break the stealth.",
+                color: "#3B82F6",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#059669" stroke="#000" stroke-width="4"/>
+                        <circle cx="50" cy="46" r="20" fill="#059669" stroke="#000" stroke-width="4"/>
+                        <rect x="30" y="44" width="40" height="15" rx="3" fill="#D1FAE5" stroke="#000" stroke-width="3"/>
+                        <!-- Lollipop stick -->
+                        <rect x="48" y="55" width="4" height="15" fill="#FFF" stroke="#000" stroke-width="1.5"/>
+                        <circle cx="50" cy="70" r="5" fill="#EC4899" stroke="#000" stroke-width="1.5"/>
+                      </svg>`
+            },
+            crow: {
+                id: "crow", name: "Crow", rarity: "Legendary", health: 30, attack: 75,
+                superTitle: "Swoop Jump", superDesc: "Jumps in the air, throwing toxic daggers radially on takeoff and landing.",
+                color: "#1F2937",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#111827" stroke="#000" stroke-width="4"/>
+                        <!-- Crow Beak -->
+                        <polygon points="50,65 38,40 62,40" fill="#FBBF24" stroke="#000" stroke-width="3"/>
+                        <ellipse cx="40" cy="38" rx="4" ry="6" fill="#FDE047" stroke="#000" stroke-width="2"/>
+                        <ellipse cx="60" cy="38" rx="4" ry="6" fill="#FDE047" stroke="#000" stroke-width="2"/>
+                        <circle cx="40" cy="38" r="2" fill="#000" /> <circle cx="60" cy="38" r="2" fill="#000" />
+                      </svg>`
+            },
+            rico: {
+                id: "rico", name: "Rico", rarity: "Super Rare", health: 38, attack: 75,
+                superTitle: "Trick Shot", superDesc: "Fires a long barrage of bouncy bullets that pierce enemies and extend range on bounce.",
+                color: "#F43F5E",
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <circle cx="50" cy="50" r="45" fill="#EC4899" stroke="#000" stroke-width="4"/>
+                        <circle cx="50" cy="46" r="16" fill="#D1D5DB" stroke="#000" stroke-width="2"/>
+                        <circle cx="50" cy="46" r="6" fill="#EF4444"/>
+                        <rect x="42" y="66" width="16" height="12" fill="#3B82F6" stroke="#000" stroke-width="1.5"/>
+                      </svg>`
+            }
+        };
+
+        let currentTrophies = 150;
+        let selectedBrawlerId = "shelly";
+
+        // Initialize Lobby Grid
+        function initLobby() {
+            const grid = document.getElementById('roster-grid');
+            grid.innerHTML = '';
+            
+            Object.values(roster).forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = `relative aspect-[4/3] w-full border-4 border-black rounded-2xl overflow-hidden hover:scale-105 active:scale-95 transition-transform shadow-md select-none outline-none group`;
+                btn.id = `roster-${b.id}`;
+                btn.onclick = () => selectLobbyBrawler(b.id);
+                
+                // Determine color based on rarity
+                let color = '#FFCB05'; // default legend yellow
+                if (b.rarity === 'Common') color = '#3B82F6';
+                else if (b.rarity === 'Rare') color = '#22C55E';
+                else if (b.rarity === 'Super Rare') color = '#00A2E8';
+                else if (b.rarity === 'Epic') color = '#A855F7';
+                else if (b.rarity === 'Mythic') color = '#EF4444';
+                else if (b.rarity === 'Chromatic') color = '#10B981';
+
+                // Fixed/Realistic trophy number
+                const brawlerTrophies = 500;
+
+                btn.style.backgroundColor = color;
+                btn.innerHTML = `
+                    <!-- Portrait SVG scaled for close-up -->
+                    <div class="absolute inset-0 flex items-center justify-center scale-[1.6] translate-y-3.5 transition group-hover:scale-[1.8]">
+                        ${b.svg}
+                    </div>
+
+                    <!-- Top Left Power Level Shield -->
+                    <div class="absolute top-0.5 left-0.5 flex items-center justify-center z-10">
+                        <svg viewBox="0 0 100 100" class="w-5 h-5 drop-shadow">
+                            <polygon points="50,10 85,25 85,60 50,90 15,60 15,25" fill="#FF5E00" stroke="#000" stroke-width="8"/>
+                            <text x="50" y="65" font-family="Lilita One" font-size="50" font-weight="900" fill="#FFF" text-anchor="middle" stroke="#000" stroke-width="4">11</text>
+                        </svg>
+                    </div>
+
+                    <!-- Top Middle Trophies -->
+                    <div class="absolute top-0.5 left-5.5 bg-black/70 border border-black rounded px-1 flex items-center gap-0.5 text-[6px] font-bold text-white z-10">
+                        <span>🏆</span>
+                        <span>${brawlerTrophies}</span>
+                    </div>
+
+                    <!-- Bottom Right Name -->
+                    <div class="absolute bottom-4 right-1.5 font-brawl text-[8px] md:text-[9px] text-white uppercase tracking-wider stroke-black-3 text-shadow-brawl select-none pointer-events-none z-10">
+                        ${b.name}
+                    </div>
+
+                    <!-- Bottom Status Green Bar -->
+                    <div class="absolute bottom-0 left-0 right-0 h-3.5 bg-[#22C55E] border-t border-black flex items-center justify-between px-1.5 text-[6px] font-bold text-white z-10">
+                        <div class="flex items-center gap-0.5">
+                            <span class="w-2 h-2 rounded-full bg-pink-500 border border-black/40 flex items-center justify-center text-[4px]">⚡</span>
+                            <span>20</span>
+                        </div>
+                        <div class="flex items-center gap-0.5">
+                            <span class="w-2 h-2 rounded-full bg-brawlYellow border border-black/40 flex items-center justify-center text-[4px] text-black">🪙</span>
+                            <span>20</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(btn);
+            });
+
+            // Update trophies from storage
+            const stored = localStorage.getItem('brawl2d_trophies');
+            if (stored) {
+                currentTrophies = parseInt(stored);
+                document.getElementById('player-trophies').textContent = currentTrophies;
+            }
+
+            selectLobbyBrawler('shelly');
+            startBgMusic();
+        }
+
+        function selectLobbyBrawler(id) {
+            selectedBrawlerId = id;
+            const data = roster[id];
+            if (!data) return;
+
+            // Highlight border
+            document.querySelectorAll('#roster-grid button').forEach(b => b.classList.remove('border-brawlYellow'));
+            const activeBtn = document.getElementById(`roster-${id}`);
+            if (activeBtn) activeBtn.classList.add('border-brawlYellow');
+
+            // Apply spin animation
+            const showcase = document.getElementById('lobby-portrait-container');
+            showcase.innerHTML = data.svg;
+            showcase.classList.remove('spin-brawler');
+            void showcase.offsetWidth; // trigger reflow
+            showcase.classList.add('spin-brawler');
+
+            // Details info
+            document.getElementById('lobby-brawler-name').textContent = data.name;
+            document.getElementById('lobby-brawler-rarity').textContent = data.rarity;
+            
+            const badge = document.getElementById('lobby-brawler-rarity');
+            if (data.rarity === 'Legendary') {
+                badge.className = "bg-orange-500 text-white font-brawl text-xs px-3 py-1 border-2 border-black rounded-lg uppercase mt-1 tracking-wider";
+            } else if (data.rarity === 'Mythic') {
+                badge.className = "bg-red-600 text-white font-brawl text-xs px-3 py-1 border-2 border-black rounded-lg uppercase mt-1 tracking-wider";
+            } else if (data.rarity === 'Epic') {
+                badge.className = "bg-purple-600 text-white font-brawl text-xs px-3 py-1 border-2 border-black rounded-lg uppercase mt-1 tracking-wider";
+            } else if (data.rarity === 'Super Rare') {
+                badge.className = "bg-blue-600 text-white font-brawl text-xs px-3 py-1 border-2 border-black rounded-lg uppercase mt-1 tracking-wider";
+            } else {
+                badge.className = "bg-slate-500 text-white font-brawl text-xs px-3 py-1 border-2 border-black rounded-lg uppercase mt-1 tracking-wider";
+            }
+
+            // Stats
+            document.getElementById('lobby-stat-health-txt').textContent = `${data.health}%`;
+            document.getElementById('lobby-stat-health-bar').style.width = `${data.health}%`;
+            
+            document.getElementById('lobby-stat-attack-txt').textContent = `${data.attack}%`;
+            document.getElementById('lobby-stat-attack-bar').style.width = `${data.attack}%`;
+
+            document.getElementById('lobby-super-title').textContent = data.superTitle;
+            document.getElementById('lobby-super-desc').textContent = data.superDesc;
+
+            // Background card color glow tint
+            document.getElementById('lobby-card-rarity-glow').style.backgroundColor = data.color;
+
+            playSound('heal');
+        }
+
+        // -------------------------------------------------------------
+        // GAMEPLAY ENGINE SYSTEM
+        // -------------------------------------------------------------
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let gameActive = false;
+        let camera = { x: 0, y: 0 };
+        const MAP_SIZE = { w: 1800, h: 1200 };
+
+        let player = null;
+        let brawlers = []; // All players + bots
+        let projectiles = [];
+        let gems = [];
+        let floatingTexts = [];
+        let mapObstacles = []; // walls, bushes, etc.
+        let particles = [];
+        
+        let gemMineTimer = 0;
+        let matchTimer = 120; // 2 minutes
+        let timerInterval = null;
+
+        let matchCountdown = -1; // 15s countdown once a team has 10 gems
+        let matchCountdownTeam = ''; // 'blue' or 'red'
+
+        // Touch Joysticks State
+        let touchMoveOrigin = null;
+        let touchMoveCurrent = null;
+        let touchShootOrigin = null;
+        let touchShootCurrent = null;
+        let mobileControlsActive = false;
+
+        // Key states
+        const keys = { w: false, a: false, s: false, d: false, Space: false, Shift: false };
+        let mousePos = { x: 0, y: 0 };
+        let isSuperActive = false;
+
+        // Auto Resize Canvas
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // Detect touch capability to enable joysticks
+        window.addEventListener('touchstart', () => {
+            mobileControlsActive = true;
+            document.getElementById('mobile-controls').style.display = 'flex';
+        }, { once: true });
+
+        // Input Listeners
+        window.addEventListener('keydown', e => {
+            const k = e.key.toLowerCase();
+            if (k === 'w' || e.key === 'ArrowUp') keys.w = true;
+            if (k === 'a' || e.key === 'ArrowLeft') keys.a = true;
+            if (k === 's' || e.key === 'ArrowDown') keys.s = true;
+            if (k === 'd' || e.key === 'ArrowRight') keys.d = true;
+            if (e.key === ' ' || e.key === 'Shift') {
+                if (player && player.superCharged >= 100) {
+                    isSuperActive = !isSuperActive;
+                    playSound('super_ready');
+                }
+            }
+        });
+
+        window.addEventListener('keyup', e => {
+            const k = e.key.toLowerCase();
+            if (k === 'w' || e.key === 'ArrowUp') keys.w = false;
+            if (k === 'a' || e.key === 'ArrowLeft') keys.a = false;
+            if (k === 's' || e.key === 'ArrowDown') keys.s = false;
+            if (k === 'd' || e.key === 'ArrowRight') keys.d = false;
+        });
+
+        // Mouse listeners
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            mousePos.x = e.clientX - rect.left;
+            mousePos.y = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('mousedown', e => {
+            if (!gameActive || !player || player.hp <= 0) return;
+            // Shoot in direction of mouse click relative to screen position
+            const worldMouseX = mousePos.x + camera.x;
+            const worldMouseY = mousePos.y + camera.y;
+            
+            const dx = worldMouseX - player.x;
+            const dy = worldMouseY - player.y;
+            const angle = Math.atan2(dy, dx);
+            
+            fireWeapon(player, angle, isSuperActive);
+            isSuperActive = false; // consume super
+        });
+
+        // Initialize Map obstacles
+        function buildMap() {
+            mapObstacles = [];
+            
+            // Outer borders
+            const borderThickness = 40;
+            mapObstacles.push({ type: 'W', x: 0, y: 0, w: MAP_SIZE.w, h: borderThickness }); // top
+            mapObstacles.push({ type: 'W', x: 0, y: MAP_SIZE.h - borderThickness, w: MAP_SIZE.w, h: borderThickness }); // bottom
+            mapObstacles.push({ type: 'W', x: 0, y: 0, w: borderThickness, h: MAP_SIZE.h }); // left
+            mapObstacles.push({ type: 'W', x: MAP_SIZE.w - borderThickness, y: 0, w: borderThickness, h: MAP_SIZE.h }); // right
+
+            // Bushes and breakable wood walls (symmetrical layout)
+            const addSymmetricalWall = (x, y, w, h, breakable = false) => {
+                const t = breakable ? 'D' : 'W'; // D = Destructible wood, W = stone wall
+                mapObstacles.push({ type: t, x, y, w, h, hp: breakable ? 3000 : Infinity });
+                mapObstacles.push({ type: t, x: MAP_SIZE.w - x - w, y: MAP_SIZE.h - y - h, w, h, hp: breakable ? 3000 : Infinity });
+            };
+
+            const addSymmetricalBush = (x, y, w, h) => {
+                mapObstacles.push({ type: 'B', x, y, w, h });
+                mapObstacles.push({ type: 'B', x: MAP_SIZE.w - x - w, y: MAP_SIZE.h - y - h, w, h });
+            };
+
+            // center ring walls
+            addSymmetricalWall(650, 450, 40, 300);
+            addSymmetricalWall(750, 350, 300, 40);
+            
+            // Symmetrical bushes
+            addSymmetricalBush(450, 300, 160, 160);
+            addSymmetricalBush(200, 500, 180, 200);
+            addSymmetricalBush(750, 500, 300, 200); // center bushes around mine
+
+            // Symmetrical breakable wood fences
+            addSymmetricalWall(450, 180, 200, 40, true);
+            addSymmetricalWall(1150, 180, 200, 40, true);
+            addSymmetricalWall(300, 800, 40, 180, true);
+        }
+
+        // Setup Match
+        function startGame() {
+            document.getElementById('lobby-screen').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            resizeCanvas();
+
+            audioCtx.resume();
+            stopBgMusic(); // stop menu music
+
+            gameActive = true;
+            matchTimer = 120;
+            matchCountdown = -1;
+            matchCountdownTeam = '';
+            projectiles = [];
+            gems = [];
+            floatingTexts = [];
+            particles = [];
+            
+            buildMap();
+
+            // Setup Team lists
+            const selectedData = roster[selectedBrawlerId];
+            
+            // Create Player
+            player = {
+                id: 'player',
+                name: selectedData.name,
+                brawlerId: selectedBrawlerId,
+                team: 'blue',
+                x: 900,
+                y: 1050,
+                vx: 0, vy: 0,
+                radius: 26,
+                speed: 4.8,
+                hp: selectedData.health * 70 + 3000,
+                maxHp: selectedData.health * 70 + 3000,
+                ammo: 3,
+                reloadTimer: 0,
+                superCharged: 0, // 0 to 100
+                inBush: false,
+                lastHitTime: 0,
+                lastShootTime: 0,
+                gems: 0,
+                isPlayer: true
+            };
+
+            brawlers = [player];
+
+            // Setup 2 friendly bots
+            const ids = Object.keys(roster).filter(id => id !== selectedBrawlerId);
+            const getRandId = () => ids.splice(Math.floor(Math.random() * ids.length), 1)[0];
+
+            const b1 = getRandId();
+            brawlers.push(createBot(b1, 'blue', 700, 1080));
+            const b2 = getRandId();
+            brawlers.push(createBot(b2, 'blue', 1100, 1080));
+
+            // Setup 3 enemy bots
+            brawlers.push(createBot(getRandId(), 'red', 700, 120));
+            brawlers.push(createBot(getRandId(), 'red', 900, 100));
+            brawlers.push(createBot(getRandId(), 'red', 1100, 120));
+
+            // Start clock
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!gameActive) return;
+                
+                // standard timer
+                if (matchCountdown === -1) {
+                    matchTimer--;
+                    if (matchTimer <= 0) {
+                        endMatch(checkWinningTeamByGems());
+                    }
+                } else {
+                    // gem grab countdown
+                    matchCountdown--;
+                    if (matchCountdown <= 0) {
+                        endMatch(matchCountdownTeam);
+                    }
+                }
+                updateHUD();
+            }, 1000);
+
+            // Spawn first gem instantly
+            spawnGem();
+
+            // Mobile joystick initial setup
+            initTouchControls();
+
+            // Run Main Loop
+            requestAnimationFrame(gameLoop);
+        }
+
+        function createBot(brawlerId, team, x, y) {
+            const data = roster[brawlerId];
+            return {
+                id: 'bot_' + Math.random().toString(36).substr(2, 5),
+                name: "Bot " + data.name,
+                brawlerId,
+                team,
+                x, y,
+                vx: 0, vy: 0,
+                radius: 26,
+                speed: 4.2,
+                hp: data.health * 70 + 3000,
+                maxHp: data.health * 70 + 3000,
+                ammo: 3,
+                reloadTimer: 0,
+                superCharged: 0,
+                inBush: false,
+                lastHitTime: 0,
+                lastShootTime: 0,
+                gems: 0,
+                isPlayer: false,
+                aiState: 'COLLECTING_GEM',
+                aiTarget: null,
+                aiCooldown: 0
+            };
+        }
+
+        // Fire Projectiles based on brawler definitions
+        function fireWeapon(b, angle, isSuper = false) {
+            if (b.ammo < 1 && !isSuper) return; // need ammo
+            if (isSuper && b.superCharged < 100) return; // need super
+
+            b.lastShootTime = Date.now();
+            if (!isSuper) {
+                b.ammo--;
+                b.reloadTimer = 60; // cooldown reload duration (frames)
+            } else {
+                b.superCharged = 0;
+            }
+
+            playSound('shoot');
+
+            const id = b.brawlerId;
+            const px = b.x + Math.cos(angle) * b.radius;
+            const py = b.y + Math.sin(angle) * b.radius;
+
+            if (id === 'shelly') {
+                const pellets = isSuper ? 9 : 5;
+                const spread = isSuper ? 0.45 : 0.3;
+                const damage = isSuper ? 620 : 500;
+                const speed = isSuper ? 13 : 11;
+                const range = isSuper ? 480 : 360;
+
+                for (let i = 0; i < pellets; i++) {
+                    const offset = (i - (pellets - 1)/2) * (spread / pellets);
+                    projectiles.push({
+                        x: px, y: py,
+                        vx: Math.cos(angle + offset) * speed,
+                        vy: Math.sin(angle + offset) * speed,
+                        radius: 7,
+                        damage,
+                        owner: b,
+                        range,
+                        distTraveled: 0,
+                        color: isSuper ? '#FF8F00' : '#E0E0E0',
+                        breakWalls: isSuper
+                    });
+                }
+            } 
+            else if (id === 'colt') {
+                const count = isSuper ? 12 : 6;
+                const damage = isSuper ? 720 : 580;
+                const speed = 15;
+                const range = isSuper ? 600 : 500;
+
+                // Fire stream
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        if (!gameActive || b.hp <= 0) return;
+                        const bx = b.x + Math.cos(angle) * b.radius;
+                        const by = b.y + Math.sin(angle) * b.radius;
+                        projectiles.push({
+                            x: bx, y: by,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            radius: 6,
+                            damage,
+                            owner: b,
+                            range,
+                            distTraveled: 0,
+                            color: isSuper ? '#FFCB05' : '#4FC3F7',
+                            breakWalls: isSuper,
+                            pierce: isSuper
+                        });
+                        playSound('shoot');
+                    }, i * 120);
+                }
+            }
+            else if (id === 'el_primo') {
+                if (isSuper) {
+                    // Leap mechanics
+                    b.leapTarget = { x: b.x + Math.cos(angle)*350, y: b.y + Math.sin(angle)*350 };
+                    b.leapStart = { x: b.x, y: b.y };
+                    b.leapProgress = 0;
+                    b.isLeaping = true;
+                } else {
+                    // Flurry punches
+                    for (let i = 0; i < 4; i++) {
+                        setTimeout(() => {
+                            if (!gameActive || b.hp <= 0) return;
+                            const bx = b.x + Math.cos(angle) * b.radius;
+                            const by = b.y + Math.sin(angle) * b.radius;
+                            projectiles.push({
+                                x: bx, y: by,
+                                vx: Math.cos(angle) * 9,
+                                vy: Math.sin(angle) * 9,
+                                radius: 18,
+                                damage: 720,
+                                owner: b,
+                                range: 140,
+                                distTraveled: 0,
+                                color: 'rgba(255, 203, 5, 0.4)',
+                                isMelee: true
+                            });
+                            playSound('shoot');
+                        }, i * 90);
+                    }
+                }
+            }
+            else if (id === 'poco') {
+                const count = 7;
+                const spread = 0.8;
+                const damage = 1100;
+                const range = 340;
+                
+                if (isSuper) {
+                    // Heal Wave
+                    for (let i = 0; i < count; i++) {
+                        const offset = (i - (count - 1)/2) * (spread / count);
+                        projectiles.push({
+                            x: px, y: py,
+                            vx: Math.cos(angle + offset) * 10,
+                            vy: Math.sin(angle + offset) * 10,
+                            radius: 22,
+                            damage: -2800, // negative represents healing!
+                            owner: b,
+                            range: 420,
+                            distTraveled: 0,
+                            color: '#4ADE80'
+                        });
+                    }
+                    playSound('heal');
+                } else {
+                    // Attack Wave
+                    for (let i = 0; i < count; i++) {
+                        const offset = (i - (count - 1)/2) * (spread / count);
+                        projectiles.push({
+                            x: px, y: py,
+                            vx: Math.cos(angle + offset) * 8.5,
+                            vy: Math.sin(angle + offset) * 8.5,
+                            radius: 16,
+                            damage,
+                            owner: b,
+                            range,
+                            distTraveled: 0,
+                            color: '#FFB300'
+                        });
+                    }
+                }
+            }
+            else if (id === 'edgar') {
+                if (isSuper) {
+                    b.leapTarget = { x: b.x + Math.cos(angle)*300, y: b.y + Math.sin(angle)*300 };
+                    b.leapStart = { x: b.x, y: b.y };
+                    b.leapProgress = 0;
+                    b.isLeaping = true;
+                } else {
+                    for (let i = 0; i < 2; i++) {
+                        setTimeout(() => {
+                            if (!gameActive || b.hp <= 0) return;
+                            const bx = b.x + Math.cos(angle) * b.radius;
+                            const by = b.y + Math.sin(angle) * b.radius;
+                            projectiles.push({
+                                x: bx, y: by,
+                                vx: Math.cos(angle) * 10,
+                                vy: Math.sin(angle) * 10,
+                                radius: 16,
+                                damage: 840,
+                                owner: b,
+                                range: 120,
+                                distTraveled: 0,
+                                color: 'rgba(255, 94, 0, 0.4)',
+                                isMelee: true,
+                                lifesteal: 0.35
+                            });
+                            playSound('shoot');
+                        }, i * 80);
+                    }
+                }
+            }
+            else if (id === 'piper') {
+                if (isSuper) {
+                    b.leapTarget = { x: b.x + Math.cos(angle)*260, y: b.y + Math.sin(angle)*260 };
+                    b.leapStart = { x: b.x, y: b.y };
+                    b.leapProgress = 0;
+                    b.isLeaping = true;
+                    // Drop 4 grenades at feet
+                    for (let i = 0; i < 4; i++) {
+                        const theta = (i / 4) * Math.PI * 2;
+                        projectiles.push({
+                            x: b.x + Math.cos(theta)*30, y: b.y + Math.sin(theta)*30,
+                            vx: 0, vy: 0,
+                            radius: 35,
+                            damage: 1500,
+                            owner: b,
+                            range: 10,
+                            distTraveled: 0,
+                            color: '#EC4899',
+                            isBomb: true,
+                            fuse: 45 // explodes after 45 frames
+                        });
+                    }
+                } else {
+                    // Bullet damage scales with range
+                    projectiles.push({
+                        x: px, y: py,
+                        vx: Math.cos(angle) * 16,
+                        vy: Math.sin(angle) * 16,
+                        radius: 5,
+                        damage: 2600, // base max range
+                        owner: b,
+                        range: 650,
+                        distTraveled: 0,
+                        color: '#EC4899',
+                        piperScaling: true
+                    });
+                }
+            }
+            else if (id === 'mortis') {
+                if (isSuper) {
+                    projectiles.push({
+                        x: px, y: py,
+                        vx: Math.cos(angle) * 12,
+                        vy: Math.sin(angle) * 12,
+                        radius: 30,
+                        damage: 1300,
+                        owner: b,
+                        range: 500,
+                        distTraveled: 0,
+                        color: '#D8B4FE',
+                        pierce: true,
+                        lifesteal: 1.0 // heals 100% of damage dealt!
+                    });
+                } else {
+                    // Mortis dash attack
+                    const dashDist = 140;
+                    const destX = b.x + Math.cos(angle) * dashDist;
+                    const destY = b.y + Math.sin(angle) * dashDist;
+                    
+                    // Move Mortis directly (checking wall collisions)
+                    let step = 0;
+                    const maxSteps = 10;
+                    for (let i = 1; i <= maxSteps; i++) {
+                        const tx = b.x + Math.cos(angle) * (dashDist / maxSteps);
+                        const ty = b.y + Math.sin(angle) * (dashDist / maxSteps);
+                        if (!checkWallCollision(tx, ty, b.radius)) {
+                            b.x = tx;
+                            b.y = ty;
+                        } else break;
+                    }
+
+                    // Create melee hitbox
+                    projectiles.push({
+                        x: b.x, y: b.y,
+                        vx: 0, vy: 0,
+                        radius: b.radius + 15,
+                        damage: 1100,
+                        owner: b,
+                        range: 10,
+                        distTraveled: 0,
+                        color: 'rgba(124, 58, 237, 0.3)',
+                        isMelee: true
+                    });
+                }
+            }
+            else if (id === 'spike') {
+                if (isSuper) {
+                    projectiles.push({
+                        x: px, y: py,
+                        vx: Math.cos(angle) * 10,
+                        vy: Math.sin(angle) * 10,
+                        radius: 20,
+                        damage: 400, // tick damage
+                        owner: b,
+                        range: 400,
+                        distTraveled: 0,
+                        color: '#4ADE80',
+                        isSpikePatch: true,
+                        ticks: 5,
+                        tickTimer: 0
+                    });
+                } else {
+                    projectiles.push({
+                        x: px, y: py,
+                        vx: Math.cos(angle) * 9,
+                        vy: Math.sin(angle) * 9,
+                        radius: 10,
+                        damage: 1100,
+                        owner: b,
+                        range: 360,
+                        distTraveled: 0,
+                        color: '#22C55E',
+                        isSpikeBall: true
+                    });
+                }
+            }
+            else if (id === 'leon') {
+                if (isSuper) {
+                    b.stealthTimer = 360; // 6 seconds
+                    b.stealthActive = true;
+                    spawnParticles(b.x, b.y, '#94A3B8', 15);
+                } else {
+                    b.stealthActive = false; // break stealth
+                    // Throw 4 blades in quick succession
+                    for (let i = 0; i < 4; i++) {
+                        setTimeout(() => {
+                            if (!gameActive || b.hp <= 0) return;
+                            const bx = b.x + Math.cos(angle) * b.radius;
+                            const by = b.y + Math.sin(angle) * b.radius;
+                            projectiles.push({
+                                x: bx, y: by,
+                                vx: Math.cos(angle + (i-1.5)*0.06) * 13,
+                                vy: Math.sin(angle + (i-1.5)*0.06) * 13,
+                                radius: 6,
+                                damage: 700,
+                                owner: b,
+                                range: 450,
+                                distTraveled: 0,
+                                color: '#10B981'
+                            });
+                            playSound('shoot');
+                        }, i * 70);
+                    }
+                }
+            }
+            else if (id === 'crow') {
+                if (isSuper) {
+                    b.leapTarget = { x: b.x + Math.cos(angle)*300, y: b.y + Math.sin(angle)*300 };
+                    b.leapStart = { x: b.x, y: b.y };
+                    b.leapProgress = 0;
+                    b.isLeaping = true;
+                    fireCrowRing(b); // fire ring on takeoff
+                } else {
+                    // Fire 3 daggers
+                    const spread = 0.25;
+                    for (let i = 0; i < 3; i++) {
+                        const offset = (i - 1) * spread;
+                        projectiles.push({
+                            x: px, y: py,
+                            vx: Math.cos(angle + offset) * 12,
+                            vy: Math.sin(angle + offset) * 12,
+                            radius: 5,
+                            damage: 520,
+                            owner: b,
+                            range: 480,
+                            distTraveled: 0,
+                            color: '#FBBF24',
+                            isPoisonous: true
+                        });
+                    }
+                }
+            }
+            else if (id === 'rico') {
+                const count = isSuper ? 12 : 5;
+                const damage = isSuper ? 650 : 520;
+                const speed = isSuper ? 14 : 11.5;
+                const range = isSuper ? 550 : 420;
+
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        if (!gameActive || b.hp <= 0) return;
+                        const rx = b.x + Math.cos(angle)*b.radius;
+                        const ry = b.y + Math.sin(angle)*b.radius;
+                        projectiles.push({
+                            x: rx, y: ry,
+                            vx: Math.cos(angle + (Math.random()*0.08 - 0.04)) * speed,
+                            vy: Math.sin(angle + (Math.random()*0.08 - 0.04)) * speed,
+                            radius: isSuper ? 8 : 6,
+                            damage,
+                            owner: b,
+                            range,
+                            distTraveled: 0,
+                            color: isSuper ? '#EC4899' : '#F43F5E',
+                            isBouncy: true,
+                            bounces: isSuper ? 5 : 3,
+                            pierce: isSuper
+                        });
+                        playSound('shoot');
+                    }, i * 110);
+                }
+            }
+        }
+
+        function fireCrowRing(b) {
+            const count = 14;
+            const px = b.x;
+            const py = b.y;
+            for (let i = 0; i < count; i++) {
+                const theta = (i / count) * Math.PI * 2;
+                projectiles.push({
+                    x: px, y: py,
+                    vx: Math.cos(theta) * 11,
+                    vy: Math.sin(theta) * 11,
+                    radius: 5,
+                    damage: 520,
+                    owner: b,
+                    range: 300,
+                    distTraveled: 0,
+                    color: '#FBBF24',
+                    isPoisonous: true
+                });
+            }
+        }
+
+        function spawnGem() {
+            gems.push({
+                x: 900 + (Math.random() * 40 - 20),
+                y: 600 + (Math.random() * 40 - 20),
+                radius: 12,
+                bob: 0
+            });
+        }
+
+        // -------------------------------------------------------------
+        // GAME ENGINE UPDATE LOOP
+        // -------------------------------------------------------------
+        function gameLoop() {
+            if (!gameActive) return;
+
+            updateEntities();
+            checkCollisions();
+            drawGame();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function updateEntities() {
+            // Reload timer for player autotasks
+            brawlers.forEach(b => {
+                if (b.hp <= 0) {
+                    // Respawn timer
+                    b.respawnTimer = (b.respawnTimer || 0) - 1;
+                    if (b.respawnTimer <= 0) {
+                        b.hp = b.maxHp;
+                        b.ammo = 3;
+                        b.superCharged = 0;
+                        b.stealthActive = false;
+                        if (b.team === 'blue') {
+                            b.x = 900 + (Math.random()*200 - 100);
+                            b.y = 1050;
+                        } else {
+                            b.x = 900 + (Math.random()*200 - 100);
+                            b.y = 150;
+                        }
+                    }
+                    return;
+                }
+
+                // Health auto regen
+                if (Date.now() - b.lastHitTime > 4000 && Date.now() - b.lastShootTime > 4000) {
+                    if (b.hp < b.maxHp) {
+                        const healAmount = Math.ceil(b.maxHp * 0.08);
+                        b.hp = Math.min(b.maxHp, b.hp + healAmount);
+                        floatingTexts.push({ x: b.x, y: b.y - 35, text: `+${healAmount}`, color: '#4ADE80', timer: 40 });
+                        playSound('heal');
+                    }
+                }
+
+                // Weapon reload
+                if (b.reloadTimer > 0) b.reloadTimer--;
+                else if (b.ammo < 3) {
+                    b.ammo++;
+                    b.reloadTimer = 55;
+                }
+
+                // Edgar passive Super charge
+                if (b.brawlerId === 'edgar' && b.superCharged < 100) {
+                    b.superCharged = Math.min(100, b.superCharged + 0.15);
+                }
+
+                // Leon stealth countdown
+                if (b.stealthActive) {
+                    b.stealthTimer--;
+                    if (b.stealthTimer <= 0) b.stealthActive = false;
+                }
+
+                // Handle leaping
+                if (b.isLeaping) {
+                    b.leapProgress += 0.05;
+                    b.x = b.leapStart.x + (b.leapTarget.x - b.leapStart.x) * b.leapProgress;
+                    b.y = b.leapStart.y + (b.leapTarget.y - b.leapStart.y) * b.leapProgress;
+                    
+                    if (b.leapProgress >= 1) {
+                        b.isLeaping = false;
+                        b.x = b.leapTarget.x;
+                        b.y = b.leapTarget.y;
+                        
+                        // triggers
+                        if (b.brawlerId === 'el_primo') {
+                            projectiles.push({
+                                x: b.x, y: b.y, vx: 0, vy: 0,
+                                radius: 80, damage: 1500, owner: b, range: 10, distTraveled: 0,
+                                color: 'rgba(255, 94, 0, 0.5)', isMelee: true, breakWalls: true
+                            });
+                            playSound('break');
+                        } else if (b.brawlerId === 'crow') {
+                            fireCrowRing(b); // Ring on landing
+                        }
+                    }
+                }
+
+                // Apply poison effect
+                if (b.poisonTimer > 0) {
+                    b.poisonTimer--;
+                    if (b.poisonTimer % 30 === 0) { // damage every half second
+                        const poisonDmg = 150;
+                        b.hp -= poisonDmg;
+                        b.lastHitTime = Date.now();
+                        floatingTexts.push({ x: b.x, y: b.y - 30, text: `-${poisonDmg}`, color: '#22C55E', timer: 30 });
+                        playSound('hit');
+                    }
+                }
+
+                // AI Logic for bots
+                if (!b.isPlayer && !b.isLeaping) {
+                    runBotAI(b);
+                }
+            });
+
+            // Player control updates
+            if (player && player.hp > 0 && !player.isLeaping) {
+                let dx = 0;
+                let dy = 0;
+                if (keys.w) dy = -1;
+                if (keys.s) dy = 1;
+                if (keys.a) dx = -1;
+                if (keys.d) dx = 1;
+
+                if (mobileControlsActive && touchMoveCurrent) {
+                    const dispX = touchMoveCurrent.x - touchMoveOrigin.x;
+                    const dispY = touchMoveCurrent.y - touchMoveOrigin.y;
+                    const dist = Math.hypot(dispX, dispY);
+                    if (dist > 10) {
+                        dx = dispX / dist;
+                        dy = dispY / dist;
+                    }
+                }
+
+                if (dx !== 0 || dy !== 0) {
+                    const speed = player.speed;
+                    // Normalize diagonal movement
+                    const angle = Math.atan2(dy, dx);
+                    const tx = player.x + Math.cos(angle) * speed;
+                    const ty = player.y + Math.sin(angle) * speed;
+
+                    // Wall Collisions
+                    if (!checkWallCollision(tx, player.y, player.radius)) player.x = tx;
+                    if (!checkWallCollision(player.x, ty, player.radius)) player.y = ty;
+                }
+
+                // Constrain player inside bounds
+                player.x = Math.max(player.radius, Math.min(MAP_SIZE.w - player.radius, player.x));
+                player.y = Math.max(player.radius, Math.min(MAP_SIZE.h - player.radius, player.y));
+            }
+
+            // Camera follow player
+            if (player) {
+                camera.x = player.x - canvas.width / 2;
+                camera.y = player.y - canvas.height / 2;
+                camera.x = Math.max(0, Math.min(MAP_SIZE.w - canvas.width, camera.x));
+                camera.y = Math.max(0, Math.min(MAP_SIZE.h - canvas.height, camera.y));
+            }
+
+            // Gem Mine spawning clock
+            gemMineTimer++;
+            if (gemMineTimer > 420) { // ~7 seconds
+                gemMineTimer = 0;
+                if (gems.length < 15) {
+                    spawnGem();
+                    playSound('gem');
+                }
+            }
+
+            // Update Projectiles
+            projectiles.forEach((p, idx) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.distTraveled += Math.hypot(p.vx, p.vy);
+
+                if (p.isBomb) {
+                    p.fuse--;
+                    if (p.fuse <= 0) {
+                        // Explode!
+                        checkAoEDamage(p.x, p.y, p.radius, p.damage, p.owner, true);
+                        projectiles.splice(idx, 1);
+                        spawnParticles(p.x, p.y, '#F43F5E', 25);
+                        playSound('break');
+                    }
+                    return;
+                }
+
+                if (p.isSpikePatch) {
+                    p.tickTimer++;
+                    if (p.tickTimer >= 60) { // every 1 sec
+                        p.tickTimer = 0;
+                        checkAoEDamage(p.x, p.y, p.radius, p.damage, p.owner, false, true); // slow & dmg
+                        p.ticks--;
+                    }
+                    if (p.ticks <= 0) projectiles.splice(idx, 1);
+                    return;
+                }
+
+                // Check wall collision for standard bullet projectiles
+                if (!p.pierce && !p.isMelee && checkWallCollision(p.x, p.y, p.radius)) {
+                    if (p.isBouncy && p.bounces > 0) {
+                        p.bounces--;
+                        p.range += 120;
+                        const obs = getCollidedWall(p.x, p.y, p.radius);
+                        if (obs) {
+                            const closestX = Math.max(obs.x, Math.min(p.x, obs.x + obs.w));
+                            const closestY = Math.max(obs.y, Math.min(p.y, obs.y + obs.h));
+                            const diffX = p.x - closestX;
+                            const diffY = p.y - closestY;
+                            if (Math.abs(diffX) > Math.abs(diffY)) {
+                                p.vx *= -1;
+                                p.x += Math.sign(diffX) * 3;
+                            } else {
+                                p.vy *= -1;
+                                p.y += Math.sign(diffY) * 3;
+                            }
+                            playSound('hit');
+                            return;
+                        }
+                    }
+
+                    if (p.breakWalls) {
+                        breakWallsInRadius(p.x, p.y, p.radius * 2);
+                    }
+                    if (p.isSpikeBall) {
+                        // Split into 6 needles
+                        for (let i = 0; i < 6; i++) {
+                            const theta = (i / 6) * Math.PI * 2;
+                            projectiles.push({
+                                x: p.x, y: p.y,
+                                vx: Math.cos(theta) * 11,
+                                vy: Math.sin(theta) * 11,
+                                radius: 5,
+                                damage: 450,
+                                owner: p.owner,
+                                range: 180,
+                                distTraveled: 0,
+                                color: '#22C55E'
+                            });
+                        }
+                    }
+                    projectiles.splice(idx, 1);
+                    return;
+                }
+
+                // Range expired
+                if (p.distTraveled >= p.range) {
+                    if (p.isSpikeBall) {
+                        for (let i = 0; i < 6; i++) {
+                            const theta = (i / 6) * Math.PI * 2;
+                            projectiles.push({
+                                x: p.x, y: p.y,
+                                vx: Math.cos(theta) * 11,
+                                vy: Math.sin(theta) * 11,
+                                radius: 5,
+                                damage: 450,
+                                owner: p.owner,
+                                range: 180,
+                                distTraveled: 0,
+                                color: '#22C55E'
+                            });
+                        }
+                    }
+                    projectiles.splice(idx, 1);
+                }
+            });
+
+            // Update Floating Texts
+            floatingTexts.forEach((t, idx) => {
+                t.y -= 0.8;
+                t.timer--;
+                if (t.timer <= 0) floatingTexts.splice(idx, 1);
+            });
+
+            // Update particles
+            particles.forEach((p, idx) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.02;
+                if (p.alpha <= 0) particles.splice(idx, 1);
+            });
+        }
+
+        // AI Logic: Simplistic MOBA robot AI
+        function runBotAI(b) {
+            b.aiCooldown = (b.aiCooldown || 0) - 1;
+            
+            // Check current tile for hiding inside bushes
+            const isInsideBush = checkInsideBush(b.x, b.y);
+            b.inBush = isInsideBush;
+
+            // Target search
+            let nearestEnemy = null;
+            let minDistEnemy = Infinity;
+            brawlers.forEach(target => {
+                if (target.team !== b.team && target.hp > 0) {
+                    // Stealth targets cannot be seen unless close
+                    if (target.stealthActive && Math.hypot(target.x - b.x, target.y - b.y) > 150) return;
+                    
+                    // Bushes hide targets unless close
+                    if (target.inBush && !isInsideBush && Math.hypot(target.x - b.x, target.y - b.y) > 180) return;
+
+                    const d = Math.hypot(target.x - b.x, target.y - b.y);
+                    if (d < minDistEnemy) {
+                        minDistEnemy = d;
+                        nearestEnemy = target;
+                    }
+                }
+            });
+
+            // Determine State
+            if (b.hp < b.maxHp * 0.35) {
+                b.aiState = 'RETREATING';
+            } else if (gems.length > 0) {
+                b.aiState = 'COLLECTING_GEM';
+            } else if (nearestEnemy) {
+                b.aiState = 'ATTACKING';
+            } else {
+                b.aiState = 'PATROLLING';
+            }
+
+            // Execute Actions
+            let targetX = b.x;
+            let targetY = b.y;
+
+            if (b.aiState === 'RETREATING') {
+                // Run back towards team spawn point
+                if (b.team === 'blue') {
+                    targetX = 900; targetY = 1100;
+                } else {
+                    targetX = 900; targetY = 100;
+                }
+            } 
+            else if (b.aiState === 'COLLECTING_GEM') {
+                // Find nearest gem
+                let nearestGem = null;
+                let minDistGem = Infinity;
+                gems.forEach(g => {
+                    const d = Math.hypot(g.x - b.x, g.y - b.y);
+                    if (d < minDistGem) {
+                        minDistGem = d;
+                        nearestGem = g;
+                    }
+                });
+                if (nearestGem) {
+                    targetX = nearestGem.x;
+                    targetY = nearestGem.y;
+                }
+            } 
+            else if (b.aiState === 'ATTACKING' && nearestEnemy) {
+                // Move within attack range
+                const rangeLimit = roster[b.brawlerId].attack * 4 + 100;
+                if (minDistEnemy > rangeLimit) {
+                    targetX = nearestEnemy.x;
+                    targetY = nearestEnemy.y;
+                } else if (minDistEnemy < rangeLimit * 0.5) {
+                    // Back away slightly (kiting)
+                    targetX = b.x - (nearestEnemy.x - b.x);
+                    targetY = b.y - (nearestEnemy.y - b.y);
+                }
+            }
+
+            // Steering movements
+            if (Math.hypot(targetX - b.x, targetY - b.y) > 10) {
+                const angle = Math.atan2(targetY - b.y, targetX - b.x);
+                const tx = b.x + Math.cos(angle) * b.speed;
+                const ty = b.y + Math.sin(angle) * b.speed;
+
+                if (!checkWallCollision(tx, b.y, b.radius)) b.x = tx;
+                if (!checkWallCollision(b.x, ty, b.radius)) b.y = ty;
+            }
+
+            // Shoot AI
+            if (nearestEnemy && minDistEnemy < 400 && b.aiCooldown <= 0) {
+                b.aiCooldown = 65 + Math.random() * 40; // cool down bot shooting
+                const angle = Math.atan2(nearestEnemy.y - b.y, nearestEnemy.x - b.x);
+                
+                // Shoot super if ready
+                const useSuper = b.superCharged >= 100;
+                fireWeapon(b, angle, useSuper);
+            }
+        }
+
+        // -------------------------------------------------------------
+        // COLLISION & GAME MECHANICS IMPLEMENTATION
+        // -------------------------------------------------------------
+        function checkCollisions() {
+            // Projectiles vs Brawlers
+            projectiles.forEach((p, pIdx) => {
+                brawlers.forEach(b => {
+                    if (b.hp <= 0 || b.isLeaping) return;
+                    if (b.team === p.owner.team && p.damage > 0) return; // ignore friendly fire
+                    if (b.team !== p.owner.team && p.damage < 0) return; // ignore healing enemies
+
+                    // Hit test
+                    const dist = Math.hypot(b.x - p.x, b.y - p.y);
+                    if (dist < b.radius + p.radius) {
+                        
+                        if (p.damage < 0) {
+                            // Healing wave
+                            const heal = Math.abs(p.damage);
+                            b.hp = Math.min(b.maxHp, b.hp + heal);
+                            floatingTexts.push({ x: b.x, y: b.y - 35, text: `+${heal}`, color: '#4ADE80', timer: 35 });
+                            playSound('heal');
+                        } else {
+                            // Damage
+                            let finalDmg = p.damage;
+                            
+                            // Piper sniper damage scaling (further is stronger)
+                            if (p.piperScaling) {
+                                finalDmg = Math.ceil(p.damage * Math.min(1.0, 0.2 + (p.distTraveled / p.range)));
+                            }
+
+                            b.hp -= finalDmg;
+                            b.lastHitTime = Date.now();
+                            floatingTexts.push({ x: b.x, y: b.y - 30, text: `-${finalDmg}`, color: '#EF4444', timer: 30 });
+                            playSound('hit');
+
+                            // Charge owner Super
+                            if (p.owner.superCharged < 100) {
+                                p.owner.superCharged = Math.min(100, p.owner.superCharged + (isSuperActive ? 4 : 18));
+                            }
+
+                            // Poison dagger triggers damage over time
+                            if (p.isPoisonous) {
+                                b.poisonTimer = 90; // 3 seconds
+                            }
+
+                            // Edgar and Mortis lifesteal
+                            if (p.lifesteal) {
+                                const gain = Math.ceil(finalDmg * p.lifesteal);
+                                p.owner.hp = Math.min(p.owner.maxHp, p.owner.hp + gain);
+                                floatingTexts.push({ x: p.owner.x, y: p.owner.y - 35, text: `+${gain}`, color: '#4ADE80', timer: 35 });
+                            }
+                        }
+
+                        // Remove projectile if it doesn't pierce
+                        if (!p.pierce) projectiles.splice(pIdx, 1);
+                    }
+                });
+            });
+
+            // Brawlers vs Gems on ground
+            gems.forEach((g, gIdx) => {
+                brawlers.forEach(b => {
+                    if (b.hp <= 0) return;
+                    const d = Math.hypot(b.x - g.x, b.y - g.y);
+                    if (d < b.radius + g.radius) {
+                        b.gems++;
+                        gems.splice(gIdx, 1);
+                        playSound('gem');
+                        updateHUD();
+                        checkGemGrabState();
+                    }
+                });
+            });
+
+            // Brawlers vs bushes (visibility check)
+            brawlers.forEach(b => {
+                b.inBush = checkInsideBush(b.x, b.y);
+            });
+        }
+
+        function checkAoEDamage(x, y, radius, damage, owner, breaksCover = false, appliesSlow = false) {
+            brawlers.forEach(b => {
+                if (b.hp <= 0) return;
+                const d = Math.hypot(b.x - x, b.y - y);
+                if (d < b.radius + radius) {
+                    if (b.team !== owner.team) {
+                        b.hp -= damage;
+                        b.lastHitTime = Date.now();
+                        floatingTexts.push({ x: b.x, y: b.y - 30, text: `-${damage}`, color: '#EF4444', timer: 30 });
+                        playSound('hit');
+
+                        if (appliesSlow) {
+                            b.speed = b.speed * 0.5; // temporary slow
+                            setTimeout(() => { b.speed = roster[b.brawlerId].speed || 4.2; }, 1200);
+                        }
+                    }
+                }
+            });
+
+            if (breaksCover) breakWallsInRadius(x, y, radius);
+        }
+
+        // Wall collisions check (Axis Aligned Bounding Boxes vs Brawler Circle)
+        function checkWallCollision(cx, cy, radius) {
+            for (let obs of mapObstacles) {
+                if (obs.type === 'B') continue; // ignore bushes
+                
+                // Closest point on rectangle to circle center
+                const closestX = Math.max(obs.x, Math.min(cx, obs.x + obs.w));
+                const closestY = Math.max(obs.y, Math.min(cy, obs.y + obs.h));
+
+                const distanceX = cx - closestX;
+                const distanceY = cy - closestY;
+                const distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+
+                if (distanceSquared < (radius * radius)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function getCollidedWall(cx, cy, radius) {
+            for (let obs of mapObstacles) {
+                if (obs.type === 'B') continue;
+                const closestX = Math.max(obs.x, Math.min(cx, obs.x + obs.w));
+                const closestY = Math.max(obs.y, Math.min(cy, obs.y + obs.h));
+                const dX = cx - closestX;
+                const dY = cy - closestY;
+                if ((dX*dX + dY*dY) < (radius * radius)) return obs;
+            }
+            return null;
+        }
+
+        function checkInsideBush(x, y) {
+            for (let obs of mapObstacles) {
+                if (obs.type === 'B') {
+                    if (x >= obs.x && x <= obs.x + obs.w && y >= obs.y && y <= obs.y + obs.h) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function breakWallsInRadius(x, y, radius) {
+            mapObstacles = mapObstacles.filter(obs => {
+                if (obs.type === 'D') { // Destructible wood wall
+                    // Check if center is in radius
+                    const cx = obs.x + obs.w/2;
+                    const cy = obs.y + obs.h/2;
+                    const dist = Math.hypot(cx - x, cy - y);
+                    if (dist < radius) {
+                        spawnParticles(cx, cy, '#D97706', 12);
+                        playSound('break');
+                        return false; // remove wall
+                    }
+                }
+                return true;
+            });
+        }
+
+        function checkGemGrabState() {
+            let blueGems = 0;
+            let redGems = 0;
+
+            brawlers.forEach(b => {
+                if (b.team === 'blue') blueGems += b.gems;
+                else redGems += b.gems;
+            });
+
+            // Trigger Match Grab Countdown (10 Gems threshold)
+            if (blueGems >= 10 && matchCountdownTeam !== 'blue') {
+                matchCountdown = 15;
+                matchCountdownTeam = 'blue';
+                document.getElementById('countdown-overlay').classList.remove('hidden');
+                document.getElementById('hud-countdown-text').classList.remove('hidden');
+            } else if (redGems >= 10 && matchCountdownTeam !== 'red') {
+                matchCountdown = 15;
+                matchCountdownTeam = 'red';
+                document.getElementById('countdown-overlay').classList.remove('hidden');
+                document.getElementById('hud-countdown-text').classList.remove('hidden');
+            } else if (blueGems < 10 && redGems < 10) {
+                // Reset countdown if gems drop
+                matchCountdown = -1;
+                matchCountdownTeam = '';
+                document.getElementById('countdown-overlay').classList.add('hidden');
+                document.getElementById('hud-countdown-text').classList.add('hidden');
+            }
+        }
+
+        function checkWinningTeamByGems() {
+            let blue = 0; let red = 0;
+            brawlers.forEach(b => {
+                if (b.team === 'blue') blue += b.gems;
+                else red += b.gems;
+            });
+            return blue >= red ? 'blue' : 'red';
+        }
+
+        function updateHUD() {
+            let blueGems = 0; let redGems = 0;
+            brawlers.forEach(b => {
+                if (b.team === 'blue') blueGems += b.gems;
+                else redGems += b.gems;
+            });
+
+            document.getElementById('hud-gems-blue').textContent = blueGems;
+            document.getElementById('hud-gems-red').textContent = redGems;
+            
+            // Format remaining timer
+            const mins = Math.floor(matchTimer / 60);
+            const secs = matchTimer % 60;
+            document.getElementById('hud-match-timer').textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+            // Handle active countdown display
+            if (matchCountdown !== -1) {
+                const teamName = matchCountdownTeam === 'blue' ? 'BLUE TEAM' : 'RED TEAM';
+                document.getElementById('countdown-banner').textContent = `${teamName} COUNTDOWN: ${matchCountdown}`;
+                
+                // Color banner text
+                if (matchCountdownTeam === 'blue') {
+                    document.getElementById('countdown-banner').className = "font-brawl text-5xl md:text-8xl text-brawlBlue stroke-black-4 text-shadow-brawl uppercase animate-bounce";
+                } else {
+                    document.getElementById('countdown-banner').className = "font-brawl text-5xl md:text-8xl text-red-500 stroke-black-4 text-shadow-brawl uppercase animate-bounce";
+                }
+            }
+
+            // Mobile Super Fill indicators
+            if (player) {
+                const superFill = document.getElementById('mobile-super-btn-fill');
+                superFill.style.opacity = player.superCharged / 100;
+                
+                // Glowing border
+                const superBtn = document.getElementById('mobile-super-btn');
+                if (player.superCharged >= 100) {
+                    superBtn.classList.add('super-glowing');
+                } else {
+                    superBtn.classList.remove('super-glowing');
+                }
+            }
+        }
+
+        // Drop gems on carrier death
+        function handleBrawlerDeath(b) {
+            b.hp = 0;
+            b.respawnTimer = 300; // 5 seconds respawn
+            
+            // Drop gems
+            for (let i = 0; i < b.gems; i++) {
+                gems.push({
+                    x: b.x + (Math.random() * 50 - 25),
+                    y: b.y + (Math.random() * 50 - 25),
+                    radius: 12,
+                    bob: Math.random() * 20
+                });
+            }
+            b.gems = 0;
+            playSound('break');
+            spawnParticles(b.x, b.y, b.team === 'blue' ? '#3B82F6' : '#EF4444', 30);
+            
+            checkGemGrabState();
+            updateHUD();
+        }
+
+        // -------------------------------------------------------------
+        // DRAW/RENDER SYSTEM (CANVAS GRAPHICS ENGINE)
+        // -------------------------------------------------------------
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            // Translate camera viewport coordinates
+            ctx.translate(-camera.x, -camera.y);
+
+            // 1. Draw Ground Texture Grid
+            ctx.fillStyle = '#1e5e22'; // grass dark green
+            ctx.fillRect(0, 0, MAP_SIZE.w, MAP_SIZE.h);
+            
+            ctx.fillStyle = '#2c7c30'; // light grass grid rows
+            const gridRow = 60;
+            for (let r = 0; r < MAP_SIZE.h; r += gridRow * 2) {
+                ctx.fillRect(0, r, MAP_SIZE.w, gridRow);
+            }
+
+            // 2. Draw Gem Mine at center
+            ctx.fillStyle = '#111827';
+            ctx.beginPath();
+            ctx.arc(900, 600, 50, 0, Math.PI*2);
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#000';
+            ctx.stroke();
+
+            ctx.fillStyle = '#7C3AED'; // inner mine
+            ctx.beginPath();
+            ctx.arc(900, 600, 32, 0, Math.PI*2);
+            ctx.fill();
+            ctx.strokeStyle = '#D8B4FE';
+            ctx.stroke();
+
+            // 3. Draw Bushes first (behind players)
+            mapObstacles.forEach(obs => {
+                if (obs.type === 'B') {
+                    ctx.fillStyle = 'rgba(16, 115, 42, 0.85)';
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    
+                    // Draw grass leaf decals inside bush area
+                    ctx.strokeStyle = 'rgba(34, 197, 94, 0.4)';
+                    ctx.lineWidth = 3;
+                    for (let lx = obs.x + 15; lx < obs.x + obs.w; lx += 45) {
+                        for (let ly = obs.y + 15; ly < obs.y + obs.h; ly += 45) {
+                            ctx.beginPath();
+                            ctx.moveTo(lx, ly);
+                            ctx.quadraticCurveTo(lx + 8, ly - 12, lx + 12, ly - 8);
+                            ctx.moveTo(lx + 5, ly);
+                            ctx.quadraticCurveTo(lx - 5, ly - 10, lx - 8, ly - 5);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            });
+
+            // 4. Draw Gems on the ground
+            gems.forEach(g => {
+                // Bobbing hover shadow
+                g.bob += 0.05;
+                const offset = Math.sin(g.bob) * 5;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                ctx.beginPath();
+                ctx.arc(g.x, g.y + 4, g.radius * 0.9, 0, Math.PI*2);
+                ctx.fill();
+
+                ctx.fillStyle = '#A78BFA'; // Gem outer purple
+                ctx.beginPath();
+                ctx.arc(g.x, g.y + offset, g.radius, 0, Math.PI*2);
+                ctx.fill();
+                
+                // Draw gem diamond highlights
+                ctx.fillStyle = '#FFF';
+                ctx.beginPath();
+                ctx.moveTo(g.x, g.y - g.radius/2 + offset);
+                ctx.lineTo(g.x + g.radius/2, g.y + offset);
+                ctx.lineTo(g.x, g.y + g.radius/2 + offset);
+                ctx.lineTo(g.x - g.radius/2, g.y + offset);
+                ctx.closePath();
+                ctx.fill();
+            });
+
+            // 5. Draw Projectiles
+            projectiles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#000';
+                ctx.stroke();
+            });
+
+            // 6. Draw Brawlers (Players and Bots)
+            brawlers.forEach(b => {
+                if (b.hp <= 0) return;
+
+                // If in bush and is player, draw transparent
+                ctx.save();
+                if (b.inBush) {
+                    // Enemies in bushes are hidden unless close to player
+                    if (b.team !== player.team && Math.hypot(b.x - player.x, b.y - player.y) > 185) {
+                        ctx.restore();
+                        return; 
+                    }
+                    ctx.globalAlpha = 0.45;
+                }
+
+                // Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.beginPath();
+                ctx.arc(b.x, b.y + 12, b.radius * 0.8, 0, Math.PI*2);
+                ctx.fill();
+
+                // Draw Rarity ring around feet for identification
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = b.team === 'blue' ? '#3B82F6' : '#EF4444';
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius + 2, 0, Math.PI*2);
+                ctx.stroke();
+
+                // Character Base drawing
+                ctx.fillStyle = roster[b.brawlerId].color;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius, 0, Math.PI*2);
+                ctx.fill();
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#000';
+                ctx.stroke();
+
+                // Distinct details for characters inside canvas
+                ctx.fillStyle = '#FFF';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                
+                // Draw initial character letter on center body
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText(b.name.charAt(0), b.x, b.y + 6);
+
+                // If stealth active
+                if (b.stealthActive) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.beginPath();
+                    ctx.arc(b.x, b.y, b.radius + 6, 0, Math.PI*2);
+                    ctx.fill();
+                }
+
+                ctx.restore(); // restore alpha opacity
+
+                // 7. HUD Over character heads (NOT affected by bush transparent alpha)
+                const barWidth = 50;
+                const barHeight = 6;
+                const hx = b.x - barWidth / 2;
+                const hy = b.y - b.radius - 18;
+
+                // Healthbar BG
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(hx, hy, barWidth, barHeight);
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#000';
+                ctx.strokeRect(hx, hy, barWidth, barHeight);
+
+                // Healthbar fill
+                const hpPercent = b.hp / b.maxHp;
+                ctx.fillStyle = b.team === 'blue' ? '#22C55E' : '#EF4444';
+                ctx.fillRect(hx + 0.5, hy + 0.5, (barWidth - 1) * hpPercent, barHeight - 1);
+
+                // Carrier Gem Counter Indicator
+                if (b.gems > 0) {
+                    ctx.fillStyle = '#9333EA';
+                    ctx.beginPath();
+                    ctx.arc(b.x - 18, hy - 8, 8, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.fillStyle = '#FFF';
+                    ctx.font = 'bold 9px Arial';
+                    ctx.fillText(b.gems, b.x - 18, hy - 5);
+                }
+
+                // If player: Draw 3 Ammo slots below HP
+                if (b.isPlayer) {
+                    const ammoSize = 12;
+                    const ax = b.x - (ammoSize * 3 + 4) / 2;
+                    const ay = hy + barHeight + 4;
+                    for (let i = 0; i < 3; i++) {
+                        ctx.fillStyle = b.ammo > i ? '#FFCB05' : '#475569';
+                        ctx.fillRect(ax + i * (ammoSize + 2), ay, ammoSize, 4);
+                        ctx.strokeRect(ax + i * (ammoSize + 2), ay, ammoSize, 4);
+                    }
+                }
+
+                // Text Display: name above HP
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 11px sans-serif';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 3;
+                ctx.strokeText(b.name, b.x, hy - 5);
+                ctx.fillText(b.name, b.x, hy - 5);
+            });
+
+            // 8. Draw Walls & Obstacles (Drawn in front of players)
+            mapObstacles.forEach(obs => {
+                if (obs.type === 'W') { // Stone Wall block
+                    ctx.fillStyle = '#374151';
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    ctx.lineWidth = 4;
+                    ctx.strokeStyle = '#000';
+                    ctx.strokeRect(obs.x, obs.y, obs.w, obs.h);
+                } 
+                else if (obs.type === 'D') { // Destructible wood block
+                    ctx.fillStyle = '#B45309';
+                    ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+                    ctx.lineWidth = 4;
+                    ctx.strokeStyle = '#000';
+                    ctx.strokeRect(obs.x, obs.y, obs.w, obs.h);
+
+                    // Wood texture lines
+                    ctx.fillStyle = '#78350F';
+                    ctx.fillRect(obs.x + 4, obs.y + obs.h/2 - 2, obs.w - 8, 4);
+                }
+            });
+
+            // 9. Draw particles
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.alpha;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1.0; // reset
+
+            // 10. Draw Floating Damage/Healing Numbers
+            floatingTexts.forEach(t => {
+                ctx.fillStyle = t.color;
+                ctx.font = 'bold 15px sans-serif';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 3.5;
+                ctx.strokeText(t.text, t.x, t.y);
+                ctx.fillText(t.text, t.x, t.y);
+            });
+
+            // 11. Desktop Aiming Guide Line (Only if player is alive and using mouse aiming)
+            if (player && player.hp > 0 && !mobileControlsActive) {
+                const worldMouseX = mousePos.x + camera.x;
+                const worldMouseY = mousePos.y + camera.y;
+                const angle = Math.atan2(worldMouseY - player.y, worldMouseX - player.x);
+
+                ctx.strokeStyle = isSuperActive ? 'rgba(239, 68, 68, 0.6)' : 'rgba(0, 162, 232, 0.4)';
+                ctx.lineWidth = isSuperActive ? 8 : 4;
+                ctx.setLineDash([10, 10]);
+                ctx.beginPath();
+                ctx.moveTo(player.x, player.y);
+                ctx.lineTo(player.x + Math.cos(angle) * 220, player.y + Math.sin(angle) * 220);
+                ctx.stroke();
+                ctx.setLineDash([]); // clear
+            }
+
+            ctx.restore();
+        }
+
+        function spawnParticles(x, y, color, count = 10) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x, y,
+                    vx: Math.random() * 6 - 3,
+                    vy: Math.random() * 6 - 3,
+                    radius: Math.random() * 4 + 3,
+                    color,
+                    alpha: 1.0
+                });
+            }
+        }
+
+        // -------------------------------------------------------------
+        // VIRTUAL JOYSTICKS (MOBILE TOUCH CONTROLS INTERFACES)
+        // -------------------------------------------------------------
+        function initTouchControls() {
+            const joyMove = document.getElementById('mobile-joy-move');
+            const stickMove = document.getElementById('mobile-joy-move-stick');
+            const joyShoot = document.getElementById('mobile-joy-shoot');
+            const stickShoot = document.getElementById('mobile-joy-shoot-stick');
+            const superBtn = document.getElementById('mobile-super-btn');
+
+            // Movement Joystick
+            joyMove.addEventListener('touchstart', e => {
+                const touch = e.touches[0];
+                const rect = joyMove.getBoundingClientRect();
+                touchMoveOrigin = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+                touchMoveCurrent = { x: touch.clientX, y: touch.clientY };
+            });
+
+            joyMove.addEventListener('touchmove', e => {
+                if (!touchMoveOrigin) return;
+                const touch = e.touches[0];
+                touchMoveCurrent = { x: touch.clientX, y: touch.clientY };
+
+                const dispX = touchMoveCurrent.x - touchMoveOrigin.x;
+                const dispY = touchMoveCurrent.y - touchMoveOrigin.y;
+                const dist = Math.min(40, Math.hypot(dispX, dispY));
+                const angle = Math.atan2(dispY, dispX);
+
+                stickMove.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`;
+            });
+
+            joyMove.addEventListener('touchend', () => {
+                touchMoveOrigin = null;
+                touchMoveCurrent = null;
+                stickMove.style.transform = `translate(0, 0)`;
+            });
+
+            // Shoot Joystick
+            joyShoot.addEventListener('touchstart', e => {
+                const touch = e.touches[0];
+                const rect = joyShoot.getBoundingClientRect();
+                touchShootOrigin = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
+                touchShootCurrent = { x: touch.clientX, y: touch.clientY };
+            });
+
+            joyShoot.addEventListener('touchmove', e => {
+                if (!touchShootOrigin) return;
+                const touch = e.touches[0];
+                touchShootCurrent = { x: touch.clientX, y: touch.clientY };
+
+                const dispX = touchShootCurrent.x - touchShootOrigin.x;
+                const dispY = touchShootCurrent.y - touchShootOrigin.y;
+                const dist = Math.min(40, Math.hypot(dispX, dispY));
+                const angle = Math.atan2(dispY, dispX);
+
+                stickShoot.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`;
+            });
+
+            joyShoot.addEventListener('touchend', () => {
+                if (touchShootOrigin && touchShootCurrent && player && player.hp > 0) {
+                    const dispX = touchShootCurrent.x - touchShootOrigin.x;
+                    const dispY = touchShootCurrent.y - touchShootOrigin.y;
+                    const dist = Math.hypot(dispX, dispY);
+
+                    // Shoot on release if dragged far enough
+                    if (dist > 15) {
+                        const angle = Math.atan2(dispY, dispX);
+                        fireWeapon(player, angle, isSuperActive);
+                        isSuperActive = false;
+                    }
+                }
+                touchShootOrigin = null;
+                touchShootCurrent = null;
+                stickShoot.style.transform = `translate(0, 0)`;
+            });
+
+            // Super Trigger Button
+            superBtn.addEventListener('click', () => {
+                if (player && player.superCharged >= 100) {
+                    isSuperActive = !isSuperActive;
+                    playSound('super_ready');
+                }
+            });
+        }
+
+        // -------------------------------------------------------------
+        // END GAME & WINNINGS CONTROLLER
+        // -------------------------------------------------------------
+        function endMatch(winningTeam) {
+            gameActive = false;
+            clearInterval(timerInterval);
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const isWin = winningTeam === 'blue';
+            const title = document.getElementById('result-title');
+            const diff = document.getElementById('result-trophy-change');
+            
+            // Render winner SVG portrait
+            document.getElementById('result-brawler-showcase').innerHTML = roster[selectedBrawlerId].svg;
+
+            if (isWin) {
+                title.textContent = "VICTORY!";
+                title.className = "font-brawl text-6xl md:text-8xl text-brawlYellow stroke-black-4 text-shadow-brawl-lg uppercase tracking-wider";
+                currentTrophies += 8;
+                diff.textContent = "+8 Trophies";
+                diff.className = "font-brawl text-3xl text-green-400 stroke-black-3 text-shadow-brawl";
+                playSound('gem');
+            } else {
+                title.textContent = "DEFEAT";
+                title.className = "font-brawl text-6xl md:text-8xl text-red-500 stroke-black-4 text-shadow-brawl-lg uppercase tracking-wider";
+                currentTrophies = Math.max(0, currentTrophies - 4);
+                diff.textContent = "-4 Trophies";
+                diff.className = "font-brawl text-3xl text-red-500 stroke-black-3 text-shadow-brawl";
+                playSound('break');
+            }
+
+            document.getElementById('result-total-trophies').textContent = currentTrophies;
+            localStorage.setItem('brawl2d_trophies', currentTrophies);
+        }
+
+        function playAgain() {
+            document.getElementById('result-screen').classList.add('hidden');
+            startGame();
+        }
+
+        function exitLobby() {
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('lobby-screen').classList.remove('hidden');
+            initLobby();
+        }
+
+        // Start Lobby on load
+        window.onload = initLobby;
+    </script>
+</body>
+</html>
