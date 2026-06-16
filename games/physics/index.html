@@ -13,17 +13,20 @@
 
     <style>
         :root {
-            --bg-color: #080c14;
-            --panel-bg: rgba(13, 18, 30, 0.8);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --accent-glow: rgba(139, 92, 246, 0.4);
+            --bg-color: #f1f5f9;
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(15, 23, 42, 0.08);
+            --accent-glow: rgba(124, 58, 237, 0.12);
             
-            --primary: #8b5cf6;
-            --primary-hover: #7c3aed;
-            --success: #10b981;
-            --danger: #ef4444;
-            --info: #0ea5e9;
-            --warning: #f59e0b;
+            --primary: #7c3aed;
+            --primary-hover: #6d28d9;
+            --success: #059669;
+            --danger: #dc2626;
+            --info: #0284c7;
+            --warning: #d97706;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --panel-title-color: #4338ca;
         }
 
         * {
@@ -37,10 +40,10 @@
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.1) 0, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.08) 0, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.04) 0, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(2, 132, 199, 0.03) 0, transparent 50%);
             min-height: 100vh;
-            color: #f3f4f6;
+            color: var(--text-main);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -52,7 +55,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 14px 30px;
-            background: rgba(10, 15, 26, 0.6);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             z-index: 10;
@@ -76,7 +79,7 @@
         .logo h1 {
             font-size: 1.35rem;
             font-weight: 800;
-            background: linear-gradient(90deg, #c084fc, #38bdf8);
+            background: linear-gradient(90deg, #6d28d9, #0284c7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
@@ -89,9 +92,9 @@
         }
 
         .btn {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(15, 23, 42, 0.04);
             border: 1px solid var(--border-color);
-            color: #e5e7eb;
+            color: var(--text-main);
             padding: 8px 16px;
             border-radius: 8px;
             font-size: 0.85rem;
@@ -105,20 +108,21 @@
         }
 
         .btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(15, 23, 42, 0.08);
+            border-color: rgba(15, 23, 42, 0.15);
             transform: translateY(-1px);
         }
 
         .btn-primary {
             background: var(--primary);
+            color: #ffffff;
             border-color: transparent;
             box-shadow: 0 4px 12px var(--accent-glow);
         }
 
         .btn-primary:hover {
             background: var(--primary-hover);
-            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.6);
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
         }
 
         /* Main Workspace Grid Layout */
@@ -142,7 +146,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
             overflow-y: auto;
             height: 100%;
         }
@@ -150,7 +154,7 @@
         .panel-title {
             font-size: 1rem;
             font-weight: 700;
-            color: #93c5fd;
+            color: var(--panel-title-color);
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
             display: flex;
@@ -161,7 +165,7 @@
         /* Tabs for Left Sidebar (Spawn vs Learn) */
         .tab-nav {
             display: flex;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(15, 23, 42, 0.04);
             border-radius: 8px;
             padding: 2px;
             border: 1px solid var(--border-color);
@@ -171,7 +175,7 @@
             flex: 1;
             background: transparent;
             border: none;
-            color: #9ca3af;
+            color: var(--text-muted);
             padding: 6px;
             font-size: 0.8rem;
             font-weight: 600;
@@ -183,7 +187,7 @@
         .tab-btn.active {
             background: var(--primary);
             color: #fff;
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
         }
 
         .tab-content {
@@ -216,7 +220,7 @@
         }
 
         .spawn-card {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(15, 23, 42, 0.02);
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 8px 12px;
@@ -228,7 +232,7 @@
         }
 
         .spawn-card:hover {
-            background: rgba(139, 92, 246, 0.08);
+            background: rgba(124, 58, 237, 0.06);
             border-color: var(--primary);
             transform: translateX(4px);
         }
@@ -240,7 +244,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255,255,255,0.03);
+            background: rgba(15, 23, 42, 0.03);
             border-radius: 6px;
         }
 
@@ -252,12 +256,12 @@
         .spawn-name {
             font-size: 0.85rem;
             font-weight: 600;
-            color: #f3f4f6;
+            color: var(--text-main);
         }
 
         .spawn-details {
             font-size: 0.7rem;
-            color: #9ca3af;
+            color: var(--text-muted);
         }
 
         /* Collapsible Lesson Cards */
@@ -265,11 +269,11 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
-            background: rgba(255,255,255,0.01);
+            background: rgba(15, 23, 42, 0.01);
         }
 
         .lesson-header {
-            background: rgba(255,255,255,0.03);
+            background: rgba(15, 23, 42, 0.03);
             padding: 10px 14px;
             font-size: 0.82rem;
             font-weight: 600;
@@ -281,13 +285,13 @@
         }
 
         .lesson-header:hover {
-            background: rgba(255,255,255,0.06);
+            background: rgba(15, 23, 42, 0.05);
         }
 
         .lesson-body {
             padding: 12px 14px;
             font-size: 0.78rem;
-            color: #cbd5e1;
+            color: var(--text-main);
             line-height: 1.45;
             border-top: 1px solid var(--border-color);
             display: none;
@@ -303,8 +307,8 @@
 
         .lesson-formula {
             font-family: 'Fira Code', monospace;
-            color: #c084fc;
-            background: rgba(0,0,0,0.3);
+            color: var(--primary);
+            background: rgba(15, 23, 42, 0.04);
             padding: 4px 8px;
             border-radius: 4px;
             display: block;
@@ -327,8 +331,8 @@
             flex-grow: 1;
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            box-shadow: inset 0 4px 30px rgba(0, 0, 0, 0.6);
-            background: #020408;
+            box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.05);
+            background: #f8fafc;
             outline: none;
         }
 
@@ -345,18 +349,19 @@
         }
 
         .canvas-badge {
-            background: rgba(13, 18, 30, 0.85);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(8px);
             border: 1px solid var(--border-color);
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 0.76rem;
             font-weight: 500;
-            color: #cbd5e1;
+            color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 6px;
             pointer-events: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .canvas-controls-bottom {
@@ -369,6 +374,7 @@
             padding: 12px 20px;
             border-radius: 16px;
             z-index: 5;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
         }
 
         .control-group-row {
@@ -379,7 +385,7 @@
 
         /* Sliders & Right sidebar panel */
         .slider-card {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(15, 23, 42, 0.02);
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 10px 12px;
@@ -393,7 +399,7 @@
             justify-content: space-between;
             font-size: 0.78rem;
             font-weight: 600;
-            color: #94a3b8;
+            color: var(--text-muted);
         }
 
         .slider-value {
@@ -406,7 +412,7 @@
             width: 100%;
             height: 4px;
             border-radius: 2px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.08);
             outline: none;
             margin: 6px 0;
         }
@@ -419,7 +425,7 @@
             border-radius: 50%;
             background: var(--info);
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+            box-shadow: 0 0 10px rgba(2, 132, 199, 0.3);
             transition: transform 0.1s;
         }
 
@@ -432,31 +438,31 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(15, 23, 42, 0.02);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 12px;
         }
 
         #chart-canvas {
-            background: #05070c;
+            background: #f8fafc;
             border-radius: 8px;
             width: 100%;
             height: 110px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(15, 23, 42, 0.08);
         }
 
         .chart-actions {
             display: flex;
             justify-content: space-between;
             font-size: 0.72rem;
-            color: #94a3b8;
+            color: var(--text-muted);
         }
 
         /* Interactive Solver Formula Card */
         .math-card {
-            background: rgba(139, 92, 246, 0.04);
-            border: 1px solid rgba(139, 92, 246, 0.15);
+            background: rgba(124, 58, 237, 0.03);
+            border: 1px solid rgba(124, 58, 237, 0.15);
             border-radius: 12px;
             padding: 12px 14px;
             display: flex;
@@ -467,14 +473,14 @@
         .math-equation {
             font-family: 'Fira Code', monospace;
             font-size: 0.8rem;
-            color: #c084fc;
+            color: var(--primary);
             padding: 4px 0;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+            border-bottom: 1px dashed rgba(15, 23, 42, 0.08);
         }
 
         .math-calculation {
             font-size: 0.78rem;
-            color: #9ca3af;
+            color: var(--text-muted);
             line-height: 1.4;
         }
 
@@ -489,7 +495,7 @@
             align-items: center;
             gap: 6px;
             font-size: 0.78rem;
-            color: #cbd5e1;
+            color: var(--text-main);
             cursor: pointer;
         }
 
@@ -513,7 +519,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(15, 23, 42, 0.08);
             transition: .2s;
             border-radius: 16px;
             border: 1px solid var(--border-color);
@@ -542,7 +548,7 @@
         /* Camera views widget style */
         .camera-views {
             display: flex;
-            background: rgba(0,0,0,0.3);
+            background: rgba(15, 23, 42, 0.04);
             border-radius: 6px;
             border: 1px solid var(--border-color);
             padding: 2px;
@@ -551,7 +557,7 @@
         .camera-btn {
             background: transparent;
             border: none;
-            color: #9ca3af;
+            color: var(--text-muted);
             font-size: 0.7rem;
             padding: 4px 8px;
             border-radius: 4px;
@@ -565,9 +571,9 @@
         }
 
         .preset-btn {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(15, 23, 42, 0.03);
             border: 1px solid var(--border-color);
-            color: #cbd5e1;
+            color: var(--text-main);
             padding: 8px;
             border-radius: 8px;
             font-weight: 600;
@@ -580,9 +586,9 @@
         }
 
         .preset-btn:hover {
-            background: rgba(139, 92, 246, 0.1);
+            background: rgba(124, 58, 237, 0.06);
             border-color: var(--primary);
-            color: #ffffff;
+            color: var(--primary);
             transform: translateY(-1px);
         }
     </style>
@@ -624,7 +630,16 @@
                         <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('ocean')">🌊 Deep Ocean</button>
                         <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('mars')">🪐 Mars Desert</button>
                         <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('jupiter')">⚡ Jupiter Core</button>
-                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem; grid-column: span 2;" onclick="setBiome3D('space')">🌌 Outer Space Vacuum</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('moon')">🌙 Lunar Surface</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('space')">🌌 Outer Space Vacuum</button>
+                    </div>
+
+                    <div class="group-title">🌦️ Atmospheric Weather</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:6px;">
+                        <button class="preset-btn" id="weather-clear" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('clear')">☀️ Clear Sky</button>
+                        <button class="preset-btn" id="weather-rain" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('rain')">🌧️ Heavy Rain</button>
+                        <button class="preset-btn" id="weather-snow" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('snow')">❄️ Snow Blizzard</button>
+                        <button class="preset-btn" id="weather-meteors" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('meteors')">☄️ Meteor Shower</button>
                     </div>
 
                     <div class="group-title">🔬 Physics Scenarios (Presets)</div>
@@ -783,6 +798,10 @@
                 <div class="canvas-badge">
                     <span style="color:#a78bfa;">Atmosphere:</span>
                     <span id="hud-env">Earth Meadow (Normal)</span>
+                </div>
+                <div class="canvas-badge">
+                    <span style="color:#3b82f6;">Weather:</span>
+                    <span id="hud-weather">Clear</span>
                 </div>
                 <div class="canvas-badge">
                     <span style="color:#0ea5e9;">Wind:</span>
@@ -1190,7 +1209,7 @@
         container3d.appendChild(renderer.domElement);
 
         const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x080c14, 0.015);
+        scene.fog = new THREE.FogExp2(0xe2e8f0, 0.015);
 
         // Perspective Camera
         const camera = new THREE.PerspectiveCamera(45, container3d.clientWidth / container3d.clientHeight, 0.1, 100);
@@ -1303,43 +1322,58 @@
                 gravity: 9.8,
                 density: 1.2,
                 bounce: 0.60,
-                color: 0x15803d, // Meadow Green
-                fogColor: 0x080c14,
+                color: 0x86efac, // Bright Meadow green
+                fogColor: 0xe2e8f0, // Soft grey-blue sky
                 description: "Standard Earth conditions. Grassy ground. Moderately dense air."
             },
             ocean: {
                 name: "Deep Ocean",
                 gravity: 9.8,
-                density: 1000.0, // Water density is 1000 kg/m^3!
-                bounce: 0.10,     // Low bounce in thick water
-                color: 0x1d4ed8, // Water Blue
-                fogColor: 0x071120,
+                density: 1000.0,
+                bounce: 0.10,
+                color: 0x7dd3fc, // Bright water blue
+                fogColor: 0xe0f2fe, // Light tropical sky blue
                 description: "Submerged in water. Buoyant forces are massive! Most objects will float."
             },
             mars: {
                 name: "Mars Desert",
                 gravity: 3.7,
-                density: 0.02, // thin atmosphere
+                density: 0.02,
                 bounce: 0.50,
-                color: 0xb45309, // Rust red desert
-                fogColor: 0x170b06,
+                color: 0xfdba74, // Dusty orange Mars
+                fogColor: 0xffedd5, // Peach Mars sky
                 description: "Low gravity and thin carbon dioxide air. Feathers fall almost like rocks."
             },
             jupiter: {
                 name: "Jupiter Core",
                 gravity: 24.8,
-                density: 5.0, // thick super-dense fluid
+                density: 5.0,
                 bounce: 0.20,
-                color: 0x7c2d12, // Liquid core
-                fogColor: 0x240e05,
+                color: 0xfde047, // Dense yellow core
+                fogColor: 0xfef9c3, // Pale yellow clouds
                 description: "Crushing gravity and extremely dense metallic fluid atmosphere."
+            },
+            moon: {
+                name: "Lunar Surface",
+                gravity: 1.6,
+                density: 0.0,
+                bounce: 0.75,
+                color: 0xcbd5e1, // Crater grey dust
+                fogColor: 0x1e293b, // Dark space sky
+                description: "Low gravity and vacuum of the Moon. Highly bouncy, no atmospheric drag."
             },
             space: {
                 name: "Outer Space",
                 gravity: 0.0,
-                density: 0.0, // vacuum
+                density: 0.0,
                 bounce: 0.80,
-                color: 0x020617, // Space blac        // Procedural Canvas Texture Generator
+                color: 0x334155, // Metallic slate floor
+                fogColor: 0x0f172a, // Black vacuum
+                description: "Zero gravity and vacuum. Objects drift endlessly in a straight line."
+            }
+        };
+
+        // Procedural Canvas Texture Generator
         function createProceduralTexture(type) {
             const canvas = document.createElement('canvas');
             canvas.width = 512;
@@ -2993,6 +3027,18 @@
                 this.vy = 0;
                 this.vz = 0;
 
+                // Angular velocities (radians per second)
+                this.wx = 0;
+                this.wy = 0;
+                this.wz = 0;
+
+                // Initial small random spin on spawn
+                if (this.name !== 'Feather' && this.name !== 'Helium Balloon') {
+                    this.wx = (Math.random() - 0.5) * 2.0;
+                    this.wy = (Math.random() - 0.5) * 2.0;
+                    this.wz = (Math.random() - 0.5) * 2.0;
+                }
+
                 // Force scalars (for display equations solver)
                 this.fg = 0;
                 this.fb = 0;
@@ -3114,6 +3160,13 @@
                         if (this.mass >= 2500) {
                             cameraRumbleIntensity = 1.0;
                         }
+
+                        // Ground impact causes realistic tumbling/flipping
+                        // Set angular velocity proportional to horizontal speed and vertical impact velocity
+                        const impactSpeed = Math.abs(this.vy);
+                        this.wz = -this.vx * (2.0 + Math.random() * 2.0) + (Math.random() - 0.5) * impactSpeed;
+                        this.wx = this.vz * (2.0 + Math.random() * 2.0) + (Math.random() - 0.5) * impactSpeed;
+                        this.wy = (Math.random() - 0.5) * impactSpeed * 2.0;
                     }
 
                     this.vy = -this.vy * COR;
@@ -3128,11 +3181,25 @@
                 if (Math.abs(this.x) >= wallLimit) {
                     this.x = Math.sign(this.x) * wallLimit;
                     this.vx = -this.vx * borderElasticity;
+                    
+                    // Add collision spin!
+                    if (Math.abs(this.vx) > 0.5) {
+                        this.wy = -Math.sign(this.vx) * 5.0;
+                        this.wz = (Math.random() - 0.5) * 5.0;
+                    }
+
                     if (this.isPoppable) this.pop();
                 }
                 if (Math.abs(this.z) >= wallLimit) {
                     this.z = Math.sign(this.z) * wallLimit;
                     this.vz = -this.vz * borderElasticity;
+                    
+                    // Add collision spin!
+                    if (Math.abs(this.vz) > 0.5) {
+                        this.wy = -Math.sign(this.vz) * 5.0;
+                        this.wx = (Math.random() - 0.5) * 5.0;
+                    }
+
                     if (this.isPoppable) this.pop();
                 }
 
@@ -3147,7 +3214,7 @@
                 // Update Three.js mesh transforms
                 this.mesh.position.set(this.x, this.y, this.z);
                 
-                // Rotations in flight
+                // Apply rotation
                 if (this.name === 'Feather') {
                     const flutter = Math.sin(Date.now() * 0.004) * 0.4;
                     this.mesh.rotation.set(flutter, 0, flutter * 0.5);
@@ -3155,15 +3222,49 @@
                     const sway = Math.sin(Date.now() * 0.003) * 0.15 * (windSpeed + 1);
                     this.mesh.rotation.set(sway, 0, sway);
                 } else if (this.name === 'Flapping Eagle' || this.name === 'Chinook Salmon' || this.name === 'Flying Squirrel' || this.name === 'Fighter Jet' || this.name === 'Submarine') {
-                    // Turn faces the movement direction in 3D
-                    if (Math.hypot(this.vx, this.vz) > 0.1) {
+                    // Creatures align to flight/swim direction unless they are tumbling on impact
+                    const onGround = (this.y <= floorLimit + 0.05);
+                    const speed = Math.hypot(this.vx, this.vz);
+                    
+                    if (onGround && (Math.abs(this.wx) > 0.1 || Math.abs(this.wz) > 0.1)) {
+                        // Tumble on ground if they have angular momentum
+                        this.mesh.rotateX(this.wx * dt);
+                        this.mesh.rotateY(this.wy * dt);
+                        this.mesh.rotateZ(this.wz * dt);
+                        
+                        // Friction decay
+                        this.wx *= Math.exp(-2.5 * dt);
+                        this.wy *= Math.exp(-2.5 * dt);
+                        this.wz *= Math.exp(-2.5 * dt);
+                    } else if (speed > 0.1) {
                         const angle = Math.atan2(-this.vz, this.vx);
-                        this.mesh.rotation.y = angle;
+                        this.mesh.rotation.set(0, angle, 0);
                     }
                 } else {
-                    // roll props
-                    this.mesh.rotateX(this.vz * 0.05 * dt);
-                    this.mesh.rotateZ(-this.vx * 0.05 * dt);
+                    // Standard props & vehicles (Anvil, Bowling Ball, regular Balloon, F1 Car, Hot Air Balloon, Elephant)
+                    // They rotate based on their actual angular velocity (wx, wy, wz) + rolling motion from translation
+                    const onGround = (this.y <= floorLimit + 0.05);
+                    
+                    // Rotate the mesh
+                    this.mesh.rotateX(this.wx * dt);
+                    this.mesh.rotateY(this.wy * dt);
+                    this.mesh.rotateZ(this.wz * dt);
+                    
+                    if (onGround) {
+                        // Rolling effect: translate linear velocity to angular velocity
+                        const rollFactor = 1.0 / this.radius;
+                        this.wz = -this.vx * rollFactor;
+                        this.wx = this.vz * rollFactor;
+                        
+                        // Decay the free spin component (wy) due to friction
+                        this.wy *= Math.exp(-4.0 * dt);
+                    } else {
+                        // In air decay angular velocities slowly (air resistance)
+                        const decay = Math.max(0.05, airDensity * 0.1);
+                        this.wx *= Math.exp(-decay * dt);
+                        this.wy *= Math.exp(-decay * dt);
+                        this.wz *= Math.exp(-decay * dt);
+                    }
                 }
 
                 this.outline.update();
@@ -3350,6 +3451,237 @@
             ground.material.color.setHex(biome.color);
             scene.fog.color.setHex(biome.fogColor);
             renderer.setClearColor(biome.fogColor);
+        }
+
+        // WEATHER SYSTEM GLOBALS & LOGIC
+        let activeWeatherType = 'clear';
+        let weatherParticles = [];
+        const weatherGroup = new THREE.Group();
+        scene.add(weatherGroup);
+
+        class WeatherParticle3D {
+            constructor(type, initialRandomY = false) {
+                this.type = type;
+                this.x = (Math.random() - 0.5) * 16;
+                this.z = (Math.random() - 0.5) * 16;
+                this.y = initialRandomY ? Math.random() * 16 : 16;
+
+                this.vx = 0;
+                this.vy = 0;
+                this.vz = 0;
+
+                if (type === 'rain') {
+                    const points = [];
+                    points.push(new THREE.Vector3(0, 0, 0));
+                    points.push(new THREE.Vector3(0, -0.4, 0));
+                    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+                    const lineMat = new THREE.LineBasicMaterial({
+                        color: 0x3b82f6,
+                        transparent: true,
+                        opacity: 0.6
+                    });
+                    this.mesh = new THREE.Line(lineGeo, lineMat);
+                } else if (type === 'snow') {
+                    const snowGeo = new THREE.DodecahedronGeometry(0.05, 0);
+                    const snowMat = new THREE.MeshBasicMaterial({
+                        color: 0xffffff,
+                        transparent: true,
+                        opacity: 0.85
+                    });
+                    this.mesh = new THREE.Mesh(snowGeo, snowMat);
+                    this.offset = Math.random() * Math.PI * 2;
+                } else if (type === 'meteors') {
+                    const meteorGeo = new THREE.SphereGeometry(0.12, 6, 6);
+                    const meteorMat = new THREE.MeshBasicMaterial({
+                        color: 0xef4444
+                    });
+                    this.mesh = new THREE.Mesh(meteorGeo, meteorMat);
+
+                    const tailPoints = [];
+                    tailPoints.push(new THREE.Vector3(0, 0, 0));
+                    tailPoints.push(new THREE.Vector3(0.25, 0.35, 0.15));
+                    const tailGeo = new THREE.BufferGeometry().setFromPoints(tailPoints);
+                    const tailMat = new THREE.LineBasicMaterial({
+                        color: 0xf97316,
+                        transparent: true,
+                        opacity: 0.6
+                    });
+                    const tailLine = new THREE.Line(tailGeo, tailMat);
+                    this.mesh.add(tailLine);
+                }
+
+                this.mesh.position.set(this.x, this.y, this.z);
+            }
+
+            update(dt) {
+                const gFactor = Math.max(0.2, gravity);
+
+                if (this.type === 'rain') {
+                    this.vy = -18.0 * Math.sqrt(gFactor / 9.8);
+                    this.vx = (windSpeed * Math.cos(windAngle * Math.PI / 180)) * 0.5;
+                    this.vz = (windSpeed * Math.sin(windAngle * Math.PI / 180)) * 0.5;
+                } else if (this.type === 'snow') {
+                    this.offset += dt * 2;
+                    this.vy = -2.5 * Math.sqrt(gFactor / 9.8);
+                    this.vx = Math.sin(this.offset) * 0.3 + (windSpeed * Math.cos(windAngle * Math.PI / 180)) * 0.4;
+                    this.vz = Math.cos(this.offset) * 0.3 + (windSpeed * Math.sin(windAngle * Math.PI / 180)) * 0.4;
+                } else if (this.type === 'meteors') {
+                    this.vy = -12.0 * Math.sqrt(gFactor / 9.8);
+                    this.vx = -4.0 + (windSpeed * Math.cos(windAngle * Math.PI / 180)) * 0.3;
+                    this.vz = -2.0 + (windSpeed * Math.sin(windAngle * Math.PI / 180)) * 0.3;
+                }
+
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.z += this.vz * dt;
+
+                if (this.y <= 0.05) {
+                    this.spawnImpactEffect();
+                    this.reset();
+                } else if (Math.abs(this.x) > 8.5 || Math.abs(this.z) > 8.5) {
+                    this.reset();
+                } else {
+                    this.mesh.position.set(this.x, this.y, this.z);
+                }
+            }
+
+            reset() {
+                this.x = (Math.random() - 0.5) * 16;
+                this.z = (Math.random() - 0.5) * 16;
+                this.y = 16;
+                this.mesh.position.set(this.x, this.y, this.z);
+            }
+
+            spawnImpactEffect() {
+                if (this.type === 'rain') {
+                    activeParticles3D.push(new WeatherSplash3D(this.x, this.z, 0x60a5fa, 0.6));
+                } else if (this.type === 'snow') {
+                    activeParticles3D.push(new WeatherSplash3D(this.x, this.z, 0xffffff, 0.3));
+                } else if (this.type === 'meteors') {
+                    for (let i = 0; i < 6; i++) {
+                        activeParticles3D.push(new SparkParticle3D(this.x, 0.05, this.z));
+                    }
+                }
+            }
+        }
+
+        class WeatherSplash3D {
+            constructor(x, z, color, maxScale = 0.6) {
+                const geo = new THREE.RingGeometry(0.01, 0.1, 8);
+                geo.rotateX(-Math.PI / 2);
+                const mat = new THREE.MeshBasicMaterial({
+                    color: color,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                this.mesh = new THREE.Mesh(geo, mat);
+                this.x = x;
+                this.y = 0.03;
+                this.z = z;
+                this.mesh.position.set(x, this.y, z);
+                scene.add(this.mesh);
+
+                this.scale = 1.0;
+                this.maxScale = maxScale;
+                this.alpha = 1.0;
+                this.decay = 0.07;
+            }
+
+            update(dt) {
+                this.scale += dt * 3.0 * this.maxScale;
+                this.alpha -= this.decay;
+                this.mesh.scale.set(this.scale, 1, this.scale);
+                this.mesh.material.opacity = Math.max(0, this.alpha);
+
+                if (this.alpha <= 0) {
+                    scene.remove(this.mesh);
+                }
+            }
+        }
+
+        class SparkParticle3D {
+            constructor(x, y, z) {
+                const geo = new THREE.BoxGeometry(0.08, 0.08, 0.08);
+                const mat = new THREE.MeshBasicMaterial({
+                    color: 0xf97316,
+                    transparent: true,
+                    opacity: 1.0
+                });
+                this.mesh = new THREE.Mesh(geo, mat);
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.mesh.position.set(x, y, z);
+                scene.add(this.mesh);
+
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 3.5;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = 2.0 + Math.random() * 4.0;
+                this.vz = Math.sin(angle) * speed;
+
+                this.alpha = 1.0;
+                this.decay = 0.03 + Math.random() * 0.03;
+            }
+
+            update(dt) {
+                this.vy -= 9.8 * dt;
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.z += this.vz * dt;
+                this.alpha -= this.decay;
+
+                this.mesh.position.set(this.x, Math.max(0.02, this.y), this.z);
+                this.mesh.material.opacity = Math.max(0, this.alpha);
+
+                if (this.alpha <= 0) {
+                    scene.remove(this.mesh);
+                }
+            }
+        }
+
+        function setWeather3D(type) {
+            activeWeatherType = type;
+
+            // Clear existing particles
+            weatherParticles.forEach(p => weatherGroup.remove(p.mesh));
+            weatherParticles = [];
+
+            // Update UI buttons active state
+            const weatherIds = ['clear', 'rain', 'snow', 'meteors'];
+            weatherIds.forEach(id => {
+                const btn = document.getElementById(`weather-${id}`);
+                if (btn) {
+                    if (id === type) {
+                        btn.style.background = 'var(--primary)';
+                        btn.style.color = '#fff';
+                        btn.style.borderColor = 'transparent';
+                    } else {
+                        btn.style.background = 'rgba(15, 23, 42, 0.03)';
+                        btn.style.color = 'var(--text-main)';
+                        btn.style.borderColor = 'var(--border-color)';
+                    }
+                }
+            });
+
+            // Update badge on top
+            const weatherBadge = document.getElementById('hud-weather');
+            if (weatherBadge) {
+                weatherBadge.innerText = type.charAt(0).toUpperCase() + type.slice(1);
+            }
+
+            // Spawn particles
+            let count = 0;
+            if (type === 'rain') count = 120;
+            else if (type === 'snow') count = 80;
+            else if (type === 'meteors') count = 15;
+
+            for (let i = 0; i < count; i++) {
+                const p = new WeatherParticle3D(type, true);
+                weatherParticles.push(p);
+                weatherGroup.add(p.mesh);
+            }
         }
 
         function updateSliders3D() {
@@ -3570,7 +3902,7 @@
             chartCtx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
 
             // Grids
-            chartCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            chartCtx.strokeStyle = 'rgba(15, 23, 42, 0.06)';
             chartCtx.lineWidth = 1;
             for (let i = 20; i < chartCanvas.height; i += 20) {
                 chartCtx.beginPath();
@@ -3580,13 +3912,13 @@
             }
 
             if (!selectedObject3D || chartHistory.length === 0) {
-                chartCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                chartCtx.fillStyle = 'rgba(15, 23, 42, 0.4)';
                 chartCtx.font = '10px sans-serif';
                 chartCtx.fillText("Waiting for active data...", 85, 60);
                 return;
             }
 
-            chartCtx.strokeStyle = chartType === 'velocity' ? '#38bdf8' : '#10b981';
+            chartCtx.strokeStyle = chartType === 'velocity' ? '#0284c7' : '#059669';
             chartCtx.lineWidth = 2;
             chartCtx.beginPath();
 
@@ -3611,7 +3943,7 @@
             });
             chartCtx.stroke();
 
-            chartCtx.fillStyle = '#94a3b8';
+            chartCtx.fillStyle = '#475569';
             chartCtx.font = '9px monospace';
             chartCtx.fillText(chartType === 'velocity' ? 'Velocity Y (m/s)' : 'Height Y (m)', 10, 15);
             chartCtx.fillText(`Max: ${maxVal.toFixed(1)}`, chartCanvas.width - 70, 15);
@@ -3783,6 +4115,18 @@
                 draggedObject3D.vy = Math.max(-maxSpeed, Math.min(maxSpeed, flickVelocity.y));
                 draggedObject3D.vz = Math.max(-maxSpeed, Math.min(maxSpeed, flickVelocity.z));
 
+                // Add nice spin on flick!
+                const speed = Math.hypot(draggedObject3D.vx, draggedObject3D.vy, draggedObject3D.vz);
+                if (speed > 0.5) {
+                    draggedObject3D.wx = (Math.random() - 0.5) * speed * 3.0;
+                    draggedObject3D.wy = (Math.random() - 0.5) * speed * 1.5;
+                    draggedObject3D.wz = (Math.random() - 0.5) * speed * 3.0;
+                } else {
+                    draggedObject3D.wx = 0;
+                    draggedObject3D.wy = 0;
+                    draggedObject3D.wz = 0;
+                }
+
                 draggedObject3D = null;
             }
             controls.enabled = true;
@@ -3831,6 +4175,9 @@
                 // Update bubble pop particles
                 activeParticles3D.forEach(p => p.update(scaledDt));
                 activeParticles3D = activeParticles3D.filter(p => p.alpha > 0);
+
+                // Update weather particles
+                weatherParticles.forEach(p => p.update(scaledDt));
             }
 
             // Camera shake rumble decay (e.g. elephant impacts)
@@ -3853,6 +4200,8 @@
 
         // Init Setup
         resetSliders3D();
+        setBiome3D('earth');
+        setWeather3D('clear');
         setChartType3D('velocity');
         updateBadgeHUD3D();
 
