@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumLab 3D - Interactive Physics, Creatures & Vehicles Sandbox</title>
+    <title>QuantumLab 3D - High-Fidelity Physics Sandbox</title>
     <!-- Modern typography -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
@@ -563,6 +563,28 @@
             background: var(--info);
             color: #fff;
         }
+
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: #cbd5e1;
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .preset-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--primary);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -572,7 +594,7 @@
         <div class="logo">
             <div class="logo-icon">⚛️</div>
             <h1>QuantumLab 3D</h1>
-            <span class="btn" style="padding: 2px 8px; font-size: 0.7rem; color: #a78bfa; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.2); text-transform: uppercase;">Vehicles & Biomes Lab</span>
+            <span class="btn" style="padding: 2px 8px; font-size: 0.7rem; color: #a78bfa; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.2); text-transform: uppercase;">High-Fidelity Animals</span>
         </div>
         <div class="header-actions">
             <a href="../../index.html" class="btn">
@@ -605,79 +627,108 @@
                         <button class="preset-btn" style="padding: 6px; font-size:0.75rem; grid-column: span 2;" onclick="setBiome3D('space')">🌌 Outer Space Vacuum</button>
                     </div>
 
+                    <div class="group-title">🔬 Physics Scenarios (Presets)</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:6px;">
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="loadPreset3D('galileo')">🧪 Galileo's Fall</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="loadPreset3D('terminal')">💨 Terminal Speed</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="loadPreset3D('buoyancy')">🌊 Archimedes Lift</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="loadPreset3D('space')">🌌 Zero-G Drift</button>
+                    </div>
+
+                    <div class="group-title">🦅 Realistic Creatures (3D Models)</div>
+                    <div class="spawn-card" onclick="spawnObject3D('bird')">
+                        <div class="spawn-icon">🦅</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Bald Eagle</span>
+                            <span class="spawn-details">0.8 kg • Feathers, curved beak, claws, wing-flap joints</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject3D('fish')">
+                        <div class="spawn-icon">🐟</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Chinook Salmon</span>
+                            <span class="spawn-details">1.2 kg • Scales bumpmap, segmented swimming wave</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject3D('squirrel')">
+                        <div class="spawn-icon">🐿️</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Flying Squirrel</span>
+                            <span class="spawn-details">0.3 kg • Fur texture, stretchy patagium membrane</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject3D('elephant')">
+                        <div class="spawn-icon">🐘</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Asian Elephant</span>
+                            <span class="spawn-details">3000 kg • Wrinkles bumpmap, flapping ears, 8-seg trunk</span>
+                        </div>
+                    </div>
+
                     <div class="group-title">🏎️ Engine Vehicles & Aircrafts</div>
                     <div class="spawn-card" onclick="spawnObject3D('f1car')">
                         <div class="spawn-icon">🏎️</div>
                         <div class="spawn-info">
                             <span class="spawn-name">F1 Racing Car</span>
-                            <span class="spawn-details">800 kg • Drives horizontally on ground</span>
+                            <span class="spawn-details">800 kg • Livery texture, rear spoiler, cockpit, driver</span>
                         </div>
                     </div>
                     <div class="spawn-card" onclick="spawnObject3D('aircraft')">
                         <div class="spawn-icon">✈️</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Fighter Jet</span>
-                            <span class="spawn-details">15000 kg • Jets forward & glides</span>
+                            <span class="spawn-details">15000 kg • Panel lines, cockpit canopy, engine fire</span>
                         </div>
                     </div>
                     <div class="spawn-card" onclick="spawnObject3D('submarine')">
                         <div class="spawn-icon">⚓</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Submarine</span>
-                            <span class="spawn-details">50000 kg • Ballast adjusts buoyancy</span>
+                            <span class="spawn-details">50000 kg • Rivets bumpmap, periscope, conning tower, prop</span>
                         </div>
                     </div>
                     <div class="spawn-card" onclick="spawnObject3D('hotair')">
                         <div class="spawn-icon">🎈</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Hot Air Balloon</span>
-                            <span class="spawn-details">800 kg • Burner rises periodically</span>
+                            <span class="spawn-details">800 kg • Stripes, wicker basket, suspension wires</span>
                         </div>
                     </div>
 
-                    <div class="group-title">🐾 Living Creatures</div>
-                    <div class="spawn-card" onclick="spawnObject3D('bird')">
-                        <div class="spawn-icon">🦅</div>
-                        <div class="spawn-info">
-                            <span class="spawn-name">Flapping Bird</span>
-                            <span class="spawn-details">0.8 kg • Flaps wings & generates lift</span>
-                        </div>
-                    </div>
-                    <div class="spawn-card" onclick="spawnObject3D('fish')">
-                        <div class="spawn-icon">🐟</div>
-                        <div class="spawn-info">
-                            <span class="spawn-name">Wiggling Fish</span>
-                            <span class="spawn-details">1.2 kg • Streamlined body</span>
-                        </div>
-                    </div>
-                    <div class="spawn-card" onclick="spawnObject3D('squirrel')">
-                        <div class="spawn-icon">🐿️</div>
-                        <div class="spawn-info">
-                            <span class="spawn-name">Gliding Squirrel</span>
-                            <span class="spawn-details">0.3 kg • Extends membrane in fall</span>
-                        </div>
-                    </div>
-                    <div class="spawn-card" onclick="spawnObject3D('elephant')">
-                        <div class="spawn-icon">🐘</div>
-                        <div class="spawn-info">
-                            <span class="spawn-name">Heavy Elephant</span>
-                            <span class="spawn-details">3000 kg • Shakes ground on lands</span>
-                        </div>
-                    </div>
-
-                    <div class="group-title">📦 Materials & Props</div>
+                    <div class="group-title">📦 Props & Lightweight Objects</div>
                     <div class="spawn-card" onclick="spawnObject3D('anvil')">
                         <div class="spawn-icon">🛠️</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Heavy Anvil</span>
-                            <span class="spawn-details">50.0 kg • Solid Steel</span>
+                            <span class="spawn-details">50.0 kg • Hammered iron, horn, hardy hole</span>
                         </div>
                     </div>
                     <div class="spawn-card" onclick="spawnObject3D('bowling')">
-                        <div class="spawn-icon" style="color:#818cf8;">🎳</div>
+                        <div class="spawn-icon">🎳</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Bowling Ball</span>
-                            <span class="spawn-details">7.2 kg • Shiny Sphere</span>
+                            <span class="spawn-details">7.0 kg • Swirly marble, finger holes</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject3D('balloon')">
+                        <div class="spawn-icon">🎈</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Helium Balloon</span>
+                            <span class="spawn-details">0.003 kg • Glossy latex, ribbon string</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject3D('bubble')">
+                        <div class="spawn-icon">🫧</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Soap Bubble</span>
+                            <span class="spawn-details">0.0001 kg • Iridescent sheen, poppable</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject3D('feather')">
+                        <div class="spawn-icon">🪶</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Feather</span>
+                            <span class="spawn-details">0.002 kg • Curved shaft, layered plumes</span>
                         </div>
                     </div>
                 </div>
@@ -687,6 +738,18 @@
             <div id="tab-learn" class="tab-content">
                 <p style="font-size:0.75rem; color:#64748b;">Collapse or expand the cards below to study physics sandbox properties:</p>
                 
+                <div class="lesson-card">
+                    <div class="lesson-header" onclick="toggleLesson('lesson5')">
+                        <span>🧬 Biomechanics & Lift</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="lesson-body" id="lesson5">
+                        <p>Living creatures adapt to gravity and fluid dynamics in fascinating ways:</p>
+                        <p>● <strong>Eagles Wing Flapping</strong>: Jointed wings push air downward, generating a counter-acting upward <strong>lift force</strong>. In this sandbox, a falling bird flaps to add upward force, slowing its fall drastically.</p>
+                        <p>● <strong>Gliding Membranes (Squirrel)</strong>: Animals like flying squirrels increase their surface area dynamically. In flight, they stretch skin membranes, causing their drag coefficient ($C_d$) to jump from $0.6$ to $1.6$, trapping air to glide safely.</p>
+                    </div>
+                </div>
+
                 <div class="lesson-card">
                     <div class="lesson-header" onclick="toggleLesson('lesson6')">
                         <span>🌊 Fluid density (Biomes)</span>
@@ -708,30 +771,6 @@
                         <p>Mechanical vehicle physics properties:</p>
                         <p>● <strong>Submarine Ballast Tanks</strong>: Submarines achieve neutral buoyancy by pumping water in and out of ballast tanks, adjusting their volume density to match the fluid density. Watch it hover in the ocean biome!</p>
                         <p>● <strong>Jet Engine Thrust</strong>: Aircraft accelerate forward by burning fuel and throwing exhaust backwards. The forward propulsion force overcomes drag.</p>
-                    </div>
-                </div>
-
-                <div class="lesson-card">
-                    <div class="lesson-header" onclick="toggleLesson('lesson1')">
-                        <span>1. Free Fall (Galileo's Law)</span>
-                        <span>▼</span>
-                    </div>
-                    <div class="lesson-body" id="lesson1">
-                        <p>In a vacuum (air density = 0), all objects fall with the exact same constant gravitational acceleration, regardless of their weight!</p>
-                        <span class="lesson-formula">a = F / m = (m * g) / m = g</span>
-                        <p>Drop an anvil and a bowling ball in space to prove they accelerate identically.</p>
-                    </div>
-                </div>
-
-                <div class="lesson-card">
-                    <div class="lesson-header" onclick="toggleLesson('lesson2')">
-                        <span>2. Terminal Velocity</span>
-                        <span>▼</span>
-                    </div>
-                    <div class="lesson-body" id="lesson2">
-                        <p>When dropping objects in normal atmosphere, a friction force called <strong>fluid drag</strong> ($F_d$) acts in opposition to the velocity vector:</p>
-                        <span class="lesson-formula">Fd = 0.5 * ρ * v² * Cd * A</span>
-                        <p>As speed ($v$) increases, drag increases until upward drag equals downward gravity ($F_d = F_g$). At this point, net force is zero and velocity remains constant.</p>
                     </div>
                 </div>
             </div>
@@ -909,7 +948,6 @@
                 const volume = Math.min(speed / 20, 0.4);
                 if (volume < 0.02) return;
 
-                // Trumpet sound for elephant
                 if (mass >= 2500) {
                     this.playElephantCall();
                     return;
@@ -993,9 +1031,9 @@
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(1600, now + 0.08);
-                gain.gain.setValueAtTime(0.06, now);
+                osc.frequency.setValueAtTime(900, now);
+                osc.frequency.exponentialRampToValueAtTime(1800, now + 0.08);
+                gain.gain.setValueAtTime(0.05, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 osc.start(now);
                 osc.stop(now + 0.12);
@@ -1027,8 +1065,8 @@
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(1000, now);
-                osc.frequency.exponentialRampToValueAtTime(1500, now + 0.05);
+                osc.frequency.setValueAtTime(1100, now);
+                osc.frequency.exponentialRampToValueAtTime(1600, now + 0.05);
                 gain.gain.setValueAtTime(0.03, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
                 osc.start(now);
@@ -1065,7 +1103,6 @@
                 osc2.stop(now + 0.5);
             }
 
-            // Sonar ping sound for submarine
             playSonarPing() {
                 this.init();
                 if (!this.ctx) return;
@@ -1082,7 +1119,6 @@
                 osc.stop(now + 1.25);
             }
 
-            // High pitch engine whine for F1 car
             playF1Engine(speedPercent) {
                 this.init();
                 if (!this.ctx) return;
@@ -1303,14 +1339,1113 @@
                 gravity: 0.0,
                 density: 0.0, // vacuum
                 bounce: 0.80,
-                color: 0x020617, // Space black
-                fogColor: 0x000000,
-                description: "Zero gravity and vacuum. Objects drift endlessly in a straight line."
+                color: 0x020617, // Space blac        // Procedural Canvas Texture Generator
+        function createProceduralTexture(type) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            if (type === 'eagle_body') {
+                ctx.fillStyle = '#451a03';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.strokeStyle = '#271001';
+                ctx.lineWidth = 4;
+                for (let y = 0; y < 512; y += 16) {
+                    const shift = (y % 32 === 0) ? 0 : 16;
+                    for (let x = -16; x < 528; x += 32) {
+                        ctx.beginPath();
+                        ctx.arc(x + shift, y, 16, 0, Math.PI);
+                        ctx.stroke();
+                    }
+                }
+            } else if (type === 'eagle_wing') {
+                ctx.fillStyle = '#3f1802';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.fillStyle = '#542205';
+                for (let x = 0; x < 512; x += 32) {
+                    ctx.fillRect(x + 4, 0, 24, 512);
+                    ctx.strokeStyle = '#271001';
+                    ctx.strokeRect(x + 4, 0, 24, 512);
+                }
+            } else if (type === 'fish_scales') {
+                const grad = ctx.createLinearGradient(0, 0, 0, 512);
+                grad.addColorStop(0, '#1e3a5f');
+                grad.addColorStop(0.35, '#2e5f8f');
+                grad.addColorStop(0.5, '#ec4899');
+                grad.addColorStop(0.65, '#94a3b8');
+                grad.addColorStop(1, '#e2e8f0');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 512, 512);
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.lineWidth = 1.5;
+                for (let y = 0; y < 512; y += 12) {
+                    const shift = (y % 24 === 0) ? 0 : 8;
+                    for (let x = -8; x < 528; x += 16) {
+                        ctx.beginPath();
+                        ctx.arc(x + shift, y, 8, 0, Math.PI);
+                        ctx.stroke();
+                    }
+                }
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
+                for (let i = 0; i < 120; i++) {
+                    const rx = Math.random() * 512;
+                    const ry = Math.random() * 180;
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 2.5 + Math.random() * 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else if (type === 'squirrel_fur') {
+                ctx.fillStyle = '#9a3412';
+                ctx.fillRect(0, 0, 512, 512);
+                for (let i = 0; i < 3000; i++) {
+                    ctx.fillStyle = Math.random() > 0.5 ? '#b45309' : '#7c2d12';
+                    const w = 2 + Math.random() * 3;
+                    const h = 8 + Math.random() * 15;
+                    ctx.fillRect(Math.random() * 512, Math.random() * 512, w, h);
+                }
+            } else if (type === 'elephant_skin') {
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 100; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(Math.random() * 512, 0);
+                    ctx.lineTo(Math.random() * 512, 512);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < 60; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, Math.random() * 512);
+                    ctx.lineTo(512, Math.random() * 512);
+                    ctx.stroke();
+                }
+            } else if (type === 'f1_livery') {
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.fillStyle = '#facc15';
+                ctx.fillRect(0, 100, 512, 35);
+                ctx.fillRect(0, 375, 512, 35);
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(0, 135, 512, 10);
+                ctx.fillRect(0, 365, 512, 10);
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(256, 256, 65, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 80px "Outfit", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('1', 256, 256);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 26px "Fira Code", monospace';
+                ctx.fillText('RACING', 110, 260);
+                ctx.fillText('POWER', 400, 260);
+            } else if (type === 'jet_panels') {
+                ctx.fillStyle = '#475569';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 3;
+                for (let x = 64; x < 512; x += 128) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke();
+                }
+                for (let y = 64; y < 512; y += 128) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
+                }
+                ctx.fillStyle = '#1e293b';
+                for (let x = 64; x < 512; x += 128) {
+                    for (let y = 16; y < 512; y += 32) {
+                        ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2); ctx.fill();
+                    }
+                }
+                ctx.fillStyle = '#1e3a8a';
+                ctx.beginPath(); ctx.arc(256, 256, 55, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 36px "Outfit"';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('★', 256, 256);
+            } else if (type === 'sub_details') {
+                ctx.fillStyle = '#eab308';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.strokeStyle = '#a16207';
+                ctx.lineWidth = 2.5;
+                ctx.strokeRect(6, 6, 500, 500);
+                for (let i = 128; i < 512; i += 128) {
+                    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 512); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke();
+                }
+                ctx.fillStyle = '#78350f';
+                for (let x = 8; x < 512; x += 32) {
+                    ctx.beginPath(); ctx.arc(x, 8, 3, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(x, 504, 3, 0, Math.PI*2); ctx.fill();
+                }
+                ctx.fillStyle = '#0f172a';
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.arc(128, 256, 35, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.arc(384, 256, 35, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            } else if (type === 'balloon_stripes') {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, 512, 512);
+                const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
+                const stripeWidth = 512 / colors.length;
+                colors.forEach((col, idx) => {
+                    ctx.fillStyle = col;
+                    ctx.fillRect(idx * stripeWidth, 0, stripeWidth, 512);
+                });
+            } else if (type === 'basket_weave') {
+                ctx.fillStyle = '#d97706';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.strokeStyle = '#78350f';
+                ctx.lineWidth = 3;
+                for (let y = 0; y < 512; y += 20) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
+                }
+                for (let x = 0; x < 512; x += 40) {
+                    const shift = (x % 80 === 0) ? 0 : 10;
+                    for (let y = 0; y < 512; y += 20) {
+                        ctx.beginPath(); ctx.moveTo(x + shift, y); ctx.lineTo(x + shift, y + 20); ctx.stroke();
+                    }
+                }
+            } else if (type === 'anvil_iron') {
+                ctx.fillStyle = '#2d3748';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+                for (let i = 0; i < 600; i++) {
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * 512, Math.random() * 512, 8 + Math.random() * 15, 0, Math.PI*2);
+                    ctx.fill();
+                }
+                ctx.strokeStyle = '#4a5568';
+                ctx.lineWidth = 1.5;
+                for (let i = 0; i < 40; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(Math.random() * 512, Math.random() * 512);
+                    ctx.lineTo(Math.random() * 512, Math.random() * 512);
+                    ctx.stroke();
+                }
+            } else if (type === 'bowling_marble') {
+                ctx.fillStyle = '#2e1047';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.lineWidth = 24;
+                const swirls = ['#4c1d95', '#6d28d9', '#1e40af', '#0369a1', '#1f2937'];
+                swirls.forEach((col, idx) => {
+                    ctx.strokeStyle = col;
+                    ctx.beginPath();
+                    ctx.arc(256, 256, 40 + idx * 45, 0.4 * Math.PI, 1.7 * Math.PI + Math.sin(idx));
+                    ctx.stroke();
+                });
+                ctx.fillStyle = 'rgba(46, 16, 71, 0.35)';
+                ctx.fillRect(0, 0, 512, 512);
             }
-        };
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
+
+        // Procedural Height / Bump Map Generator
+        function createProceduralBumpMap(type) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#808080';
+            ctx.fillRect(0, 0, 512, 512);
+
+            if (type === 'fish_scales') {
+                ctx.strokeStyle = '#505050';
+                ctx.lineWidth = 2.5;
+                for (let y = 0; y < 512; y += 12) {
+                    const shift = (y % 24 === 0) ? 0 : 8;
+                    for (let x = -8; x < 528; x += 16) {
+                        ctx.beginPath();
+                        ctx.arc(x + shift, y, 8, 0, Math.PI);
+                        ctx.stroke();
+                    }
+                }
+            } else if (type === 'elephant_skin') {
+                ctx.strokeStyle = '#383838';
+                ctx.lineWidth = 1.5;
+                for (let i = 0; i < 110; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(Math.random() * 512, 0);
+                    ctx.lineTo(Math.random() * 512, 512);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < 70; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, Math.random() * 512);
+                    ctx.lineTo(512, Math.random() * 512);
+                    ctx.stroke();
+                }
+            } else if (type === 'jet_panels') {
+                ctx.strokeStyle = '#484848';
+                ctx.lineWidth = 3;
+                for (let x = 64; x < 512; x += 128) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke();
+                }
+                for (let y = 64; y < 512; y += 128) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
+                }
+                ctx.fillStyle = '#c0c0c0';
+                for (let x = 64; x < 512; x += 128) {
+                    for (let y = 16; y < 512; y += 32) {
+                        ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+                    }
+                }
+            } else if (type === 'sub_details') {
+                ctx.strokeStyle = '#484848';
+                ctx.lineWidth = 2.5;
+                for (let i = 128; i < 512; i += 128) {
+                    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 512); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke();
+                }
+                ctx.fillStyle = '#b8b8b8';
+                for (let x = 8; x < 512; x += 32) {
+                    ctx.beginPath(); ctx.arc(x, 8, 3, 0, Math.PI*2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(x, 504, 3, 0, Math.PI*2); ctx.fill();
+                }
+            } else if (type === 'anvil_iron') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+                for (let i = 0; i < 400; i++) {
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * 512, Math.random() * 512, 12 + Math.random() * 15, 0, Math.PI*2);
+                    ctx.fill();
+                }
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
 
         // 3D Object Templates
         const TEMPLATES_3D = {
+            bird: {
+                name: 'Flapping Eagle',
+                mass: 0.8,
+                volume: 0.0018,
+                radius: 0.5,
+                dragCoeff: 0.6,
+                elasticity: 0.35,
+                color: 0xd97706,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    
+                    const bodyTex = createProceduralTexture('eagle_body');
+                    const bodyMat = new THREE.MeshStandardMaterial({ map: bodyTex, roughness: 0.6 });
+                    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+                    const beakMat = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.2, metalness: 0.1 });
+                    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                    const irisMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+                    const clawMat = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.3 });
+                    const talonMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.2 });
+
+                    // Torso (elongated sphere)
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 16), bodyMat);
+                    body.scale.set(1.5, 0.9, 0.9);
+                    body.castShadow = true;
+                    group.add(body);
+
+                    // Head (white sphere)
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 16), whiteMat);
+                    head.position.set(0.28, 0.15, 0);
+                    head.castShadow = true;
+                    group.add(head);
+
+                    // Ruffled neck feathers
+                    const ruff = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.25, 0.1, 16), whiteMat);
+                    ruff.position.set(0.18, 0.08, 0);
+                    ruff.rotation.z = -Math.PI / 6;
+                    group.add(ruff);
+
+                    // Curved yellow beak
+                    const beakRoot = new THREE.Mesh(new THREE.ConeGeometry(0.065, 0.12, 8), beakMat);
+                    beakRoot.rotation.z = -Math.PI / 2.3;
+                    beakRoot.position.set(0.43, 0.16, 0);
+                    group.add(beakRoot);
+
+                    const beakTip = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.08, 8), beakMat);
+                    beakTip.rotation.z = -Math.PI / 1.7;
+                    beakTip.position.set(0.48, 0.10, 0);
+                    group.add(beakTip);
+
+                    // Eyes (yellow iris + black pupil)
+                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), irisMat);
+                    eyeL.position.set(0.34, 0.20, 0.09);
+                    const pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), eyeMat);
+                    pupilL.position.set(0.02, 0, 0.02);
+                    eyeL.add(pupilL);
+                    
+                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), irisMat);
+                    eyeR.position.set(0.34, 0.20, -0.09);
+                    const pupilR = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), eyeMat);
+                    pupilR.position.set(0.02, 0, -0.02);
+                    eyeR.add(pupilR);
+                    group.add(eyeL, eyeR);
+
+                    // Detailed Wings L & R
+                    const wingTex = createProceduralTexture('eagle_wing');
+                    const wingMat = new THREE.MeshStandardMaterial({ map: wingTex, roughness: 0.6 });
+
+                    // Left Wing
+                    const innerL = new THREE.Group();
+                    innerL.name = "innerL";
+                    innerL.position.set(0, 0.05, -0.22);
+                    const innerLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.22), wingMat);
+                    innerLMesh.position.set(0.12, 0, -0.11);
+                    innerLMesh.castShadow = true;
+                    innerL.add(innerLMesh);
+
+                    // Secondary feathers L
+                    for (let i = 0; i < 4; i++) {
+                        const f = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.008, 0.35), wingMat);
+                        f.position.set(0.05 + i * 0.06, -0.015, -0.2);
+                        f.rotation.y = -0.1 - i * 0.05;
+                        f.rotation.x = 0.05;
+                        f.castShadow = true;
+                        innerL.add(f);
+                    }
+
+                    const outerL = new THREE.Group();
+                    outerL.name = "outerL";
+                    outerL.position.set(0.25, 0, -0.22);
+                    const outerLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.03, 0.18), wingMat);
+                    outerLMesh.position.set(0.15, 0, -0.09);
+                    outerLMesh.castShadow = true;
+                    outerL.add(outerLMesh);
+
+                    // Primary feathers L
+                    for (let i = 0; i < 6; i++) {
+                        const f = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.006, 0.45), wingMat);
+                        f.position.set(0.08 + i * 0.05, -0.01, -0.22);
+                        f.rotation.y = -0.2 - i * 0.08;
+                        f.rotation.x = 0.08;
+                        f.castShadow = true;
+                        outerL.add(f);
+                    }
+                    innerL.add(outerL);
+                    group.add(innerL);
+
+                    // Right Wing
+                    const innerR = new THREE.Group();
+                    innerR.name = "innerR";
+                    innerR.position.set(0, 0.05, 0.22);
+                    const innerRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.22), wingMat);
+                    innerRMesh.position.set(0.12, 0, 0.11);
+                    innerRMesh.castShadow = true;
+                    innerR.add(innerRMesh);
+
+                    // Secondary feathers R
+                    for (let i = 0; i < 4; i++) {
+                        const f = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.008, 0.35), wingMat);
+                        f.position.set(0.05 + i * 0.06, -0.015, 0.2);
+                        f.rotation.y = 0.1 + i * 0.05;
+                        f.rotation.x = -0.05;
+                        f.castShadow = true;
+                        innerR.add(f);
+                    }
+
+                    const outerR = new THREE.Group();
+                    outerR.name = "outerR";
+                    outerR.position.set(0.25, 0, 0.22);
+                    const outerRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.03, 0.18), wingMat);
+                    outerRMesh.position.set(0.15, 0, 0.09);
+                    outerRMesh.castShadow = true;
+                    outerR.add(outerRMesh);
+
+                    // Primary feathers R
+                    for (let i = 0; i < 6; i++) {
+                        const f = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.006, 0.45), wingMat);
+                        f.position.set(0.08 + i * 0.05, -0.01, 0.22);
+                        f.rotation.y = 0.2 + i * 0.08;
+                        f.rotation.x = -0.08;
+                        f.castShadow = true;
+                        outerR.add(f);
+                    }
+                    innerR.add(outerR);
+                    group.add(innerR);
+
+                    // Overlapping White Tail Feathers
+                    for (let i = -2; i <= 2; i++) {
+                        const tf = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.01, 0.12), whiteMat);
+                        tf.position.set(-0.55 - Math.abs(i) * 0.02, -0.04, i * 0.06);
+                        tf.rotation.y = i * 0.1;
+                        tf.rotation.z = Math.PI / 16;
+                        tf.castShadow = true;
+                        group.add(tf);
+                    }
+
+                    // Yellow legs and claws with talons
+                    const legL = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.02, 0.15, 8), clawMat);
+                    legL.position.set(0, -0.25, 0.08);
+                    legL.rotation.z = -Math.PI / 12;
+                    legL.castShadow = true;
+                    // Foot with 3 toes forward, 1 back
+                    for (let t = -1; t <= 1; t++) {
+                        const toe = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.02, 0.02), clawMat);
+                        toe.position.set(0.04, -0.08, t * 0.03);
+                        toe.rotation.y = t * 0.25;
+                        const talon = new THREE.Mesh(new THREE.ConeGeometry(0.01, 0.04, 4), talonMat);
+                        talon.position.set(0.05, -0.01, 0);
+                        talon.rotation.z = -Math.PI / 3;
+                        toe.add(talon);
+                        legL.add(toe);
+                    }
+                    const backToeL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.02, 0.02), clawMat);
+                    backToeL.position.set(-0.03, -0.08, 0);
+                    const backTalonL = new THREE.Mesh(new THREE.ConeGeometry(0.01, 0.03, 4), talonMat);
+                    backTalonL.position.set(-0.03, -0.01, 0);
+                    backTalonL.rotation.z = Math.PI / 3;
+                    backToeL.add(backTalonL);
+                    legL.add(backToeL);
+
+                    const legR = legL.clone();
+                    legR.position.z = -0.08;
+                    group.add(legL, legR);
+
+                    return group;
+                },
+                behavior: (obj, dt) => {
+                    const innerL = obj.mesh.getObjectByName("innerL");
+                    const outerL = obj.mesh.getObjectByName("outerL");
+                    const innerR = obj.mesh.getObjectByName("innerR");
+                    const outerR = obj.mesh.getObjectByName("outerR");
+                    
+                    if (obj.vy < -0.1 && airDensity > 0 && !obj.isDragging) {
+                        const flapSpeed = 22;
+                        const innerRot = Math.sin(Date.now() * 0.001 * flapSpeed) * 0.55;
+                        const outerRot = Math.sin(Date.now() * 0.001 * flapSpeed + 0.6) * 0.45;
+                        
+                        if (innerL) innerL.rotation.z = innerRot;
+                        if (outerL) outerL.rotation.z = outerRot;
+                        if (innerR) innerR.rotation.z = innerRot;
+                        if (outerR) outerR.rotation.z = outerRot;
+
+                        const liftMagnitude = airDensity * 3.8 * Math.abs(obj.vy) * DT;
+                        obj.vy += liftMagnitude / obj.mass;
+
+                        if (Math.random() < 0.006) synth.playBirdChirp();
+                    } else {
+                        if (innerL) innerL.rotation.z = 0.1;
+                        if (outerL) outerL.rotation.z = 0.05;
+                        if (innerR) innerR.rotation.z = 0.1;
+                        if (outerR) outerR.rotation.z = 0.05;
+                    }
+                }
+            },
+            fish: {
+                name: 'Chinook Salmon',
+                mass: 1.2,
+                volume: 0.0012,
+                radius: 0.45,
+                dragCoeff: 0.25,
+                elasticity: 0.15,
+                color: 0xf97316,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    
+                    const scaleTex = createProceduralTexture('fish_scales');
+                    const scaleBump = createProceduralBumpMap('fish_scales');
+                    const fishMat = new THREE.MeshStandardMaterial({ 
+                        map: scaleTex, 
+                        bumpMap: scaleBump, 
+                        bumpScale: 0.015,
+                        roughness: 0.15, 
+                        metalness: 0.8 
+                    });
+                    const finMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.8, roughness: 0.3 });
+                    const pinkFinMat = new THREE.MeshStandardMaterial({ color: 0xec4899, transparent: true, opacity: 0.8, roughness: 0.3 });
+                    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                    const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 16), fishMat);
+                    head.scale.set(1.1, 0.9, 0.65);
+                    head.castShadow = true;
+                    head.name = "head";
+                    group.add(head);
+
+                    const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.12), fishMat);
+                    jaw.position.set(0.12, -0.08, 0);
+                    jaw.rotation.z = -Math.PI / 10;
+                    head.add(jaw);
+
+                    const gillsL = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.2, 0.04), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+                    gillsL.position.set(-0.06, -0.02, 0.15);
+                    gillsL.rotation.y = -Math.PI/6;
+                    const gillsR = gillsL.clone();
+                    gillsR.position.z = -0.15;
+                    gillsR.rotation.y = Math.PI/6;
+                    head.add(gillsL, gillsR);
+
+                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.038, 8, 8), whiteMat);
+                    const pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 8), eyeMat);
+                    pupilL.position.set(0.015, 0, 0.015);
+                    eyeL.add(pupilL);
+                    eyeL.position.set(0.12, 0.06, 0.12);
+                    
+                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.038, 8, 8), whiteMat);
+                    const pupilR = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 8), eyeMat);
+                    pupilR.position.set(0.015, 0, -0.015);
+                    eyeR.add(pupilR);
+                    eyeR.position.set(0.12, 0.06, -0.12);
+                    head.add(eyeL, eyeR);
+
+                    const body1 = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), fishMat);
+                    body1.scale.set(1.1, 0.95, 0.7);
+                    body1.castShadow = true;
+                    body1.name = "body1";
+                    body1.position.set(-0.22, 0, 0);
+                    head.add(body1);
+
+                    const pectL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.015, 0.28), finMat);
+                    pectL.name = "pectL";
+                    pectL.position.set(-0.02, -0.12, 0.2);
+                    pectL.rotation.set(0.2, 0.1, -0.3);
+                    pectL.castShadow = true;
+                    
+                    const pectR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.015, 0.28), finMat);
+                    pectR.name = "pectR";
+                    pectR.position.set(-0.02, -0.12, -0.2);
+                    pectR.rotation.set(-0.2, -0.1, -0.3);
+                    pectR.castShadow = true;
+                    body1.add(pectL, pectR);
+
+                    const body2 = new THREE.Mesh(new THREE.SphereGeometry(0.21, 16, 16), fishMat);
+                    body2.scale.set(1.2, 0.9, 0.65);
+                    body2.position.set(-0.24, 0, 0);
+                    body2.castShadow = true;
+                    body2.name = "body2";
+                    body1.add(body2);
+
+                    const dorsal = new THREE.Group();
+                    dorsal.position.set(-0.05, 0.22, 0);
+                    dorsal.rotation.z = -Math.PI / 10;
+                    const dorsalMesh = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.2, 0.02), pinkFinMat);
+                    dorsalMesh.position.set(-0.08, 0.08, 0);
+                    dorsalMesh.castShadow = true;
+                    dorsal.add(dorsalMesh);
+                    for (let i = 0; i < 5; i++) {
+                        const spine = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.25, 4), pinkFinMat);
+                        spine.position.set(-i * 0.05, 0.1, 0);
+                        spine.rotation.z = -i * 0.15;
+                        dorsal.add(spine);
+                    }
+                    body2.add(dorsal);
+
+                    const pelvL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.01, 0.12), finMat);
+                    pelvL.position.set(-0.05, -0.18, 0.1);
+                    pelvL.rotation.set(0.1, 0, -0.15);
+                    const pelvR = pelvL.clone();
+                    pelvR.position.z = -0.1;
+                    pelvR.rotation.set(-0.1, 0, -0.15);
+                    body2.add(pelvL, pelvR);
+
+                    const body3 = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), fishMat);
+                    body3.scale.set(1.2, 0.85, 0.6);
+                    body3.position.set(-0.22, 0, 0);
+                    body3.castShadow = true;
+                    body3.name = "body3";
+                    body2.add(body3);
+
+                    const analFin = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.02), pinkFinMat);
+                    analFin.position.set(-0.08, -0.16, 0);
+                    analFin.rotation.z = Math.PI / 6;
+                    analFin.castShadow = true;
+                    body3.add(analFin);
+
+                    const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.04, 0.25, 8), fishMat);
+                    tail.rotation.z = Math.PI / 2;
+                    tail.position.set(-0.2, 0, 0);
+                    tail.castShadow = true;
+                    tail.name = "tail";
+                    body3.add(tail);
+
+                    const caudalFin = new THREE.Group();
+                    caudalFin.name = "caudalFin";
+                    caudalFin.position.set(0, -0.18, 0);
+                    
+                    const caudalMesh = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.38, 4), pinkFinMat);
+                    caudalMesh.rotation.z = -Math.PI / 2;
+                    caudalMesh.scale.set(1, 1, 0.12);
+                    caudalMesh.position.set(0, -0.18, 0);
+                    caudalMesh.castShadow = true;
+                    caudalFin.add(caudalMesh);
+                    
+                    for (let i = -3; i <= 3; i++) {
+                        const ray = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.35, 4), pinkFinMat);
+                        ray.position.set(0.12, -0.18, i * 0.03);
+                        ray.rotation.z = -Math.PI / 2;
+                        ray.rotation.y = i * 0.15;
+                        caudalFin.add(ray);
+                    }
+                    tail.add(caudalFin);
+
+                    return group;
+                },
+                behavior: (obj, dt) => {
+                    const head = obj.mesh.getObjectByName("head");
+                    const body1 = obj.mesh.getObjectByName("body1");
+                    const body2 = obj.mesh.getObjectByName("body2");
+                    const body3 = obj.mesh.getObjectByName("body3");
+                    const tail = obj.mesh.getObjectByName("tail");
+                    const caudalFin = obj.mesh.getObjectByName("caudalFin");
+                    const pectL = obj.mesh.getObjectByName("pectL");
+                    const pectR = obj.mesh.getObjectByName("pectR");
+
+                    const speed = Math.hypot(obj.vx, obj.vy, obj.vz);
+                    if (speed > 0.05 && !obj.isDragging) {
+                        const wiggleSpeed = 12 + Math.min(speed * 3.5, 12);
+                        const time = Date.now() * 0.001 * wiggleSpeed;
+                        
+                        if (head) head.rotation.y = Math.sin(time) * 0.06;
+                        if (body1) body1.rotation.y = Math.sin(time - 0.25) * 0.12;
+                        if (body2) body2.rotation.y = Math.sin(time - 0.5) * 0.16;
+                        if (body3) body3.rotation.y = Math.sin(time - 0.75) * 0.20;
+                        if (tail) tail.rotation.y = Math.sin(time - 1.0) * 0.24;
+                        if (caudalFin) caudalFin.rotation.y = Math.sin(time - 1.25) * 0.28;
+                        
+                        if (pectL) pectL.rotation.z = -0.3 + Math.sin(time) * 0.15;
+                        if (pectR) pectR.rotation.z = 0.3 - Math.sin(time) * 0.15;
+
+                        if (Math.random() < 0.008) synth.playFishSplash();
+                    } else {
+                        if (head) head.rotation.y = 0;
+                        if (body1) body1.rotation.y = 0;
+                        if (body2) body2.rotation.y = 0;
+                        if (body3) body3.rotation.y = 0;
+                        if (tail) tail.rotation.y = 0;
+                        if (caudalFin) caudalFin.rotation.y = 0;
+                    }
+                }
+            },
+            squirrel: {
+                name: 'Flying Squirrel',
+                mass: 0.35,
+                volume: 0.0008,
+                radius: 0.4,
+                dragCoeff: 0.60,
+                color: 0xd97706,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    
+                    const furTex = createProceduralTexture('squirrel_fur');
+                    const squirrelMat = new THREE.MeshStandardMaterial({ map: furTex, roughness: 0.75 });
+                    const creamMat = new THREE.MeshStandardMaterial({ color: 0xf3f4f6, roughness: 0.8 });
+                    const pinkMat = new THREE.MeshStandardMaterial({ color: 0xfca5a5, roughness: 0.6 });
+                    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                    const whiteBasicMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), squirrelMat);
+                    body.scale.set(1.4, 0.85, 0.85);
+                    body.castShadow = true;
+                    group.add(body);
+
+                    const belly = new THREE.Mesh(new THREE.SphereGeometry(0.155, 12, 12), creamMat);
+                    belly.scale.set(1.15, 0.7, 0.7);
+                    belly.position.set(0.04, -0.06, 0);
+                    body.add(belly);
+
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 16), squirrelMat);
+                    head.position.set(0.24, 0.06, 0);
+                    head.castShadow = true;
+                    group.add(head);
+
+                    const cheekL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), creamMat);
+                    cheekL.position.set(0.06, -0.04, 0.08);
+                    const cheekR = cheekL.clone();
+                    cheekR.position.z = -0.08;
+                    head.add(cheekL, cheekR);
+
+                    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 8), pinkMat);
+                    nose.position.set(0.14, 0.01, 0);
+                    head.add(nose);
+
+                    const whiskerMat = new THREE.LineBasicMaterial({ color: 0x1e293b });
+                    for (let i = -1; i <= 1; i++) {
+                        const pointsL = [new THREE.Vector3(0.1, -0.01, 0.04), new THREE.Vector3(0.16, i * 0.03 - 0.03, 0.16)];
+                        const lineL = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pointsL), whiskerMat);
+                        const pointsR = [new THREE.Vector3(0.1, -0.01, -0.04), new THREE.Vector3(0.16, i * 0.03 - 0.03, -0.16)];
+                        const lineR = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pointsR), whiskerMat);
+                        head.add(lineL, lineR);
+                    }
+
+                    const earL = new THREE.Group();
+                    earL.position.set(0.06, 0.11, 0.06);
+                    earL.rotation.set(0.1, 0, -Math.PI / 8);
+                    const earLOuter = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.09, 8), squirrelMat);
+                    earLOuter.castShadow = true;
+                    earL.add(earLOuter);
+                    const earLInner = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.07, 8), pinkMat);
+                    earLInner.position.set(0, 0, 0.008);
+                    earL.add(earLInner);
+
+                    const earR = new THREE.Group();
+                    earR.position.set(0.06, 0.11, -0.06);
+                    earR.rotation.set(-0.1, 0, -Math.PI / 8);
+                    const earROuter = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.09, 8), squirrelMat);
+                    earROuter.castShadow = true;
+                    earR.add(earROuter);
+                    const earRInner = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.07, 8), pinkMat);
+                    earRInner.position.set(0, 0, -0.008);
+                    earR.add(earRInner);
+                    head.add(earL, earR);
+
+                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), eyeMat);
+                    const specL = new THREE.Mesh(new THREE.SphereGeometry(0.01, 8, 8), whiteBasicMat);
+                    specL.position.set(0.018, 0.015, 0.018);
+                    eyeL.add(specL);
+                    eyeL.position.set(0.08, 0.04, 0.11);
+                    
+                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), eyeMat);
+                    const specR = new THREE.Mesh(new THREE.SphereGeometry(0.01, 8, 8), whiteBasicMat);
+                    specR.position.set(0.018, 0.015, -0.018);
+                    eyeR.add(specR);
+                    eyeR.position.set(0.08, 0.04, -0.11);
+                    head.add(eyeL, eyeR);
+
+                    const limbMat = squirrelMat;
+                    const clawMat = pinkMat;
+                    const pawGeo = new THREE.BoxGeometry(0.035, 0.02, 0.06);
+
+                    const p1 = new THREE.Group();
+                    p1.name = "p1";
+                    p1.position.set(0.2, -0.08, 0.15);
+                    const upper1 = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.018, 0.14, 8), limbMat);
+                    upper1.rotation.z = Math.PI/3;
+                    p1.add(upper1);
+                    const paw1 = new THREE.Mesh(pawGeo, clawMat);
+                    paw1.position.set(0.06, -0.06, 0.02);
+                    p1.add(paw1);
+                    group.add(p1);
+
+                    const p2 = new THREE.Group();
+                    p2.name = "p2";
+                    p2.position.set(0.2, -0.08, -0.15);
+                    const upper2 = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.018, 0.14, 8), limbMat);
+                    upper2.rotation.z = Math.PI/3;
+                    p2.add(upper2);
+                    const paw2 = new THREE.Mesh(pawGeo, clawMat);
+                    paw2.position.set(0.06, -0.06, -0.02);
+                    p2.add(paw2);
+                    group.add(p2);
+
+                    const p3 = new THREE.Group();
+                    p3.name = "p3";
+                    p3.position.set(-0.2, -0.08, 0.15);
+                    const upper3 = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.02, 0.14, 8), limbMat);
+                    upper3.rotation.z = -Math.PI/3;
+                    p3.add(upper3);
+                    const paw3 = new THREE.Mesh(pawGeo, clawMat);
+                    paw3.position.set(-0.06, -0.06, 0.02);
+                    p3.add(paw3);
+                    group.add(p3);
+
+                    const p4 = new THREE.Group();
+                    p4.name = "p4";
+                    p4.position.set(-0.2, -0.08, -0.15);
+                    const upper4 = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.02, 0.14, 8), limbMat);
+                    upper4.rotation.z = -Math.PI/3;
+                    p4.add(upper4);
+                    const paw4 = new THREE.Mesh(pawGeo, clawMat);
+                    paw4.position.set(-0.06, -0.06, -0.02);
+                    p4.add(paw4);
+                    group.add(p4);
+
+                    const membraneMat = new THREE.MeshStandardMaterial({ 
+                        color: 0xcc5c04, 
+                        side: THREE.DoubleSide, 
+                        transparent: true, 
+                        opacity: 0.8 
+                    });
+                    
+                    const patagiumL = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.35), membraneMat);
+                    patagiumL.name = "patagiumL";
+                    patagiumL.rotation.x = Math.PI / 2;
+                    patagiumL.position.set(0, -0.07, 0.18);
+                    patagiumL.castShadow = true;
+                    group.add(patagiumL);
+
+                    const patagiumR = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.35), membraneMat);
+                    patagiumR.name = "patagiumR";
+                    patagiumR.rotation.x = Math.PI / 2;
+                    patagiumR.position.set(0, -0.07, -0.18);
+                    patagiumR.castShadow = true;
+                    group.add(patagiumR);
+
+                    const tail1 = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), squirrelMat);
+                    tail1.name = "tail1";
+                    tail1.scale.set(1.4, 0.7, 0.7);
+                    tail1.position.set(-0.25, 0.05, 0);
+                    group.add(tail1);
+
+                    const tail2 = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), squirrelMat);
+                    tail2.name = "tail2";
+                    tail2.scale.set(1.4, 0.8, 0.8);
+                    tail2.position.set(-0.16, 0.03, 0);
+                    tail1.add(tail2);
+
+                    const tail3 = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), squirrelMat);
+                    tail3.name = "tail3";
+                    tail3.scale.set(1.6, 0.9, 0.9);
+                    tail3.position.set(-0.14, 0.01, 0);
+                    tail2.add(tail3);
+
+                    return group;
+                },
+                behavior: (obj, dt) => {
+                    const patagiumL = obj.mesh.getObjectByName("patagiumL");
+                    const patagiumR = obj.mesh.getObjectByName("patagiumR");
+                    const p1 = obj.mesh.getObjectByName("p1");
+                    const p2 = obj.mesh.getObjectByName("p2");
+                    const p3 = obj.mesh.getObjectByName("p3");
+                    const p4 = obj.mesh.getObjectByName("p4");
+                    const tail1 = obj.mesh.getObjectByName("tail1");
+                    const tail2 = obj.mesh.getObjectByName("tail2");
+                    const tail3 = obj.mesh.getObjectByName("tail3");
+
+                    const t = Date.now() * 0.007;
+                    if (tail1) tail1.rotation.y = Math.sin(t) * 0.12;
+                    if (tail2) tail2.rotation.y = Math.sin(t - 0.25) * 0.15;
+                    if (tail3) tail3.rotation.y = Math.sin(t - 0.5) * 0.18;
+
+                    if (obj.vy < -1.5 && airDensity > 0 && !obj.isDragging) {
+                        obj.dragCoeff = 1.60;
+                        if (patagiumL) {
+                            patagiumL.visible = true;
+                            patagiumL.scale.set(1, 1, 1);
+                        }
+                        if (patagiumR) {
+                            patagiumR.visible = true;
+                            patagiumR.scale.set(1, 1, 1);
+                        }
+                        if (p1) p1.position.set(0.2, -0.06, 0.3);
+                        if (p2) p2.position.set(0.2, -0.06, -0.3);
+                        if (p3) p3.position.set(-0.2, -0.06, 0.3);
+                        if (p4) p4.position.set(-0.2, -0.06, -0.3);
+
+                        if (Math.random() < 0.007) synth.playSquirrelSqueak();
+                    } else {
+                        obj.dragCoeff = 0.60;
+                        if (patagiumL) patagiumL.visible = false;
+                        if (patagiumR) patagiumR.visible = false;
+                        if (p1) p1.position.set(0.2, -0.08, 0.15);
+                        if (p2) p2.position.set(0.2, -0.08, -0.15);
+                        if (p3) p3.position.set(-0.2, -0.08, 0.15);
+                        if (p4) p4.position.set(-0.2, -0.08, -0.15);
+                    }
+                }
+            },
+            elephant: {
+                name: 'Asian Elephant',
+                mass: 3000.0,
+                volume: 3.2,
+                radius: 1.2,
+                dragCoeff: 1.15,
+                elasticity: 0.10,
+                color: 0x94a3b8,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    
+                    const skinTex = createProceduralTexture('elephant_skin');
+                    const skinBump = createProceduralBumpMap('elephant_skin');
+                    const skinMat = new THREE.MeshStandardMaterial({ 
+                        map: skinTex, 
+                        bumpMap: skinBump,
+                        bumpScale: 0.02,
+                        roughness: 0.85 
+                    });
+                    const pinkSkinMat = new THREE.MeshStandardMaterial({ color: 0xfca5a5, roughness: 0.7 });
+                    const tuskMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.2, metalness: 0.05 });
+                    const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                    const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.85, 24, 24), skinMat);
+                    body.scale.set(1.4, 0.95, 0.9);
+                    body.position.y = 0.35;
+                    body.castShadow = true;
+                    group.add(body);
+
+                    for (let i = -2; i <= 2; i++) {
+                        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.86, 0.015, 8, 32), skinMat);
+                        ring.position.set(i * 0.25, 0.35, 0);
+                        ring.rotation.y = Math.PI / 2;
+                        group.add(ring);
+                    }
+
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.48, 20, 20), skinMat);
+                    head.position.set(0.9, 0.5, 0);
+                    head.castShadow = true;
+                    head.name = "head";
+                    group.add(head);
+
+                    const domeL = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), skinMat);
+                    domeL.position.set(0.12, 0.3, 0.14);
+                    const domeR = domeL.clone();
+                    domeR.position.z = -0.14;
+                    head.add(domeL, domeR);
+
+                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), whiteMat);
+                    const pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 8), eyeMat);
+                    pupilL.position.set(0.02, 0.005, 0.015);
+                    eyeL.add(pupilL);
+                    eyeL.position.set(0.24, 0.12, 0.28);
+                    
+                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), whiteMat);
+                    const pupilR = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 8), eyeMat);
+                    pupilR.position.set(0.02, 0.005, -0.015);
+                    eyeR.add(pupilR);
+                    eyeR.position.set(0.24, 0.12, -0.28);
+                    head.add(eyeL, eyeR);
+
+                    const earGeo = new THREE.BoxGeometry(0.05, 0.62, 0.52);
+                    const earL = new THREE.Group();
+                    earL.name = "earL";
+                    earL.position.set(0.85, 0.48, -0.42);
+                    
+                    const earLOuter = new THREE.Mesh(earGeo, skinMat);
+                    earLOuter.castShadow = true;
+                    earLOuter.position.z = -0.1;
+                    earL.add(earLOuter);
+                    
+                    const earLInner = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.56, 0.46), pinkSkinMat);
+                    earLInner.position.set(0.01, 0, -0.1);
+                    earL.add(earLInner);
+                    
+                    const earR = new THREE.Group();
+                    earR.name = "earR";
+                    earR.position.set(0.85, 0.48, 0.42);
+                    
+                    const earROuter = new THREE.Mesh(earGeo, skinMat);
+                    earROuter.castShadow = true;
+                    earROuter.position.z = 0.1;
+                    earR.add(earROuter);
+                    
+                    const earRInner = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.56, 0.46), pinkSkinMat);
+                    earRInner.position.set(0.01, 0, 0.1);
+                    earR.add(earRInner);
+                    group.add(earL, earR);
+
+                    const tuskL = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.48, 12), tuskMat);
+                    tuskL.position.set(1.15, 0.18, 0.18);
+                    tuskL.rotation.set(0.2, 0.1, -Math.PI / 5.5);
+                    tuskL.castShadow = true;
+                    
+                    const tuskR = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.48, 12), tuskMat);
+                    tuskR.position.set(1.15, 0.18, -0.18);
+                    tuskR.rotation.set(-0.2, -0.1, -Math.PI / 5.5);
+                    tuskR.castShadow = true;
+                    group.add(tuskL, tuskR);
+
+                    const tChain = new THREE.Group();
+                    tChain.name = "tChain";
+                    tChain.position.set(1.22, 0.38, 0);
+
+                    let parentSeg = tChain;
+                    for (let i = 1; i <= 8; i++) {
+                        const topR = 0.095 - (i - 1) * 0.008;
+                        const botR = 0.095 - i * 0.008;
+                        const segMesh = new THREE.Mesh(new THREE.CylinderGeometry(topR, botR, 0.15, 8), skinMat);
+                        segMesh.name = `t${i}`;
+                        segMesh.castShadow = true;
+                        
+                        if (i === 1) {
+                            segMesh.position.set(0.06, -0.06, 0);
+                            segMesh.rotation.z = -Math.PI / 4;
+                            parentSeg.add(segMesh);
+                        } else {
+                            segMesh.position.set(0, -0.13, 0);
+                            parentSeg.add(segMesh);
+                        }
+                        parentSeg = segMesh;
+                    }
+                    
+                    const finger = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.04, 0.015), skinMat);
+                    finger.position.set(0, -0.08, 0.01);
+                    parentSeg.add(finger);
+                    group.add(tChain);
+
+                    const legGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.85, 12);
+                    
+                    const l1 = new THREE.Mesh(legGeo, skinMat); l1.position.set(0.55, -0.42, 0.42);
+                    const l2 = new THREE.Mesh(legGeo, skinMat); l2.position.set(0.55, -0.42, -0.42);
+                    const l3 = new THREE.Mesh(legGeo, skinMat); l3.position.set(-0.55, -0.42, 0.42);
+                    const l4 = new THREE.Mesh(legGeo, skinMat); l4.position.set(-0.55, -0.42, -0.42);
+                    l1.castShadow = l2.castShadow = l3.castShadow = l4.castShadow = true;
+
+                    for (let a = -2; a <= 2; a++) {
+                        const nail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.05), whiteMat);
+                        nail.position.set(0.18 + Math.cos(a*0.3)*0.02, -0.41, a * 0.08);
+                        nail.rotation.y = a * 0.3;
+                        l1.add(nail);
+                    }
+                    for (let a = -2; a <= 2; a++) {
+                        const nail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.05), whiteMat);
+                        nail.position.set(0.18 + Math.cos(a*0.3)*0.02, -0.41, a * 0.08);
+                        nail.rotation.y = a * 0.3;
+                        l2.add(nail);
+                    }
+                    for (let a = -1.5; a <= 1.5; a += 1) {
+                        const nail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.05), whiteMat);
+                        nail.position.set(0.18 + Math.cos(a*0.45)*0.02, -0.41, a * 0.09);
+                        nail.rotation.y = a * 0.45;
+                        l3.add(nail);
+                    }
+                    for (let a = -1.5; a <= 1.5; a += 1) {
+                        const nail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.05), whiteMat);
+                        nail.position.set(0.18 + Math.cos(a*0.45)*0.02, -0.41, a * 0.09);
+                        nail.rotation.y = a * 0.45;
+                        l4.add(nail);
+                    }
+                    group.add(l1, l2, l3, l4);
+
+                    const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.02, 0.65, 8), skinMat);
+                    tail.position.set(-0.92, 0.1, 0);
+                    tail.rotation.z = -Math.PI / 9;
+                    tail.castShadow = true;
+                    const tuftMat = new THREE.MeshBasicMaterial({ color: 0x111827 });
+                    for (let i = 0; i < 6; i++) {
+                        const bristle = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.15, 4), tuftMat);
+                        bristle.position.set((Math.random() - 0.5) * 0.02, -0.35 - Math.random() * 0.05, (Math.random() - 0.5) * 0.02);
+                        bristle.rotation.set(Math.random() * 0.2, 0, Math.random() * 0.2);
+                        tail.add(bristle);
+                    }
+                    group.add(tail);
+
+                    return group;
+                },
+                behavior: (obj, dt) => {
+                    const earL = obj.mesh.getObjectByName("earL");
+                    const earR = obj.mesh.getObjectByName("earR");
+                    
+                    const earFlap = Math.sin(Date.now() * 0.0016) * 0.1;
+                    if (earL) earL.rotation.y = -Math.PI / 8 + earFlap;
+                    if (earR) earR.rotation.y = Math.PI / 8 - earFlap;
+
+                    const time = Date.now() * 0.0016;
+                    const t1 = obj.mesh.getObjectByName("t1");
+                    if (t1) t1.rotation.z = -Math.PI/4 + Math.sin(time) * 0.1;
+                    
+                    for (let i = 2; i <= 8; i++) {
+                        const seg = obj.mesh.getObjectByName(`t${i}`);
+                        if (seg) {
+                            seg.rotation.z = Math.sin(time - i * 0.25) * 0.15;
+                        }
+                    }
+                    
+                    if (obj.vy < -3 && Math.random() < 0.01) {
+                        synth.playElephantCall();
+                    }
+                }
+            },
             f1car: {
                 name: 'F1 Racing Car',
                 mass: 800.0,
@@ -1321,68 +2456,102 @@
                 color: 0xef4444,
                 buildGeometry: () => {
                     const group = new THREE.Group();
-                    
-                    // Main aerodynamic body
-                    const chassis = new THREE.Mesh(
-                        new THREE.BoxGeometry(1.5, 0.2, 0.6),
-                        new THREE.MeshStandardMaterial({ color: 0xd92626, roughness: 0.2, metalness: 0.8 })
-                    );
+                    const liveryTex = createProceduralTexture('f1_livery');
+                    const metalMat = new THREE.MeshStandardMaterial({ map: liveryTex, roughness: 0.2, metalness: 0.8 });
+                    const blackMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.6 });
+                    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.95 });
+                    const rimMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.1, metalness: 0.9 });
+
+                    const chassis = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.22, 0.65), metalMat);
                     chassis.castShadow = true;
+                    chassis.position.y = 0.05;
                     group.add(chassis);
 
-                    // Spoiler rear wing
-                    const spoiler = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.2, 0.3, 0.8),
-                        new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.5 })
-                    );
-                    spoiler.position.set(-0.7, 0.2, 0);
-                    spoiler.castShadow = true;
-                    group.add(spoiler);
-
-                    // Front nose cone wing
-                    const nose = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.3, 0.1, 0.7),
-                        new THREE.MeshStandardMaterial({ color: 0xd92626, roughness: 0.2 })
-                    );
-                    nose.position.set(0.8, -0.05, 0);
+                    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.4), metalMat);
+                    nose.position.set(0.9, -0.02, 0);
                     nose.castShadow = true;
-                    group.add(nose);
+                    chassis.add(nose);
 
-                    // 4 Wheels
-                    const wheelGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.18, 12);
-                    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 });
+                    const fWing = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.04, 1.2), blackMat);
+                    fWing.position.set(1.1, -0.05, 0);
+                    fWing.castShadow = true;
+                    chassis.add(fWing);
                     
-                    const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.name = "w1"; w1.rotation.x = Math.PI/2; w1.position.set(0.5, -0.1, 0.35);
-                    const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.name = "w2"; w2.rotation.x = Math.PI/2; w2.position.set(0.5, -0.1, -0.35);
-                    const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.name = "w3"; w3.rotation.x = Math.PI/2; w3.position.set(-0.5, -0.1, 0.35);
-                    const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.name = "w4"; w4.rotation.x = Math.PI/2; w4.position.set(-0.5, -0.1, -0.35);
-                    
-                    w1.castShadow = w2.castShadow = w3.castShadow = w4.castShadow = true;
-                    group.add(w1, w2, w3, w4);
+                    const fWingL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.1, 0.02), blackMat);
+                    fWingL.position.set(1.1, -0.02, 0.6);
+                    const fWingR = fWingL.clone();
+                    fWingR.position.z = -0.6;
+                    chassis.add(fWingL, fWingR);
 
+                    const rearMountL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.35, 0.04), blackMat);
+                    rearMountL.position.set(-0.72, 0.18, 0.2);
+                    const rearMountR = rearMountL.clone();
+                    rearMountR.position.z = -0.2;
+                    chassis.add(rearMountL, rearMountR);
+
+                    const spoiler = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.04, 0.95), blackMat);
+                    spoiler.position.set(-0.72, 0.35, 0);
+                    spoiler.castShadow = true;
+                    chassis.add(spoiler);
+                    
+                    const spoilerWingL = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.18, 0.02), blackMat);
+                    spoilerWingL.position.set(-0.72, 0.28, 0.47);
+                    const spoilerWingR = spoilerWingL.clone();
+                    spoilerWingR.position.z = -0.47;
+                    chassis.add(spoilerWingL, spoilerWingR);
+
+                    const cockpitOpen = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.02, 0.25), blackMat);
+                    cockpitOpen.position.set(0.1, 0.12, 0);
+                    chassis.add(cockpitOpen);
+
+                    const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 12), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.1 }));
+                    helmet.position.set(0.1, 0.20, 0);
+                    const visor = new THREE.Mesh(new THREE.SphereGeometry(0.082, 12, 12), new THREE.MeshBasicMaterial({ color: 0x111827 }));
+                    visor.scale.set(1, 0.6, 0.95);
+                    visor.position.set(0.02, 0.015, 0);
+                    helmet.add(visor);
+                    chassis.add(helmet);
+
+                    const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.25, 8), blackMat);
+                    exhaust.rotation.z = Math.PI / 2;
+                    exhaust.position.set(-0.85, 0.02, 0);
+                    chassis.add(exhaust);
+
+                    const wheelGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.22, 16);
+                    const rimGeo = new THREE.CylinderGeometry(0.14, 0.14, 0.23, 12);
+                    
+                    const w1 = new THREE.Group(); w1.name = "w1"; w1.position.set(0.5, -0.06, 0.44);
+                    const w1Tire = new THREE.Mesh(wheelGeo, wheelMat); w1Tire.rotation.x = Math.PI/2; w1Tire.castShadow = true; w1.add(w1Tire);
+                    const w1Rim = new THREE.Mesh(rimGeo, rimMat); w1Rim.rotation.x = Math.PI/2; w1.add(w1Rim);
+                    
+                    const w2 = new THREE.Group(); w2.name = "w2"; w2.position.set(0.5, -0.06, -0.44);
+                    const w2Tire = w1Tire.clone(); w2.add(w2Tire);
+                    const w2Rim = w1Rim.clone(); w2.add(w2Rim);
+
+                    const w3 = new THREE.Group(); w3.name = "w3"; w3.position.set(-0.5, -0.06, 0.44);
+                    const w3Tire = w1Tire.clone(); w3.add(w3Tire);
+                    const w3Rim = w1Rim.clone(); w3.add(w3Rim);
+
+                    const w4 = new THREE.Group(); w4.name = "w4"; w4.position.set(-0.5, -0.06, -0.44);
+                    const w4Tire = w1Tire.clone(); w4.add(w4Tire);
+                    const w4Rim = w1Rim.clone(); w4.add(w4Rim);
+                    
+                    chassis.add(w1, w2, w3, w4);
                     return group;
                 },
                 behavior: (obj, dt) => {
                     const floorLimit = obj.radius;
                     if (obj.y <= floorLimit + 0.05 && !obj.isDragging) {
-                        // Accelerate forward using engine thrust!
                         const thrustAcc = 8.0 * DT;
-                        
-                        // Drive relative to wind or orientation
                         obj.vx += thrustAcc;
                         
-                        // Rotates wheels
-                        const wheels = ["w1", "w2", "w3", "w4"];
-                        wheels.forEach(name => {
+                        ["w1", "w2", "w3", "w4"].forEach(name => {
                             const w = obj.mesh.getObjectByName(name);
-                            if (w) w.rotateZ(-obj.vx * 0.1);
+                            if (w) w.rotateY(obj.vx * 0.1);
                         });
-
-                        // Play engine roar pitch proportional to speed
+                        
                         const speedPercent = Math.min(Math.abs(obj.vx) / 15, 1.0);
-                        if (Math.random() < 0.2) {
-                            synth.playF1Engine(speedPercent);
-                        }
+                        if (Math.random() < 0.2) synth.playF1Engine(speedPercent);
                     }
                 }
             },
@@ -1391,68 +2560,99 @@
                 mass: 15000.0,
                 volume: 12.0,
                 radius: 1.2,
-                dragCoeff: 0.05, // super streamlined
+                dragCoeff: 0.05,
                 elasticity: 0.10,
                 color: 0x94a3b8,
                 buildGeometry: () => {
                     const group = new THREE.Group();
                     
-                    // Nose Cone fuselage
-                    const jet = new THREE.Mesh(
-                        new THREE.ConeGeometry(0.25, 1.8, 8),
-                        new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.4, metalness: 0.6 })
-                    );
-                    jet.rotation.z = -Math.PI / 2;
-                    jet.castShadow = true;
-                    group.add(jet);
+                    const panelTex = createProceduralTexture('jet_panels');
+                    const panelBump = createProceduralBumpMap('jet_panels');
+                    const jetMat = new THREE.MeshStandardMaterial({ 
+                        map: panelTex, 
+                        bumpMap: panelBump,
+                        bumpScale: 0.012,
+                        roughness: 0.4, 
+                        metalness: 0.75 
+                    });
+                    const metalMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.2, metalness: 0.9 });
+                    const glassMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.55, roughness: 0.1 });
+                    
+                    const fuselage = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.24, 1.8, 16), jetMat);
+                    fuselage.rotation.z = -Math.PI / 2;
+                    fuselage.castShadow = true;
+                    group.add(fuselage);
 
-                    // Delta Wings
-                    const wing = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.8, 0.02, 1.6),
-                        new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.4 })
-                    );
-                    wing.position.set(-0.2, 0, 0);
-                    wing.castShadow = true;
-                    group.add(wing);
+                    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.45, 16), metalMat);
+                    nose.position.y = 1.125;
+                    fuselage.add(nose);
 
-                    // Flame Exhaust glowing cone
-                    const flame = new THREE.Mesh(
-                        new THREE.ConeGeometry(0.15, 0.5, 8),
-                        new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.8 })
-                    );
+                    const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.14, 16, 16), glassMat);
+                    canopy.scale.set(1.8, 1, 1);
+                    canopy.position.set(0.3, 0.2, 0);
+                    group.add(canopy);
+
+                    const wingGeo = new THREE.BoxGeometry(0.65, 0.025, 0.9);
+                    const wingL = new THREE.Mesh(wingGeo, jetMat);
+                    wingL.position.set(-0.3, -0.02, -0.72);
+                    wingL.rotation.y = -Math.PI/6;
+                    wingL.castShadow = true;
+                    
+                    const wingR = new THREE.Mesh(wingGeo, jetMat);
+                    wingR.position.set(-0.3, -0.02, 0.72);
+                    wingR.rotation.y = Math.PI/6;
+                    wingR.castShadow = true;
+                    group.add(wingL, wingR);
+
+                    const stabGeo = new THREE.BoxGeometry(0.25, 0.02, 0.4);
+                    const stabL = new THREE.Mesh(stabGeo, jetMat);
+                    stabL.position.set(-0.88, 0.01, -0.32);
+                    stabL.rotation.y = -Math.PI/5;
+                    const stabR = stabL.clone();
+                    stabR.position.z = 0.32;
+                    stabR.rotation.y = Math.PI/5;
+                    group.add(stabL, stabR);
+
+                    const fin = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.42, 0.03), jetMat);
+                    fin.position.set(-0.85, 0.35, 0);
+                    fin.rotation.z = -Math.PI / 10;
+                    fin.castShadow = true;
+                    group.add(fin);
+
+                    const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.18, 12), metalMat);
+                    nozzle.position.y = -0.99;
+                    fuselage.add(nozzle);
+
+                    const flame = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.65, 8), new THREE.MeshBasicMaterial({ color: 0xff6600, transparent: true, opacity: 0.85 }));
                     flame.rotation.z = Math.PI / 2;
-                    flame.position.set(-1.15, 0, 0);
+                    flame.position.set(-1.3, 0, 0);
                     flame.name = "flame";
                     group.add(flame);
 
                     return group;
                 },
                 behavior: (obj, dt) => {
-                    // Aircraft flies if in fluid atmosphere!
                     if (airDensity > 0 && !obj.isDragging) {
                         const jetSpeed = Math.abs(obj.vx);
-                        // Forward thrust accelerates Jet!
-                        if (jetSpeed < 18) {
-                            obj.vx += 12.0 * DT;
-                        }
-
-                        // WING LIFT: generates upward lift proportional to speed squared
+                        if (jetSpeed < 18) obj.vx += 12.0 * DT;
                         const liftForce = 0.5 * airDensity * (obj.vx * obj.vx) * 0.45 * 0.8; 
                         const liftAcc = liftForce / obj.mass;
                         obj.vy += liftAcc * DT;
-
-                        // Animate flame glow flicker
                         const flame = obj.mesh.getObjectByName("flame");
                         if (flame) {
-                            flame.scale.set(1, 0.8 + Math.random() * 0.4, 1);
+                            flame.scale.set(1, 0.75 + Math.random() * 0.5, 1);
+                            flame.visible = true;
                         }
+                    } else {
+                        const flame = obj.mesh.getObjectByName("flame");
+                        if (flame) flame.visible = false;
                     }
                 }
             },
             submarine: {
                 name: 'Submarine',
                 mass: 50000.0,
-                volume: 51.0, // density close to water (1000 kg/m^3)
+                volume: 51.0,
                 radius: 1.3,
                 dragCoeff: 0.15,
                 elasticity: 0.10,
@@ -1460,50 +2660,76 @@
                 buildGeometry: () => {
                     const group = new THREE.Group();
                     
-                    // Main Sub hull cylinder
-                    const hull = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.35, 0.35, 1.8, 16),
-                        new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.3, metalness: 0.2 })
-                    );
+                    const subTex = createProceduralTexture('sub_details');
+                    const subBump = createProceduralBumpMap('sub_details');
+                    const subMat = new THREE.MeshStandardMaterial({ 
+                        map: subTex, 
+                        bumpMap: subBump,
+                        bumpScale: 0.015,
+                        roughness: 0.3, 
+                        metalness: 0.3 
+                    });
+                    const blackMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
+                    const brassMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.1, metalness: 0.95 });
+
+                    const hull = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 1.8, 20), subMat);
                     hull.rotation.z = Math.PI / 2;
                     hull.castShadow = true;
                     group.add(hull);
 
-                    // Conning tower/sail
-                    const sail = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.3, 0.4, 0.25),
-                        new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.3 })
-                    );
-                    sail.position.set(0.2, 0.4, 0);
+                    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), subMat);
+                    nose.scale.set(0.8, 1, 1);
+                    nose.position.y = 0.9;
+                    hull.add(nose);
+
+                    const tail = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.45, 16), subMat);
+                    tail.position.y = -1.125;
+                    hull.add(tail);
+
+                    const sail = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.45, 0.22), subMat);
+                    name = "sail";
+                    sail.position.set(0.18, 0.45, 0);
                     sail.castShadow = true;
                     group.add(sail);
 
-                    // Propeller blades at rear (wiggles)
-                    const prop = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.05, 0.4, 0.1),
-                        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 })
-                    );
-                    prop.name = "prop";
-                    prop.position.set(-1.0, 0, 0);
-                    group.add(prop);
+                    const scope = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.2, 8), blackMat);
+                    scope.position.set(0.2, 0.75, 0.05);
+                    const scopeHorizontal = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.06, 8), blackMat);
+                    scopeHorizontal.rotation.x = Math.PI/2;
+                    scopeHorizontal.position.set(0.2, 0.85, 0.05);
+                    group.add(scope, scopeHorizontal);
+
+                    const divePlaneL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.18), subMat);
+                    divePlaneL.position.set(0.2, 0.45, 0.2);
+                    const divePlaneR = divePlaneL.clone();
+                    divePlaneR.position.z = -0.2;
+                    group.add(divePlaneL, divePlaneR);
+
+                    const propGroup = new THREE.Group();
+                    propGroup.name = "propGroup";
+                    propGroup.position.set(-1.18, 0, 0);
+                    
+                    const hub = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), brassMat);
+                    propGroup.add(hub);
+                    
+                    for (let i = 0; i < 4; i++) {
+                        const blade = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.35, 0.09), brassMat);
+                        blade.rotation.x = (i * Math.PI / 2) + Math.PI / 6;
+                        propGroup.add(blade);
+                    }
+                    group.add(propGroup);
 
                     return group;
                 },
                 behavior: (obj, dt) => {
-                    // Submarine ballast system adjusts displaced volume to achieve neutral buoyancy!
-                    // It will try to float neutrally at the current fluid density
                     if (airDensity > 0 && !obj.isDragging) {
-                        // Dynamically adjusts volume displacement to match mass / fluid density
                         const targetVol = obj.mass / airDensity;
-                        // Bob slightly around neutral ballast
-                        const bobbingFactor = 1.0 + Math.sin(Date.now() * 0.0025) * 0.03;
+                        const bobbingFactor = 1.0 + Math.sin(Date.now() * 0.0025) * 0.025;
                         obj.volume = targetVol * bobbingFactor;
-
-                        // Wiggle propeller
-                        const prop = obj.mesh.getObjectByName("prop");
-                        if (prop) prop.rotateX(0.25);
-
-                        // Sonar pings
+                        
+                        const prop = obj.mesh.getObjectByName("propGroup");
+                        if (prop) prop.rotateX(0.28);
+                        
                         if (Math.random() < 0.004) synth.playSonarPing();
                     }
                 }
@@ -1519,30 +2745,45 @@
                 buildGeometry: () => {
                     const group = new THREE.Group();
                     
-                    // Giant striped envelope sphere
-                    const envelope = new THREE.Mesh(
-                        new THREE.SphereGeometry(1.6, 24, 24),
-                        new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5 })
-                    );
-                    envelope.position.y = 1.2;
+                    const stripesTex = createProceduralTexture('balloon_stripes');
+                    const weaveTex = createProceduralTexture('basket_weave');
+                    
+                    const envelopeMat = new THREE.MeshStandardMaterial({ map: stripesTex, roughness: 0.4 });
+                    const basketMat = new THREE.MeshStandardMaterial({ map: weaveTex, roughness: 0.85 });
+                    const frameMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5, metalness: 0.7 });
+                    const fireMat = new THREE.MeshBasicMaterial({ color: 0xff3300, transparent: true, opacity: 0.0 });
+
+                    const envelope = new THREE.Mesh(new THREE.SphereGeometry(1.5, 24, 24), envelopeMat);
+                    envelope.position.y = 1.1;
                     envelope.scale.set(1, 1.25, 1);
                     envelope.castShadow = true;
                     group.add(envelope);
 
-                    // Basket box
-                    const basket = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.5, 0.4, 0.5),
-                        new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.9 })
-                    );
-                    basket.position.y = -1.2;
+                    const bottomCone = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.8, 24), envelopeMat);
+                    bottomCone.position.y = 0.05;
+                    bottomCone.rotation.x = Math.PI;
+                    group.add(bottomCone);
+
+                    const basket = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.45, 0.55), basketMat);
+                    basket.position.y = -1.25;
                     basket.castShadow = true;
                     group.add(basket);
 
-                    // Burner flame
-                    const flame = new THREE.Mesh(
-                        new THREE.ConeGeometry(0.12, 0.4, 8),
-                        new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.0 })
-                    );
+                    for (let x = -1; x <= 1; x += 2) {
+                        for (let z = -1; z <= 1; z += 2) {
+                            const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 1.0, 4), frameMat);
+                            wire.position.set(x * 0.2, -0.7, z * 0.2);
+                            wire.rotation.x = -x * 0.1;
+                            wire.rotation.z = z * 0.1;
+                            group.add(wire);
+                        }
+                    }
+
+                    const burner = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.08, 8), frameMat);
+                    burner.position.y = -0.98;
+                    group.add(burner);
+
+                    const flame = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.48, 8), fireMat);
                     flame.name = "flame";
                     flame.position.y = -0.8;
                     group.add(flame);
@@ -1551,172 +2792,17 @@
                 },
                 behavior: (obj, dt) => {
                     const flame = obj.mesh.getObjectByName("flame");
-                    
-                    // Burner triggers periodically to heat air and expand envelope volume (buoyancy)
                     const cycle = Date.now() % 5000;
                     if (cycle < 2000 && airDensity > 0 && !obj.isDragging) {
-                        // Burner ON: volume expands due to heated gas density delta!
                         obj.volume = 2600.0;
                         if (flame) {
-                            flame.material.opacity = 0.85;
-                            flame.scale.set(1, 0.8 + Math.random() * 0.4, 1);
+                            flame.material.opacity = 0.88;
+                            flame.scale.set(1, 0.75 + Math.random() * 0.5, 1);
                         }
                     } else {
-                        // Burner OFF: gas cools, volume shrinks back
                         obj.volume = 2000.0;
                         if (flame) flame.material.opacity = 0.0;
                     }
-                }
-            },
-            bird: {
-                name: 'Flapping Bird',
-                mass: 0.8,
-                volume: 0.0018,
-                radius: 0.5,
-                dragCoeff: 0.6,
-                elasticity: 0.35,
-                color: 0x38bdf8,
-                buildGeometry: () => {
-                    const group = new THREE.Group();
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4 }));
-                    body.castShadow = true; body.scale.set(1.4, 0.9, 0.9); group.add(body);
-                    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.2, 8), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.2 }));
-                    beak.rotation.z = -Math.PI / 2; beak.position.set(0.3, 0, 0); group.add(beak);
-                    const wingLeft = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.02, 0.3), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.5 }));
-                    wingLeft.position.set(0, 0, -0.25); wingLeft.name = "wingL"; group.add(wingLeft);
-                    const wingRight = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.02, 0.3), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.5 }));
-                    wingRight.position.set(0, 0, 0.25); wingRight.name = "wingR"; group.add(wingRight);
-                    return group;
-                },
-                behavior: (obj, dt) => {
-                    const left = obj.mesh.getObjectByName("wingL");
-                    const right = obj.mesh.getObjectByName("wingR");
-                    if (obj.vy < -0.1 && airDensity > 0 && !obj.isDragging) {
-                        const flapSpeed = 22;
-                        const wingRot = Math.sin(Date.now() * 0.001 * flapSpeed) * 0.8;
-                        if (left) left.rotation.x = wingRot;
-                        if (right) right.rotation.x = -wingRot;
-                        const liftMagnitude = airDensity * 3.8 * Math.abs(obj.vy) * DT;
-                        obj.vy += liftMagnitude / obj.mass;
-                        if (Math.random() < 0.006) synth.playBirdChirp();
-                    } else {
-                        if (left) left.rotation.x = 0;
-                        if (right) right.rotation.x = 0;
-                    }
-                }
-            },
-            fish: {
-                name: 'Wiggling Fish',
-                mass: 1.2,
-                volume: 0.0012,
-                radius: 0.45,
-                dragCoeff: 0.25,
-                elasticity: 0.15,
-                color: 0xf97316,
-                buildGeometry: () => {
-                    const group = new THREE.Group();
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 16), new THREE.MeshStandardMaterial({ color: 0xe04f16, roughness: 0.2, metalness: 0.1 }));
-                    body.scale.set(1.5, 0.8, 0.6); body.castShadow = true; group.add(body);
-                    const tailFin = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.3, 4), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.3 }));
-                    tailFin.rotation.z = Math.PI / 2; tailFin.position.set(-0.45, 0, 0); tailFin.name = "tail"; tailFin.castShadow = true; group.add(tailFin);
-                    return group;
-                },
-                behavior: (obj, dt) => {
-                    const tail = obj.mesh.getObjectByName("tail");
-                    if (tail && Math.abs(obj.vx) + Math.abs(obj.vy) > 0.1 && !obj.isDragging) {
-                        const wiggle = Math.sin(Date.now() * 0.015) * 0.5;
-                        tail.rotation.y = wiggle;
-                        if (Math.random() < 0.005) synth.playFishSplash();
-                    }
-                }
-            },
-            squirrel: {
-                name: 'Gliding Squirrel',
-                mass: 0.35,
-                volume: 0.0008,
-                radius: 0.4,
-                dragCoeff: 0.60,
-                elasticity: 0.30,
-                color: 0xd97706,
-                buildGeometry: () => {
-                    const group = new THREE.Group();
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.6 }));
-                    body.scale.set(1.3, 0.9, 0.9); body.castShadow = true; group.add(body);
-                    const tail = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.8 }));
-                    tail.position.set(-0.35, 0.1, 0); tail.scale.set(1.6, 0.8, 0.8); group.add(tail);
-                    const flap = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.01, 0.5), new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.6, transparent: true, opacity: 0.0 }));
-                    flap.name = "flap"; flap.position.set(0, -0.05, 0); group.add(flap);
-                    return group;
-                },
-                behavior: (obj, dt) => {
-                    const flap = obj.mesh.getObjectByName("flap");
-                    if (obj.vy < -1.5 && airDensity > 0 && !obj.isDragging) {
-                        obj.dragCoeff = 1.60;
-                        if (flap) flap.material.opacity = 0.65;
-                        if (Math.random() < 0.007) synth.playSquirrelSqueak();
-                    } else {
-                        obj.dragCoeff = 0.60;
-                        if (flap) flap.material.opacity = 0.0;
-                    }
-                }
-            },
-            elephant: {
-                name: 'Heavy Elephant',
-                mass: 3000.0,
-                volume: 3.2,
-                radius: 1.2,
-                dragCoeff: 1.15,
-                elasticity: 0.10,
-                color: 0x94a3b8,
-                buildGeometry: () => {
-                    const group = new THREE.Group();
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.9, 16, 16), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7 }));
-                    body.scale.set(1.3, 1, 1); body.position.y = 0.3; body.castShadow = true; group.add(body);
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 12), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7 }));
-                    head.position.set(1.0, 0.4, 0); head.castShadow = true; group.add(head);
-                    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.14, 0.8, 8), new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7 }));
-                    trunk.position.set(1.4, 0.0, 0); trunk.rotation.z = -Math.PI / 6; trunk.castShadow = true; group.add(trunk);
-                    const legGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.7, 8);
-                    const legMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8 });
-                    const l1 = new THREE.Mesh(legGeo, legMat); l1.position.set(0.5, -0.5, 0.4);
-                    const l2 = new THREE.Mesh(legGeo, legMat); l2.position.set(0.5, -0.5, -0.4);
-                    const l3 = new THREE.Mesh(legGeo, legMat); l3.position.set(-0.5, -0.5, 0.4);
-                    const l4 = new THREE.Mesh(legGeo, legMat); l4.position.set(-0.5, -0.5, -0.4);
-                    l1.castShadow = l2.castShadow = l3.castShadow = l4.castShadow = true;
-                    group.add(l1, l2, l3, l4);
-                    return group;
-                }
-            },
-            anvil: {
-                name: 'Heavy Anvil',
-                mass: 50.0,
-                volume: 0.0064,
-                radius: 0.7,
-                dragCoeff: 0.9,
-                elasticity: 0.08,
-                color: 0x64748b,
-                buildGeometry: () => {
-                    const group = new THREE.Group();
-                    const plate = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 0.6), new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6, metalness: 0.5 }));
-                    plate.position.y = 0.15; plate.castShadow = true; group.add(plate);
-                    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.4, 0.6, 4), new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8, metalness: 0.4 }));
-                    base.position.y = -0.3; base.castShadow = true; group.add(base);
-                    const horn = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.6, 8), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5, metalness: 0.6 }));
-                    horn.rotation.z = -Math.PI / 2; horn.position.set(0.8, 0.15, 0); horn.castShadow = true; group.add(horn);
-                    return group;
-                }
-            },
-            bowling: {
-                name: 'Bowling Ball',
-                mass: 7.2,
-                volume: 0.005,
-                radius: 0.5,
-                dragCoeff: 0.47,
-                elasticity: 0.45,
-                color: 0x4f46e5,
-                buildGeometry: () => {
-                    const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), new THREE.MeshStandardMaterial({ color: 0x312e81, roughness: 0.12 }));
-                    sphere.castShadow = true; return sphere;
                 }
             },
             balloon: {
@@ -1729,10 +2815,17 @@
                 color: 0xef4444,
                 buildGeometry: () => {
                     const group = new THREE.Group();
-                    const balloon = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.2 }));
-                    balloon.scale.set(1, 1.2, 1); balloon.castShadow = true; group.add(balloon);
-                    const points = [new THREE.Vector3(0, -0.6, 0), new THREE.Vector3(-0.05, -1.2, 0), new THREE.Vector3(0.05, -1.8, 0), new THREE.Vector3(0, -2.4, 0)];
-                    const string = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color: 0x9ca3af }));
+                    const balloon = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.18, metalness: 0.1 }));
+                    balloon.scale.set(1, 1.25, 1);
+                    balloon.castShadow = true;
+                    group.add(balloon);
+
+                    const node = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.06, 8), new THREE.MeshStandardMaterial({ color: 0xef4444 }));
+                    node.position.y = -0.62;
+                    group.add(node);
+
+                    const points = [new THREE.Vector3(0, -0.64, 0), new THREE.Vector3(-0.06, -1.2, 0), new THREE.Vector3(0.06, -1.8, 0), new THREE.Vector3(0, -2.4, 0)];
+                    const string = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color: 0xd1d5db }));
                     group.add(string);
                     return group;
                 }
@@ -1746,7 +2839,14 @@
                 elasticity: 0.1,
                 color: 0x38bdf8,
                 buildGeometry: () => {
-                    return new THREE.Mesh(new THREE.SphereGeometry(0.35, 32, 32), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.01, metalness: 0.95, transparent: true, opacity: 0.35, side: THREE.DoubleSide }));
+                    return new THREE.Mesh(new THREE.SphereGeometry(0.35, 32, 32), new THREE.MeshStandardMaterial({ 
+                        color: 0x38bdf8, 
+                        roughness: 0.01, 
+                        metalness: 0.95, 
+                        transparent: true, 
+                        opacity: 0.32, 
+                        side: THREE.DoubleSide 
+                    }));
                 },
                 isPoppable: true
             },
@@ -1760,10 +2860,111 @@
                 color: 0xe2e8f0,
                 buildGeometry: () => {
                     const group = new THREE.Group();
-                    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.9, 8), new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
-                    shaft.castShadow = true; group.add(shaft);
-                    const plume = new THREE.Mesh(new THREE.PlaneGeometry(0.25, 0.8), new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.9, side: THREE.DoubleSide, transparent: true, opacity: 0.8 }));
-                    plume.rotation.y = Math.PI / 4; plume.castShadow = true; group.add(plume);
+                    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.006, 0.9, 8), new THREE.MeshStandardMaterial({ color: 0xe2e8f0 }));
+                    shaft.rotation.z = Math.PI / 16;
+                    shaft.castShadow = true;
+                    group.add(shaft);
+
+                    for (let i = 0; i < 12; i++) {
+                        const plumeH = 0.08 - Math.abs(i - 6) * 0.01;
+                        const plume = new THREE.Mesh(new THREE.PlaneGeometry(plumeH, 0.08), new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.95, side: THREE.DoubleSide, transparent: true, opacity: 0.8 }));
+                        plume.position.set(plumeH / 2, -0.35 + i * 0.07, 0);
+                        plume.rotation.z = Math.PI / 4;
+                        plume.rotation.y = 0.05;
+                        plume.castShadow = true;
+                        
+                        const plumeR = plume.clone();
+                        plumeR.position.x = -plumeH / 2;
+                        plumeR.rotation.z = -Math.PI / 4;
+                        group.add(plume, plumeR);
+                    }
+                    return group;
+                }
+            },
+            anvil: {
+                name: 'Heavy Anvil',
+                mass: 50.0,
+                volume: 0.0064,
+                radius: 0.4,
+                dragCoeff: 0.82,
+                elasticity: 0.15,
+                color: 0x334155,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    const ironMat = new THREE.MeshStandardMaterial({
+                        map: createProceduralTexture('anvil_iron'),
+                        bumpMap: createProceduralBumpMap('anvil_iron'),
+                        bumpScale: 0.02,
+                        roughness: 0.6,
+                        metalness: 0.95
+                    });
+
+                    const base = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.25, 0.4), ironMat);
+                    base.position.y = -0.2;
+                    base.castShadow = true;
+                    group.add(base);
+
+                    const waist = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.3, 0.25), ironMat);
+                    waist.position.y = 0.075;
+                    waist.castShadow = true;
+                    group.add(waist);
+
+                    const table = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.2, 0.32), ironMat);
+                    table.position.y = 0.325;
+                    table.castShadow = true;
+                    group.add(table);
+
+                    const horn = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.4, 16), ironMat);
+                    horn.rotation.z = Math.PI / 2;
+                    horn.position.set(0.5, 0.325, 0);
+                    horn.castShadow = true;
+                    group.add(horn);
+
+                    const heel = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.2), ironMat);
+                    heel.position.set(-0.4, 0.3, 0);
+                    heel.castShadow = true;
+                    group.add(heel);
+
+                    const hole = new THREE.Mesh(new THREE.PlaneGeometry(0.06, 0.06), new THREE.MeshBasicMaterial({ color: 0x05070a }));
+                    hole.rotation.x = -Math.PI / 2;
+                    hole.position.set(-0.25, 0.426, 0.05);
+                    group.add(hole);
+
+                    return group;
+                }
+            },
+            bowling: {
+                name: 'Bowling Ball',
+                mass: 7.0,
+                volume: 0.005,
+                radius: 0.35,
+                dragCoeff: 0.47,
+                elasticity: 0.70,
+                color: 0x4f46e5,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    const ballMat = new THREE.MeshStandardMaterial({
+                        map: createProceduralTexture('bowling_marble'),
+                        roughness: 0.08,
+                        metalness: 0.1
+                    });
+
+                    const ball = new THREE.Mesh(new THREE.SphereGeometry(0.35, 32, 32), ballMat);
+                    ball.castShadow = true;
+                    group.add(ball);
+
+                    const holeMat = new THREE.MeshBasicMaterial({ color: 0x111827 });
+                    const hole1 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.08, 8), holeMat);
+                    hole1.position.set(0.1, 0.3, 0.1);
+                    hole1.rotation.set(0.3, 0, -0.3);
+                    const hole2 = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.08, 8), holeMat);
+                    hole2.position.set(0.22, 0.22, 0.03);
+                    hole2.rotation.set(0.6, 0, -0.6);
+                    const hole3 = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.08, 8), holeMat);
+                    hole3.position.set(0.2, 0.24, 0.18);
+                    hole3.rotation.set(0.5, 0, -0.4);
+                    
+                    group.add(hole1, hole2, hole3);
                     return group;
                 }
             }
@@ -1953,7 +3154,7 @@
                 } else if (this.name === 'Helium Balloon') {
                     const sway = Math.sin(Date.now() * 0.003) * 0.15 * (windSpeed + 1);
                     this.mesh.rotation.set(sway, 0, sway);
-                } else if (this.name === 'Flapping Bird' || this.name === 'Wiggling Fish' || this.name === 'Gliding Squirrel' || this.name === 'Fighter Jet' || this.name === 'Submarine') {
+                } else if (this.name === 'Flapping Eagle' || this.name === 'Chinook Salmon' || this.name === 'Flying Squirrel' || this.name === 'Fighter Jet' || this.name === 'Submarine') {
                     // Turn faces the movement direction in 3D
                     if (Math.hypot(this.vx, this.vz) > 0.1) {
                         const angle = Math.atan2(-this.vz, this.vx);
@@ -2097,7 +3298,6 @@
             if (!template) return;
 
             const rx = (Math.random() - 0.5) * 8;
-            // Hot air balloon starts lower, aircraft/birds start higher
             const ry = (type === 'hotair' || type === 'submarine') ? 2 + Math.random() * 2 : 12 + Math.random() * 3;
             const rz = (Math.random() - 0.5) * 8;
 
@@ -2141,14 +3341,12 @@
             const biome = BIOMES[biomeId];
             if (!biome) return;
 
-            // Update UI sliders values
             document.getElementById('slide-gravity').value = biome.gravity;
             document.getElementById('slide-density').value = biome.density;
             document.getElementById('slide-bounce').value = biome.bounce;
             
             updateSliders3D();
 
-            // Animate visual changes
             ground.material.color.setHex(biome.color);
             scene.fog.color.setHex(biome.fogColor);
             renderer.setClearColor(biome.fogColor);
@@ -2468,7 +3666,7 @@
 
                 selectObject(activeObjects3D[0]);
             } else if (presetName === 'buoyancy') {
-                setBiome3D('ocean'); // Set ocean context!
+                setBiome3D('ocean');
 
                 spawnObject3D('submarine');
                 activeObjects3D[0].x = -3;
