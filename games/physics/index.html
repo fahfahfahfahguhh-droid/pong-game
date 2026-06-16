@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumLab - Interactive Physics Sandbox</title>
+    <title>QuantumLab 3D - Interactive Physics Laboratory</title>
     <!-- Modern typography -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Three.js and OrbitControls CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --panel-bg: rgba(17, 24, 39, 0.75);
+            --bg-color: #080c14;
+            --panel-bg: rgba(13, 18, 30, 0.8);
             --border-color: rgba(255, 255, 255, 0.08);
-            --accent-glow: rgba(124, 58, 237, 0.4);
+            --accent-glow: rgba(139, 92, 246, 0.4);
             
             --primary: #8b5cf6;
             --primary-hover: #7c3aed;
@@ -32,11 +37,11 @@
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.12) 0, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.1) 0, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.1) 0, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.08) 0, transparent 50%);
             min-height: 100vh;
             color: #f3f4f6;
-            overflow-x: hidden;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -46,9 +51,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 40px;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(10px);
+            padding: 14px 30px;
+            background: rgba(10, 15, 26, 0.6);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             z-index: 10;
         }
@@ -60,8 +65,8 @@
         }
 
         .logo-icon {
-            font-size: 1.8rem;
-            animation: spin 6s linear infinite;
+            font-size: 1.6rem;
+            animation: spin 8s linear infinite;
         }
 
         @keyframes spin {
@@ -69,9 +74,9 @@
         }
 
         .logo h1 {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             font-weight: 800;
-            background: linear-gradient(90deg, #a78bfa, #38bdf8);
+            background: linear-gradient(90deg, #c084fc, #38bdf8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
@@ -80,28 +85,28 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .btn {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border-color);
             color: #e5e7eb;
-            padding: 8px 18px;
+            padding: 8px 16px;
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
             transform: translateY(-1px);
         }
 
@@ -113,151 +118,214 @@
 
         .btn-primary:hover {
             background: var(--primary-hover);
-            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.6);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.6);
         }
 
         /* Main Workspace Grid Layout */
         .workspace {
             display: grid;
-            grid-template-columns: 280px 1fr 340px;
-            gap: 20px;
-            padding: 20px;
+            grid-template-columns: 320px 1fr 340px;
+            gap: 16px;
+            padding: 16px;
             flex-grow: 1;
-            max-width: 1800px;
-            margin: 0 auto;
-            width: 100%;
+            width: 100vw;
+            height: calc(100vh - 65px);
         }
 
         /* Glassmorphic Panel Styles */
         .panel {
             background: var(--panel-bg);
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 20px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            gap: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             overflow-y: auto;
-            max-height: calc(100vh - 120px);
+            height: 100%;
         }
 
         .panel-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
             color: #93c5fd;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        /* Left Sidebar: Spawn Library */
-        .spawn-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
+        /* Tabs for Left Sidebar (Spawn vs Learn) */
+        .tab-nav {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 2px;
+            border: 1px solid var(--border-color);
         }
 
-        .spawn-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            padding: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
             gap: 14px;
         }
 
-        .spawn-card:hover {
-            background: rgba(124, 58, 237, 0.1);
-            border-color: var(--primary);
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.15);
-        }
-
-        .spawn-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
+        .tab-content.active {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .spawn-info {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .spawn-name {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #f3f4f6;
-        }
-
-        .spawn-details {
-            font-size: 0.75rem;
-            color: #9ca3af;
-        }
-
-        /* Preset Scenarios */
-        .preset-list {
+        /* Spawn Library list */
+        .spawn-grid {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
-        .preset-btn {
+        .spawn-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 10px 14px;
-            font-size: 0.85rem;
-            text-align: left;
             cursor: pointer;
-            color: #d1d5db;
-            transition: all 0.15s ease;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .preset-btn:hover {
-            background: rgba(14, 165, 233, 0.1);
-            border-color: var(--info);
-            color: #fff;
+        .spawn-card:hover {
+            background: rgba(139, 92, 246, 0.08);
+            border-color: var(--primary);
+            transform: translateX(4px);
         }
 
-        /* Center Canvas Sandbox Area */
+        .spawn-icon {
+            font-size: 1.4rem;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.03);
+            border-radius: 6px;
+        }
+
+        .spawn-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .spawn-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #f3f4f6;
+        }
+
+        .spawn-details {
+            font-size: 0.72rem;
+            color: #9ca3af;
+        }
+
+        /* Collapsible Lesson Cards */
+        .lesson-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.01);
+        }
+
+        .lesson-header {
+            background: rgba(255,255,255,0.03);
+            padding: 10px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .lesson-header:hover {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .lesson-body {
+            padding: 12px 14px;
+            font-size: 0.78rem;
+            color: #cbd5e1;
+            line-height: 1.45;
+            border-top: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .lesson-body.active {
+            display: block;
+        }
+
+        .lesson-body p {
+            margin-bottom: 8px;
+        }
+
+        .lesson-formula {
+            font-family: 'Fira Code', monospace;
+            color: #c084fc;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: block;
+            margin: 6px 0;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        /* Center 3D WebGL Canvas Area */
         .canvas-container {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
             position: relative;
+            height: 100%;
         }
 
-        #sandbox-canvas {
-            background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+        #sandbox-3d {
+            width: 100%;
+            flex-grow: 1;
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            width: 100%;
-            height: 600px;
-            cursor: crosshair;
-            box-shadow: inset 0 4px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: inset 0 4px 30px rgba(0, 0, 0, 0.6);
+            background: #020408;
+            outline: none;
         }
 
-        /* Simulation Controls HUD overlays */
+        /* 3D Viewport HUD Overlays */
         .canvas-hud-top {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+            top: 15px;
+            left: 15px;
+            right: 15px;
             display: flex;
             justify-content: space-between;
             pointer-events: none;
@@ -265,12 +333,12 @@
         }
 
         .canvas-badge {
-            background: rgba(15, 23, 42, 0.75);
+            background: rgba(13, 18, 30, 0.85);
             backdrop-filter: blur(8px);
             border: 1px solid var(--border-color);
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.76rem;
             font-weight: 500;
             color: #cbd5e1;
             display: flex;
@@ -286,22 +354,129 @@
             background: var(--panel-bg);
             backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
-            padding: 14px 24px;
+            padding: 12px 20px;
             border-radius: 16px;
+            z-index: 5;
         }
 
         .control-group-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+        }
+
+        /* Sliders & Right sidebar panel */
+        .slider-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .slider-value {
+            color: var(--info);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .input-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            margin: 6px 0;
+        }
+
+        .input-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--info);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+            transition: transform 0.1s;
+        }
+
+        .input-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Oscilloscope 2D Graph Canvas */
+        .chart-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        #chart-canvas {
+            background: #05070c;
+            border-radius: 8px;
+            width: 100%;
+            height: 110px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-actions {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: #94a3b8;
+        }
+
+        /* Interactive Solver Formula Card */
+        .math-card {
+            background: rgba(139, 92, 246, 0.04);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-radius: 12px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .math-equation {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: #c084fc;
+            padding: 4px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+
+        .math-calculation {
+            font-size: 0.78rem;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+
+        .dynamic-value {
+            color: var(--success);
+            font-weight: 600;
         }
 
         /* Custom Toggle Switch */
         .switch-container {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
+            gap: 6px;
+            font-size: 0.78rem;
             color: #cbd5e1;
             cursor: pointer;
         }
@@ -309,8 +484,8 @@
         .switch {
             position: relative;
             display: inline-block;
-            width: 40px;
-            height: 20px;
+            width: 32px;
+            height: 16px;
         }
 
         .switch input {
@@ -328,17 +503,17 @@
             bottom: 0;
             background-color: rgba(255, 255, 255, 0.1);
             transition: .2s;
-            border-radius: 20px;
+            border-radius: 16px;
             border: 1px solid var(--border-color);
         }
 
         .slider-switch:before {
             position: absolute;
             content: "";
-            height: 12px;
-            width: 12px;
-            left: 3px;
-            bottom: 3px;
+            height: 10px;
+            width: 10px;
+            left: 2px;
+            bottom: 2px;
             background-color: #fff;
             transition: .2s;
             border-radius: 50%;
@@ -349,149 +524,43 @@
         }
 
         input:checked + .slider-switch:before {
-            transform: translateX(20px);
+            transform: translateX(16px);
         }
 
-        /* Right Sidebar: Lab Controls & Oscilloscope Chart */
-        .slider-card {
-            background: rgba(255, 255, 255, 0.02);
+        /* Camera views widget style */
+        .camera-views {
+            display: flex;
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+            padding: 2px;
         }
 
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #94a3b8;
-        }
-
-        .slider-value {
-            color: var(--info);
-            font-family: 'Fira Code', monospace;
-        }
-
-        .input-slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 4px;
-            border-radius: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            outline: none;
-            margin: 8px 0;
-        }
-
-        .input-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--info);
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
-            transition: transform 0.1s;
-        }
-
-        .input-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.25);
-        }
-
-        /* Oscilloscope Chart Canvas */
-        .chart-box {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 12px;
-        }
-
-        #chart-canvas {
-            background: #05070c;
-            border-radius: 8px;
-            width: 100%;
-            height: 120px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .chart-actions {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #94a3b8;
-        }
-
-        /* Math Physics Equations Display Card */
-        .math-card {
-            background: rgba(124, 58, 237, 0.04);
-            border: 1px solid rgba(124, 58, 237, 0.15);
-            border-radius: 12px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .math-equation {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.82rem;
-            color: #c084fc;
-            padding: 6px 0;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
-        }
-
-        .math-calculation {
-            font-size: 0.8rem;
-            color: #9ca3af;
-            line-height: 1.4;
-        }
-
-        .dynamic-value {
-            color: var(--success);
-            font-weight: 600;
-        }
-
-        /* Sound controls & general footer */
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: #4b5563;
-            font-size: 0.85rem;
-            margin-top: auto;
-            border-top: 1px solid var(--border-color);
-        }
-
-        /* Scrollbar styles */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
+        .camera-btn {
             background: transparent;
+            border: none;
+            color: #9ca3af;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
+
+        .camera-btn.active {
+            background: var(--info);
+            color: #fff;
         }
     </style>
 </head>
 <body>
 
-    <!-- Top Header -->
+    <!-- Top Navigation Header -->
     <header>
         <div class="logo">
             <div class="logo-icon">⚛️</div>
-            <h1>QuantumLab</h1>
-            <span class="btn" style="padding: 2px 8px; font-size: 0.7rem; color: #a78bfa; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.2); text-transform: uppercase;">Physics Sandbox</span>
+            <h1>QuantumLab 3D</h1>
+            <span class="btn" style="padding: 2px 8px; font-size: 0.7rem; color: #a78bfa; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.2); text-transform: uppercase;">WebGL Physics Lab</span>
         </div>
         <div class="header-actions">
             <a href="../../index.html" class="btn">
@@ -501,219 +570,267 @@
         </div>
     </header>
 
-    <!-- Main Workspace Grid -->
+    <!-- Main Grid Workspace -->
     <div class="workspace">
 
-        <!-- LEFT PANEL: Spawn Library & Presets -->
+        <!-- LEFT SIDEBAR: Library & Explanations Tabs -->
         <div class="panel">
-            <div>
-                <div class="panel-title">
-                    <span>1. Spawn Library</span>
-                    <span style="font-size: 0.75rem; color:#64748b;">Click to Drop</span>
-                </div>
-                <p style="font-size: 0.78rem; color:#64748b; margin-top:4px; margin-bottom:12px;">Choose an object to spawn in the lab. Drag, throw, or bump them together!</p>
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchLeftTab('spawn')">Spawn Library</button>
+                <button class="tab-btn" onclick="switchLeftTab('learn')">Learn Physics 📖</button>
+            </div>
+
+            <!-- Tab Content 1: Spawn Library -->
+            <div id="tab-spawn" class="tab-content active">
                 <div class="spawn-grid">
-                    <div class="spawn-card" onclick="spawnObject('anvil')">
-                        <div class="spawn-icon" style="color:#94a3b8;">🛠️</div>
+                    <p style="font-size: 0.75rem; color:#64748b;">Click an object to drop it in the 3D test chamber. Use your mouse to rotate and zoom the camera!</p>
+                    <div class="spawn-card" onclick="spawnObject3D('anvil')">
+                        <div class="spawn-icon">🛠️</div>
                         <div class="spawn-info">
-                            <span class="spawn-name">Anvil</span>
-                            <span class="spawn-details">Massive (50kg) • Aerodynamic</span>
+                            <span class="spawn-name">Heavy Anvil</span>
+                            <span class="spawn-details">50.0 kg • Flat & Metallic</span>
                         </div>
                     </div>
-                    <div class="spawn-card" onclick="spawnObject('bowling')">
+                    <div class="spawn-card" onclick="spawnObject3D('bowling')">
                         <div class="spawn-icon" style="color:#818cf8;">🎳</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Bowling Ball</span>
-                            <span class="spawn-details">Heavy (7.2kg) • Steel core</span>
+                            <span class="spawn-details">7.2 kg • Solid Sphere</span>
                         </div>
                     </div>
-                    <div class="spawn-card" onclick="spawnObject('football')">
+                    <div class="spawn-card" onclick="spawnObject3D('football')">
                         <div class="spawn-icon" style="color:#b45309;">🏈</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Football</span>
-                            <span class="spawn-details">Medium (0.4kg) • Elastic</span>
+                            <span class="spawn-details">0.43 kg • Prolate Oval</span>
                         </div>
                     </div>
-                    <div class="spawn-card" onclick="spawnObject('balloon')">
+                    <div class="spawn-card" onclick="spawnObject3D('balloon')">
                         <div class="spawn-icon" style="color:#f87171;">🎈</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Helium Balloon</span>
-                            <span class="spawn-details">Floats (10g) • High Volume</span>
+                            <span class="spawn-details">0.003 kg (Shell) • 14L Vol</span>
                         </div>
                     </div>
-                    <div class="spawn-card" onclick="spawnObject('bubble')">
+                    <div class="spawn-card" onclick="spawnObject3D('bubble')">
                         <div class="spawn-icon" style="color:#38bdf8;">🫧</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Soap Bubble</span>
-                            <span class="spawn-details">Featherweight (0.1g) • Pops</span>
+                            <span class="spawn-details">0.0001 kg • Air Floating</span>
                         </div>
                     </div>
-                    <div class="spawn-card" onclick="spawnObject('feather')">
+                    <div class="spawn-card" onclick="spawnObject3D('feather')">
                         <div class="spawn-icon" style="color:#cbd5e1;">🪶</div>
                         <div class="spawn-info">
-                            <span class="spawn-name">Feather</span>
-                            <span class="spawn-details">Light (2g) • Air Resistance</span>
+                            <span class="spawn-name">Soft Feather</span>
+                            <span class="spawn-details">0.002 kg • Aerodynamic Drag</span>
                         </div>
+                    </div>
+                </div>
+
+                <div style="border-top:1px solid var(--border-color); padding-top:10px;">
+                    <span style="font-size: 0.85rem; font-weight: 700; color: #93c5fd;">Lab Presets</span>
+                    <div class="preset-list" style="margin-top:8px;">
+                        <button class="preset-btn" onclick="loadPreset3D('galileo')">🏛️ Galileo's Vacuum Drop</button>
+                        <button class="preset-btn" onclick="loadPreset3D('terminal')">🌬️ Terminal Velocity Comparison</button>
+                        <button class="preset-btn" onclick="loadPreset3D('buoyancy')">🎈 Archimedean Buoyancy Test</button>
+                        <button class="preset-btn" onclick="loadPreset3D('space')">🛰️ Zero-G Space Drift</button>
                     </div>
                 </div>
             </div>
 
-            <div>
-                <div class="panel-title">
-                    <span>2. Lab Presets</span>
+            <!-- Tab Content 2: Learn Physics Lessons -->
+            <div id="tab-learn" class="tab-content">
+                <p style="font-size:0.75rem; color:#64748b;">Collapse or expand the cards below to study physics sandbox properties:</p>
+                <div class="lesson-card">
+                    <div class="lesson-header" onclick="toggleLesson('lesson1')">
+                        <span>1. Free Fall (Galileo's Law)</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="lesson-body" id="lesson1">
+                        <p>In a vacuum (air density = 0), all objects fall with the exact same constant gravitational acceleration, regardless of their weight!</p>
+                        <p>This is because the gravitational force is directly proportional to mass ($F = m \cdot g$), but acceleration is $a = F/m$. Substituting these together, the mass variable cancels out mathematically:</p>
+                        <span class="lesson-formula">a = F / m = (m * g) / m = g</span>
+                        <p>Use the <strong>Vacuum Drop</strong> preset to drop an anvil and a feather together without air resistance, proving they land simultaneously.</p>
+                    </div>
                 </div>
-                <p style="font-size: 0.78rem; color:#64748b; margin-top:4px; margin-bottom:12px;">Instant setups to demonstrate key physical concepts:</p>
-                <div class="preset-list">
-                    <button class="preset-btn" onclick="loadPreset('galileo')">🏛️ Galileo's Vacuum Drop</button>
-                    <button class="preset-btn" onclick="loadPreset('terminal')">🌬️ Terminal Velocity Plot</button>
-                    <button class="preset-btn" onclick="loadPreset('buoyancy')">🎈 Archimedean Buoyancy</button>
-                    <button class="preset-btn" onclick="loadPreset('space')">🛰️ Zero-G Drift (Space)</button>
+
+                <div class="lesson-card">
+                    <div class="lesson-header" onclick="toggleLesson('lesson2')">
+                        <span>2. Terminal Velocity</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="lesson-body" id="lesson2">
+                        <p>When dropping objects in normal atmosphere, a friction force called <strong>fluid drag</strong> ($F_d$) acts in opposition to the velocity vector:</p>
+                        <span class="lesson-formula">Fd = 0.5 * ρ * v² * Cd * A</span>
+                        <p>As the object accelerates, its speed ($v$) increases, which increases drag. Eventually, the upward drag force equals the downward gravitational force.</p>
+                        <p>At this point, the net force is zero ($F_{net} = 0$), acceleration stops, and the object travels at a constant terminal velocity ($V_t$).</p>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="lesson-header" onclick="toggleLesson('lesson3')">
+                        <span>3. Archimedes' Buoyancy</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="lesson-body" id="lesson3">
+                        <p>Fluid pressure increases with depth, producing a net upward force called the <strong>buoyant force</strong> ($F_b$).</p>
+                        <p>Archimedes' Principle states that this force equals the weight of the fluid displaced by the object:</p>
+                        <span class="lesson-formula">Fb = ρ * V * g</span>
+                        <p>A helium balloon floats upward because its displaced volume is large, making $F_b$ greater than the gravitational pull of its very light latex shell.</p>
+                        <p>If you remove air density, $F_b$ drops to zero, and the helium balloon falls to the ground like a stone!</p>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="lesson-header" onclick="toggleLesson('lesson4')">
+                        <span>4. Aerodynamics Variables</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="lesson-body" id="lesson4">
+                        <p>How do shapes affect falling speed?</p>
+                        <p>● <strong>Drag Coefficient ($C_d$)</strong>: A unitless rating of shape aerodynamics. Feathers are flat and splayed ($C_d \approx 1.8$, very high drag), while bowling balls are smooth spheres ($C_d \approx 0.47$, very low drag).</p>
+                        <p>● <strong>Cross Area ($A$)</strong>: The projected frontal size of the falling body. Greater area increases collision rate with air molecules, heightening resistance.</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- CENTER PANEL: Interactive Sandbox Canvas -->
+        <!-- CENTER PANEL: WebGL 3D Physics Canvas Sandbox -->
         <div class="canvas-container">
             <!-- HUD Overlays -->
             <div class="canvas-hud-top">
                 <div class="canvas-badge">
-                    <span style="color:#38bdf8;">Environment:</span>
+                    <span style="color:#a78bfa;">Atmosphere:</span>
                     <span id="hud-env">Earth (Normal)</span>
                 </div>
                 <div class="canvas-badge">
-                    <span style="color:#fb7185;">Active Forces:</span>
-                    <span id="hud-forces">Gravity + Drag + Buoyancy</span>
+                    <span style="color:#0ea5e9;">Wind:</span>
+                    <span id="hud-wind">None</span>
                 </div>
             </div>
 
-            <!-- Main Canvas -->
-            <canvas id="sandbox-canvas" width="800" height="600"></canvas>
+            <!-- Three.js Canvas Container -->
+            <div id="sandbox-3d" tabindex="0"></div>
 
-            <!-- Bottom HUD Controls -->
+            <!-- Simulation Controls HUD -->
             <div class="canvas-controls-bottom">
                 <div class="control-group-row">
-                    <button class="btn btn-primary" id="btn-pause" onclick="togglePause()">Pause Sim</button>
-                    <button class="btn" onclick="stepFrame()">Step Frame ⏭️</button>
-                    <button class="btn" onclick="resetForces()">Reset Sliders 🔄</button>
+                    <button class="btn btn-primary" id="btn-pause" onclick="togglePause3D()">Pause Sim</button>
+                    <button class="btn" onclick="stepFrame3D()">Step Frame ⏭️</button>
+                    <button class="btn" onclick="resetSliders3D()">Reset Sliders 🔄</button>
                 </div>
+
+                <!-- Camera Angle Selector -->
+                <div class="control-group-row">
+                    <span style="font-size:0.75rem; color:#64748b;">Camera:</span>
+                    <div class="camera-views">
+                        <button class="camera-btn active" id="cam-orbit" onclick="setCameraView('orbit')">Orbit</button>
+                        <button class="camera-btn" id="cam-front" onclick="setCameraView('front')">Front</button>
+                        <button class="camera-btn" id="cam-top" onclick="setCameraView('top')">Top</button>
+                    </div>
+                </div>
+
                 <div class="control-group-row">
                     <label class="switch-container">
                         <span class="switch">
                             <input type="checkbox" id="toggle-vectors" checked>
                             <span class="slider-switch"></span>
                         </span>
-                        <span>Show Forces (Vectors)</span>
+                        <span>Vectors</span>
                     </label>
                     <label class="switch-container">
                         <span class="switch">
                             <input type="checkbox" id="toggle-trails" checked>
                             <span class="slider-switch"></span>
                         </span>
-                        <span>Show Trails</span>
+                        <span>Trails</span>
                     </label>
                 </div>
             </div>
         </div>
 
-        <!-- RIGHT PANEL: Lab Adjustments & Chart Readings -->
+        <!-- RIGHT PANEL: Environment & Oscilloscope Plots -->
         <div class="panel">
             <div>
                 <div class="panel-title">
-                    <span>3. Lab Environment</span>
+                    <span>3. Lab Controls</span>
                 </div>
-                <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">
-                    <!-- Gravity Slider -->
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:6px;">
+                    <!-- Gravity -->
                     <div class="slider-card">
                         <div class="slider-label">
-                            <span>Gravity acceleration</span>
+                            <span>Gravity Field</span>
                             <span><span class="slider-value" id="val-gravity">9.8</span> m/s²</span>
                         </div>
-                        <input type="range" class="input-slider" id="slide-gravity" min="0" max="25" step="0.1" value="9.8" oninput="updateSliders()">
-                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
-                            <span>Space (0)</span>
-                            <span>Moon (1.6)</span>
-                            <span>Earth (9.8)</span>
-                            <span>Jupiter (24.8)</span>
-                        </div>
+                        <input type="range" class="input-slider" id="slide-gravity" min="0" max="25" step="0.1" value="9.8" oninput="updateSliders3D()">
                     </div>
 
-                    <!-- Air Density Slider -->
+                    <!-- Air Density -->
                     <div class="slider-card">
                         <div class="slider-label">
                             <span>Air Density (Fluid ρ)</span>
                             <span><span class="slider-value" id="val-density">1.2</span> kg/m³</span>
                         </div>
-                        <input type="range" class="input-slider" id="slide-density" min="0" max="6" step="0.1" value="1.2" oninput="updateSliders()">
-                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
-                            <span>Vacuum (0)</span>
-                            <span>Thin Air (0.5)</span>
-                            <span>Sea Level (1.2)</span>
-                            <span>Dense Fluid (6)</span>
-                        </div>
+                        <input type="range" class="input-slider" id="slide-density" min="0" max="5" step="0.1" value="1.2" oninput="updateSliders3D()">
                     </div>
 
-                    <!-- Wind Slider -->
+                    <!-- Wind Speed -->
                     <div class="slider-card">
                         <div class="slider-label">
-                            <span>Cross Wind Speed</span>
+                            <span>Wind Speed Force</span>
                             <span><span class="slider-value" id="val-wind">0</span> m/s</span>
                         </div>
-                        <input type="range" class="input-slider" id="slide-wind" min="-15" max="15" step="0.5" value="0" oninput="updateSliders()">
-                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
-                            <span>⬅ Left (-15)</span>
-                            <span>None (0)</span>
-                            <span>Right (15) ➡</span>
-                        </div>
+                        <input type="range" class="input-slider" id="slide-wind" min="0" max="15" step="0.5" value="0" oninput="updateSliders3D()">
                     </div>
 
-                    <!-- Elasticity Slider -->
+                    <!-- Wind Direction -->
                     <div class="slider-card">
                         <div class="slider-label">
-                            <span>Surface Bounciness (CoR)</span>
+                            <span>Wind Angle Vector</span>
+                            <span><span class="slider-value" id="val-wind-dir">0</span>°</span>
+                        </div>
+                        <input type="range" class="input-slider" id="slide-wind-dir" min="0" max="360" step="5" value="0" oninput="updateSliders3D()">
+                    </div>
+
+                    <!-- Elasticity -->
+                    <div class="slider-card">
+                        <div class="slider-label">
+                            <span>Bounciness (CoR)</span>
                             <span><span class="slider-value" id="val-bounce">0.60</span></span>
                         </div>
-                        <input type="range" class="input-slider" id="slide-bounce" min="0" max="1" step="0.05" value="0.6" oninput="updateSliders()">
-                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
-                            <span>Clay (0)</span>
-                            <span>Rubber (0.6)</span>
-                            <span>Superball (1.0)</span>
-                        </div>
+                        <input type="range" class="input-slider" id="slide-bounce" min="0" max="1" step="0.05" value="0.6" oninput="updateSliders3D()">
                     </div>
 
-                    <!-- Slow Motion Slider -->
+                    <!-- Time Scale -->
                     <div class="slider-card">
                         <div class="slider-label">
-                            <span>Time Scale (Speed)</span>
+                            <span>Sim Speed (TimeScale)</span>
                             <span><span class="slider-value" id="val-timescale">1.0</span>x</span>
                         </div>
-                        <input type="range" class="input-slider" id="slide-timescale" min="0.1" max="1.5" step="0.1" value="1" oninput="updateSliders()">
-                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
-                            <span>Slow Mo (0.1x)</span>
-                            <span>Normal (1.0x)</span>
-                            <span>Fast (1.5x)</span>
-                        </div>
+                        <input type="range" class="input-slider" id="slide-timescale" min="0.1" max="1.5" step="0.1" value="1" oninput="updateSliders3D()">
                     </div>
                 </div>
             </div>
 
-            <!-- Live Readings Chart -->
+            <!-- 2D Live Oscilloscope Plotter -->
             <div class="chart-box">
                 <div class="panel-title" style="border:none; padding:0;">
                     <span>4. Oscilloscope Plotter</span>
-                    <span style="font-size:0.75rem; color:#10b981; animation: blink 2s infinite;">● Live</span>
+                    <span style="font-size:0.7rem; color:#10b981;">● Live</span>
                 </div>
-                <div style="display:flex; gap:10px; margin-top:2px;">
-                    <button class="btn" style="flex:1; padding:4px 8px; font-size:0.75rem;" id="chart-y-height" onclick="setChartType('height')">Height Plot</button>
-                    <button class="btn" style="flex:1; padding:4px 8px; font-size:0.75rem;" id="chart-y-velocity" onclick="setChartType('velocity')">Velocity Plot</button>
+                <div style="display:flex; gap:8px; margin-top:2px;">
+                    <button class="btn" style="flex:1; padding:3px 6px; font-size:0.72rem;" id="chart-y-height" onclick="setChartType3D('height')">Height Plot</button>
+                    <button class="btn" style="flex:1; padding:3px 6px; font-size:0.72rem;" id="chart-y-velocity" onclick="setChartType3D('velocity')">Velocity Plot</button>
                 </div>
-                <canvas id="chart-canvas" width="310" height="120"></canvas>
+                <canvas id="chart-canvas" width="310" height="110"></canvas>
                 <div class="chart-actions">
-                    <span id="chart-desc">Plots currently selected object</span>
-                    <span style="color:#0ea5e9; cursor:pointer;" onclick="clearChart()">Clear Curve</span>
+                    <span id="chart-desc">Plots height of selection</span>
+                    <span style="color:#0ea5e9; cursor:pointer;" onclick="clearChart3D()">Clear</span>
                 </div>
             </div>
 
-            <!-- Dynamic Physics Formulas Card -->
+            <!-- Dynamic Live Equations Resolver -->
             <div class="math-card">
                 <div class="panel-title" style="border:none; padding:0; color:#c084fc;">
                     <span>5. Live Equation Solver</span>
@@ -727,7 +844,7 @@
 
     </div>
 
-    <!-- Web Audio API Synthesizer -->
+    <!-- Web Audio synthesized sound generator -->
     <script>
         class LabSynth {
             constructor() {
@@ -743,13 +860,12 @@
                 }
             }
 
-            // Synthesize ground impact sound based on mass and impact speed
             playImpact(mass, velocity) {
                 this.init();
                 if (!this.ctx) return;
 
                 const speed = Math.abs(velocity);
-                const volume = Math.min(speed / 200, 0.4); // Volume proportional to speed
+                const volume = Math.min(speed / 20, 0.4);
                 if (volume < 0.02) return;
 
                 const osc = this.ctx.createOscillator();
@@ -760,9 +876,8 @@
                 filter.connect(gain);
                 gain.connect(this.ctx.destination);
 
-                // Design sound characteristics based on mass
                 if (mass >= 40) {
-                    // Massive thud (Anvil)
+                    // Anvil
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(80, this.ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(10, this.ctx.currentTime + 0.35);
@@ -776,7 +891,7 @@
                     osc.start();
                     osc.stop(this.ctx.currentTime + 0.4);
                 } else if (mass >= 5) {
-                    // Bowling Ball thud
+                    // Bowling Ball
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(120, this.ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.2);
@@ -789,7 +904,7 @@
                     osc.start();
                     osc.stop(this.ctx.currentTime + 0.25);
                 } else if (mass >= 0.3) {
-                    // Elastic Bounce (Football)
+                    // Football
                     osc.type = 'triangle';
                     osc.frequency.setValueAtTime(220, this.ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.15);
@@ -798,8 +913,8 @@
                     gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
                     osc.start();
                     osc.stop(this.ctx.currentTime + 0.18);
-                } else if (mass > 0.0005) {
-                    // Squeaky rub/bounce (Balloon)
+                } else {
+                    // Balloon
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(440, this.ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.1);
@@ -811,7 +926,6 @@
                 }
             }
 
-            // Bubble pop sound
             playPop() {
                 this.init();
                 if (!this.ctx) return;
@@ -837,17 +951,124 @@
         const synth = new LabSynth();
     </script>
 
-    <!-- Lab Physics Loop & Canvas Drag & Drop -->
+    <!-- 3D Physics Engine Loop with Three.js WebGL Rendering -->
     <script>
-        const canvas = document.getElementById('sandbox-canvas');
-        const ctx = canvas.getContext('2d');
-        const chartCanvas = document.getElementById('chart-canvas');
-        const chartCtx = chartCanvas.getContext('2d');
+        // Left tab switcher
+        function switchLeftTab(tabId) {
+            document.getElementById('tab-spawn').classList.remove('active');
+            document.getElementById('tab-learn').classList.remove('active');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
 
-        // Physics parameters (synced with sliders)
+            if (tabId === 'spawn') {
+                document.getElementById('tab-spawn').classList.add('active');
+                event.target.classList.add('active');
+            } else {
+                document.getElementById('tab-learn').classList.add('active');
+                event.target.classList.add('active');
+            }
+        }
+
+        // Lesson collapsible
+        function toggleLesson(lessonId) {
+            const body = document.getElementById(lessonId);
+            const isVisible = body.classList.contains('active');
+            
+            // Close all lessons first
+            document.querySelectorAll('.lesson-body').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.lesson-header span:last-child').forEach(s => s.innerText = '▼');
+
+            if (!isVisible) {
+                body.classList.add('active');
+                event.currentTarget.querySelector('span:last-child').innerText = '▲';
+            }
+        }
+
+        // 3D Setup
+        const container3d = document.getElementById('sandbox-3d');
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container3d.clientWidth, container3d.clientHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container3d.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x080c14, 0.015);
+
+        // Perspective Camera
+        const camera = new THREE.PerspectiveCamera(45, container3d.clientWidth / container3d.clientHeight, 0.1, 100);
+        camera.position.set(0, 10, 22);
+
+        // OrbitControls
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 - 0.02; // prevent camera from going below floor
+        controls.minDistance = 5;
+        controls.maxDistance = 45;
+        controls.target.set(0, 7, 0);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+        dirLight.position.set(15, 25, 15);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 50;
+        const d = 15;
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+        scene.add(dirLight);
+
+        // Grid Chamber Box representation
+        // Chamber dimensions: 16m wide (X: -8 to 8), 16m high (Y: 0 to 16), 16m deep (Z: -8 to 8)
+        const gridHelper = new THREE.GridHelper(16, 16, 0x8b5cf6, 0x334155);
+        gridHelper.position.y = 0.01;
+        scene.add(gridHelper);
+
+        // Glowing metal corner boundary framework
+        const boundsGeometry = new THREE.BoxGeometry(16, 16, 16);
+        const boundsEdges = new THREE.EdgesGeometry(boundsGeometry);
+        const boundsLine = new THREE.LineSegments(boundsEdges, new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.3 }));
+        boundsLine.position.y = 8;
+        scene.add(boundsLine);
+
+        // Flat dark steel ground platform
+        const groundGeo = new THREE.PlaneGeometry(30, 30);
+        const groundMat = new THREE.MeshStandardMaterial({ 
+            color: 0x0f172a, 
+            roughness: 0.7, 
+            metalness: 0.2 
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Height Ruler markers in 3D
+        // Draw ticks every 2 meters
+        const ticksGroup = new THREE.Group();
+        const rulerMat = new THREE.MeshBasicMaterial({ color: 0x64748b });
+        for (let y = 2; y <= 16; y += 2) {
+            // horizontal tick cylinders
+            const tickGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.6, 8);
+            const tick = new THREE.Mesh(tickGeo, rulerMat);
+            tick.rotation.z = Math.PI / 2;
+            tick.position.set(-8, y, -8);
+            ticksGroup.add(tick);
+        }
+        scene.add(ticksGroup);
+
+        // Physics constants (synced with sliders)
         let gravity = 9.8;
         let airDensity = 1.2;
         let windSpeed = 0;
+        let windAngle = 0; // degrees
         let borderElasticity = 0.6;
         let timeScale = 1.0;
 
@@ -855,118 +1076,195 @@
         let showVectors = true;
         let showTrails = true;
 
-        // Constants
-        const GROUND_Y = 540; // bottom baseline representing ground
-        const METERS_PER_PIXEL = 0.04; // 1 pixel = 4 cm (so 600px height is 24m)
-        const FPS = 60;
-        const DT = 1 / FPS;
+        const DT = 1 / 60;
+        const MAX_TRAIL_POINTS = 50;
 
-        let activeObjects = [];
-        let selectedObject = null;
-        let draggedObject = null;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
+        let activeObjects3D = [];
+        let selectedObject3D = null;
+        let draggedObject3D = null;
 
-        let mouseX = 0;
-        let mouseY = 0;
+        // Interaction Raycasting
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const dragPlane = new THREE.Plane();
+        const planeNormal = new THREE.Vector3();
+        const planeIntersection = new THREE.Vector3();
+
         let isMouseDown = false;
-        let lastMouseX = 0;
-        let lastMouseY = 0;
-        let flickVelocityX = 0;
-        let flickVelocityY = 0;
+        let lastInteractionPoint = new THREE.Vector3();
+        let flickVelocity = new THREE.Vector3();
 
-        // Active chart variables
-        let chartType = 'velocity'; // 'height' or 'velocity'
-        let chartHistory = []; // stores points for current selected object
+        // 2D Plotter variables
+        const chartCanvas = document.getElementById('chart-canvas');
+        const chartCtx = chartCanvas.getContext('2d');
+        let chartType = 'velocity';
+        let chartHistory = [];
         let totalSimTime = 0;
 
-        // Preset objects stats
-        const OBJECT_TEMPLATES = {
+        // 3D Object Templates
+        const TEMPLATES_3D = {
             anvil: {
-                name: 'Anvil',
-                mass: 50.0, // kg
-                volume: 0.0064, // m^3 (dense steel, density ~7800kg/m^3)
-                radius: 28, // pixels (approx 1.1m radius representation)
-                dragCoeff: 0.9, // aerodynamic drag coefficient (cube-ish shape)
-                elasticity: 0.08, // dead bounce
-                color: '#64748b',
-                textColor: '#fff',
-                icon: '🛠️',
-                renderType: 'anvil'
+                name: 'Heavy Anvil',
+                mass: 50.0,
+                volume: 0.0064,
+                radius: 0.7, // collision radius
+                dragCoeff: 0.9,
+                elasticity: 0.08,
+                color: 0x64748b,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    // Flat top plate
+                    const plate = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 0.6), new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6, metalness: 0.5 }));
+                    plate.position.y = 0.15;
+                    plate.castShadow = true;
+                    group.add(plate);
+                    // Core wedge base
+                    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.4, 0.6, 4), new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8, metalness: 0.4 }));
+                    base.position.y = -0.3;
+                    base.castShadow = true;
+                    group.add(base);
+                    // Pointy horn
+                    const horn = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.6, 8), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.5, metalness: 0.6 }));
+                    horn.rotation.z = -Math.PI / 2;
+                    horn.position.set(0.8, 0.15, 0);
+                    horn.castShadow = true;
+                    group.add(horn);
+
+                    return group;
+                }
             },
             bowling: {
                 name: 'Bowling Ball',
-                mass: 7.2, // kg (16 lb ball)
-                volume: 0.005, // m^3 (density ~1440kg/m^3)
-                radius: 22,
-                dragCoeff: 0.47, // smooth sphere
-                elasticity: 0.45, // low-mid bounce
-                color: '#4f46e5',
-                textColor: '#fff',
-                icon: '🎳',
-                renderType: 'bowling'
+                mass: 7.2,
+                volume: 0.005,
+                radius: 0.5,
+                dragCoeff: 0.47,
+                elasticity: 0.45,
+                color: 0x4f46e5,
+                buildGeometry: () => {
+                    const sphere = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.5, 32, 32),
+                        new THREE.MeshStandardMaterial({ color: 0x312e81, roughness: 0.12, metalness: 0.1 })
+                    );
+                    sphere.castShadow = true;
+                    return sphere;
+                }
             },
             football: {
                 name: 'Football',
-                mass: 0.43, // kg (regulation NFL ball)
-                volume: 0.0042, // m^3
-                radius: 20,
-                dragCoeff: 0.52, // ellipsoidal shape
-                elasticity: 0.75, // high bouncy rubber bladder
-                color: '#9a3412',
-                textColor: '#fff',
-                icon: '🏈',
-                renderType: 'football'
+                mass: 0.43,
+                volume: 0.0042,
+                radius: 0.45,
+                dragCoeff: 0.52,
+                elasticity: 0.75,
+                color: 0x9a3412,
+                buildGeometry: () => {
+                    // Ellipsoidal shape (prolate spheroid)
+                    const ballGeo = new THREE.SphereGeometry(0.45, 32, 32);
+                    const ballMat = new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.6, metalness: 0.05 });
+                    const ball = new THREE.Mesh(ballGeo, ballMat);
+                    ball.scale.set(1.4, 0.9, 0.9);
+                    ball.castShadow = true;
+
+                    // Add simple white laces mesh
+                    const laceGeo = new THREE.BoxGeometry(0.5, 0.02, 0.08);
+                    const laceMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                    const lace = new THREE.Mesh(laceGeo, laceMat);
+                    lace.position.y = 0.42;
+                    ball.add(lace);
+
+                    return ball;
+                }
             },
             balloon: {
                 name: 'Helium Balloon',
-                mass: 0.003, // kg (latex shell weight only, extremely light)
-                volume: 0.014, // m^3 (14 liters volume -> provides massive buoyancy!)
-                radius: 24,
-                dragCoeff: 0.47, // sphere-ish
+                mass: 0.003,
+                volume: 0.014,
+                radius: 0.55,
+                dragCoeff: 0.47,
                 elasticity: 0.60,
-                color: '#f87171',
-                textColor: '#fff',
-                icon: '🎈',
-                renderType: 'balloon'
+                color: 0xf87171,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    // Balloon body
+                    const balloon = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.5, 32, 32),
+                        new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.2, metalness: 0.1 })
+                    );
+                    balloon.scale.set(1, 1.2, 1);
+                    balloon.castShadow = true;
+                    group.add(balloon);
+
+                    // String line
+                    const points = [];
+                    points.push(new THREE.Vector3(0, -0.6, 0));
+                    points.push(new THREE.Vector3(-0.05, -1.2, 0));
+                    points.push(new THREE.Vector3(0.05, -1.8, 0));
+                    points.push(new THREE.Vector3(0, -2.4, 0));
+                    const stringGeo = new THREE.BufferGeometry().setFromPoints(points);
+                    const string = new THREE.Line(stringGeo, new THREE.LineBasicMaterial({ color: 0x9ca3af }));
+                    group.add(string);
+
+                    return group;
+                }
             },
             bubble: {
                 name: 'Soap Bubble',
-                mass: 0.0001, // kg (almost zero mass)
-                volume: 0.0008, // m^3
-                radius: 12,
+                mass: 0.0001,
+                volume: 0.0008,
+                radius: 0.35,
                 dragCoeff: 0.5,
                 elasticity: 0.1,
-                color: 'rgba(56, 189, 248, 0.4)',
-                textColor: '#fff',
-                icon: '🫧',
-                renderType: 'bubble',
+                color: 0x38bdf8,
+                buildGeometry: () => {
+                    const bubble = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.35, 32, 32),
+                        new THREE.MeshStandardMaterial({ 
+                            color: 0x38bdf8, 
+                            roughness: 0.01, 
+                            metalness: 0.95, 
+                            transparent: true, 
+                            opacity: 0.35,
+                            side: THREE.DoubleSide
+                        })
+                    );
+                    return bubble;
+                },
                 isPoppable: true
             },
             feather: {
                 name: 'Feather',
-                mass: 0.002, // kg
-                volume: 0.0001, // m^3
-                radius: 16,
-                dragCoeff: 1.8, // huge air drag due to shape and fluffiness
+                mass: 0.002,
+                volume: 0.0001,
+                radius: 0.45,
+                dragCoeff: 1.8,
                 elasticity: 0.05,
-                color: '#e2e8f0',
-                textColor: '#0f172a',
-                icon: '🪶',
-                renderType: 'feather'
+                color: 0xe2e8f0,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    // Shaft core line cylinder
+                    const shaftMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.5 });
+                    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.9, 8), shaftMat);
+                    shaft.castShadow = true;
+                    group.add(shaft);
+
+                    // Plume plane
+                    const plume = new THREE.Mesh(
+                        new THREE.PlaneGeometry(0.25, 0.8),
+                        new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.9, side: THREE.DoubleSide, transparent: true, opacity: 0.8 })
+                    );
+                    plume.rotation.y = Math.PI / 4;
+                    plume.castShadow = true;
+                    group.add(plume);
+
+                    return group;
+                }
             }
         };
 
-        // Class definition for Sandbox Object
-        class PhysicsObject {
-            constructor(x, y, template) {
-                this.id = Math.random().toString(36).substring(2, 9);
-                this.x = x;
-                this.y = y;
-                this.vx = 0;
-                this.vy = 0;
-                
-                // Properties copy
+        // 3D Physics Object Class wrapper
+        class PhysicsObject3D {
+            constructor(x, y, z, template) {
                 this.name = template.name;
                 this.mass = template.mass;
                 this.volume = template.volume;
@@ -974,415 +1272,356 @@
                 this.dragCoeff = template.dragCoeff;
                 this.elasticity = template.elasticity;
                 this.color = template.color;
-                this.textColor = template.textColor;
-                this.icon = template.icon;
-                this.renderType = template.renderType;
                 this.isPoppable = template.isPoppable || false;
 
-                // Forces recorded for display vector arrows
-                this.fg = 0; // gravity force
-                this.fb = 0; // buoyancy force
-                this.fdx = 0; // drag force X
-                this.fdy = 0; // drag force Y
-                
-                this.trail = [];
+                // Position (x: -8 to 8, y: 0 to 16, z: -8 to 8)
+                this.x = x;
+                this.y = y;
+                this.z = z;
+
+                // Velocities
+                this.vx = 0;
+                this.vy = 0;
+                this.vz = 0;
+
+                // Force scalars (for display equations solver)
+                this.fg = 0;
+                this.fb = 0;
+                this.fdMag = 0;
+
                 this.isDragging = false;
+                this.markedForDeletion = false;
+
+                // Render mesh
+                this.mesh = template.buildGeometry();
+                this.mesh.position.set(this.x, this.y, this.z);
+                scene.add(this.mesh);
+
+                // Highlight border box for selection
+                const outlineGeo = new THREE.BoxHelper(this.mesh, 0x8b5cf6);
+                this.outline = outlineGeo;
+                this.outline.visible = false;
+                scene.add(this.outline);
+
+                // 3D Vector Arrow Helpers
+                this.arrowFg = new THREE.ArrowHelper(new THREE.Vector3(0, -1, 0), new THREE.Vector3(), 0.1, 0xef4444, 0.15, 0.1);
+                this.arrowFb = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(), 0.1, 0x10b981, 0.15, 0.1);
+                this.arrowFd = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(), 0.1, 0x38bdf8, 0.15, 0.1);
+                
+                this.arrowFg.visible = showVectors;
+                this.arrowFb.visible = showVectors;
+                this.arrowFd.visible = showVectors;
+
+                scene.add(this.arrowFg);
+                scene.add(this.arrowFb);
+                scene.add(this.arrowFd);
+
+                // 3D Fading trail line
+                this.trailPoints = [];
+                const maxPoints = MAX_TRAIL_POINTS;
+                const trailPositions = new Float32Array(maxPoints * 3);
+                this.trailGeo = new THREE.BufferGeometry();
+                this.trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+                this.trailMat = new THREE.LineBasicMaterial({ color: this.color, transparent: true, opacity: 0.35 });
+                this.trailLine = new THREE.Line(this.trailGeo, this.trailMat);
+                this.trailLine.visible = showTrails;
+                scene.add(this.trailLine);
             }
 
-            // Calculate cross-sectional area based on radius in pixels -> convert to meters
             getCrossSectionalArea() {
-                const r_meters = this.radius * METERS_PER_PIXEL;
-                return Math.PI * r_meters * r_meters;
+                return Math.PI * this.radius * this.radius;
             }
 
             update(dt) {
-                if (this.isDragging) return;
+                if (this.isDragging) {
+                    // Update outline mesh while dragging
+                    this.mesh.position.set(this.x, this.y, this.z);
+                    this.outline.update();
+                    this.updateArrows();
+                    return;
+                }
 
-                const g_accel = gravity; // m/s^2
-                
-                // 1. GRAVITY FORCE: Fg = mass * g (downwards)
+                const g_accel = gravity;
+
+                // 1. Gravity vector
                 this.fg = this.mass * g_accel;
 
-                // 2. BUOYANCY FORCE (Archimedes' Principle): Fb = fluid_density * displaced_volume * g (upwards)
-                // Buoyancy acts in opposite direction of gravity field
+                // 2. Buoyant vector
                 this.fb = airDensity * this.volume * g_accel;
 
-                // 3. FLUID DRAG FORCE: Fd = 0.5 * rho * v^2 * Cd * Area (opposes relative velocity)
-                // We use relative velocity to account for wind
-                const vx_meters = this.vx * METERS_PER_PIXEL;
-                const vy_meters = this.vy * METERS_PER_PIXEL;
-                const rel_vx = vx_meters - windSpeed; // relative speed X to wind
-                const rel_vy = vy_meters;             // relative speed Y to air
+                // 3. 3D Air drag vector mapping relative wind
+                // wind calculations based on horizontal speed and angle
+                const windRad = windAngle * Math.PI / 185;
+                const windVx = windSpeed * Math.cos(windRad);
+                const windVz = windSpeed * Math.sin(windRad);
 
-                const rel_speed = Math.hypot(rel_vx, rel_vy);
+                const relVx = this.vx - windVx;
+                const relVy = this.vy;
+                const relVz = this.vz - windVz;
+
+                const relSpeed = Math.hypot(relVx, relVy, relVz);
                 const area = this.getCrossSectionalArea();
 
-                if (rel_speed > 0.001 && airDensity > 0) {
-                    const dragMag = 0.5 * airDensity * rel_speed * rel_speed * this.dragCoeff * area;
-                    // Project force vectors in opposition of relative speed
-                    this.fdx = -dragMag * (rel_vx / rel_speed);
-                    this.fdy = -dragMag * (rel_vy / rel_speed);
-                } else {
-                    this.fdx = 0;
-                    this.fdy = 0;
+                let fdx = 0, fdy = 0, fdz = 0;
+                this.fdMag = 0;
+
+                if (relSpeed > 0.001 && airDensity > 0) {
+                    this.fdMag = 0.5 * airDensity * relSpeed * relSpeed * this.dragCoeff * area;
+                    fdx = -this.fdMag * (relVx / relSpeed);
+                    fdy = -this.fdMag * (relVy / relSpeed);
+                    fdz = -this.fdMag * (relVz / relSpeed);
                 }
 
-                // 4. NET FORCES SUMMATION (directions: positive is down/right)
-                const netForceX = this.fdx;
-                const netForceY = this.fg - this.fb + this.fdy;
+                // 4. Net acceleration
+                const fNetX = fdx;
+                const fNetY = -this.fg + this.fb + fdy; // Y: positive is UP in Three.js coordinates!
+                const fNetZ = fdz;
 
-                // 5. ACCELERATION: F = m * a  =>  a = F / m
-                const ax_meters = netForceX / this.mass;
-                const ay_meters = netForceY / this.mass;
+                const ax = fNetX / this.mass;
+                const ay = fNetY / this.mass;
+                const az = fNetZ / this.mass;
 
-                // 6. INTEGRATE VELOCITY (Convert m/s^2 accel to pixels/s)
-                const ax_pixels = ax_meters / METERS_PER_PIXEL;
-                const ay_pixels = ay_meters / METERS_PER_PIXEL;
+                // Integrate
+                this.vx += ax * dt;
+                this.vy += ay * dt;
+                this.vz += az * dt;
 
-                this.vx += ax_pixels * dt;
-                this.vy += ay_pixels * dt;
-
-                // 7. INTEGRATE POSITION
                 this.x += this.vx * dt;
                 this.y += this.vy * dt;
+                this.z += this.vz * dt;
 
-                // 8. Trail recording
-                if (showTrails) {
-                    this.trail.push({ x: this.x, y: this.y });
-                    if (this.trail.length > 50) this.trail.shift();
-                } else {
-                    this.trail = [];
-                }
-
-                // Bounds check - Collide Ground
-                const groundLimit = GROUND_Y - this.radius;
-                if (this.y >= groundLimit) {
-                    this.y = groundLimit;
+                // 5. Bounds collision checking
+                const floorLimit = this.radius;
+                if (this.y <= floorLimit) {
+                    this.y = floorLimit;
+                    const COR = this.elasticity * borderElasticity;
                     
-                    // Bounce along normal: speed * combined coefficient of restitution
-                    const combinedCOR = this.elasticity * borderElasticity;
-                    
-                    if (Math.abs(this.vy) > 15) {
+                    if (Math.abs(this.vy) > 0.5) {
                         synth.playImpact(this.mass, this.vy);
                     }
-                    
-                    this.vy = -this.vy * combinedCOR;
-                    this.vx *= 0.94; // ground rolling friction
 
-                    // Pop bubble if it hits ground with some speed
-                    if (this.isPoppable && Math.abs(this.vy) > 10) {
-                        this.pop();
-                    }
+                    this.vy = -this.vy * COR;
+                    this.vx *= 0.95; // ground friction
+                    this.vz *= 0.95;
+
+                    if (this.isPoppable && Math.abs(this.vy) > 0.2) this.pop();
                 }
 
-                // Side walls collision
-                const leftLimit = this.radius;
-                const rightLimit = canvas.width - this.radius;
-                if (this.x < leftLimit) {
-                    this.x = leftLimit;
-                    this.vx = -this.vx * borderElasticity;
-                    if (this.isPoppable) this.pop();
-                } else if (this.x > rightLimit) {
-                    this.x = rightLimit;
+                // Side walls boundaries limits (x: -8 to 8, z: -8 to 8)
+                const wallLimit = 8 - this.radius;
+                if (Math.abs(this.x) >= wallLimit) {
+                    this.x = Math.sign(this.x) * wallLimit;
                     this.vx = -this.vx * borderElasticity;
                     if (this.isPoppable) this.pop();
                 }
+                if (Math.abs(this.z) >= wallLimit) {
+                    this.z = Math.sign(this.z) * wallLimit;
+                    this.vz = -this.vz * borderElasticity;
+                    if (this.isPoppable) this.pop();
+                }
 
-                // Ceiling bounds
-                const ceilingLimit = this.radius;
-                if (this.y < ceilingLimit) {
+                // Ceiling boundary limit
+                const ceilingLimit = 16 - this.radius;
+                if (this.y >= ceilingLimit) {
                     this.y = ceilingLimit;
                     this.vy = -this.vy * borderElasticity;
                     if (this.isPoppable) this.pop();
+                }
+
+                // Update Three.js mesh transforms
+                this.mesh.position.set(this.x, this.y, this.z);
+                
+                // Rotations in flight (especially feathers and balloons sway)
+                if (this.name === 'Feather') {
+                    // feather flutter rotation animation
+                    const flutter = Math.sin(Date.now() * 0.004) * 0.4;
+                    this.mesh.rotation.set(flutter, 0, flutter * 0.5);
+                } else if (this.name === 'Helium Balloon') {
+                    // balloon swing swaying in wind
+                    const sway = Math.sin(Date.now() * 0.003) * 0.15 * (windSpeed + 1);
+                    this.mesh.rotation.set(sway, 0, sway);
+                } else {
+                    // roll spheres
+                    this.mesh.rotateX(this.vz * 0.05 * dt);
+                    this.mesh.rotateZ(-this.vx * 0.05 * dt);
+                }
+
+                this.outline.update();
+
+                // 6. Vector Arrows positions & scaling
+                this.updateArrows();
+
+                // 7. Render 3D trails buffer
+                if (showTrails) {
+                    this.trailPoints.push(new THREE.Vector3(this.x, this.y, this.z));
+                    if (this.trailPoints.length > MAX_TRAIL_POINTS) {
+                        this.trailPoints.shift();
+                    }
+
+                    const posAttr = this.trailLine.geometry.attributes.position;
+                    for (let i = 0; i < MAX_TRAIL_POINTS; i++) {
+                        if (i < this.trailPoints.length) {
+                            posAttr.setXYZ(i, this.trailPoints[i].x, this.trailPoints[i].y, this.trailPoints[i].z);
+                        } else if (this.trailPoints.length > 0) {
+                            const lastPt = this.trailPoints[this.trailPoints.length - 1];
+                            posAttr.setXYZ(i, lastPt.x, lastPt.y, lastPt.z);
+                        }
+                    }
+                    posAttr.needsUpdate = true;
+                    this.trailLine.visible = true;
+                } else {
+                    this.trailLine.visible = false;
+                }
+            }
+
+            updateArrows() {
+                const vectorScale = 0.05; // scales force in N to cylinder length
+
+                // Position vectors at center
+                const pos = new THREE.Vector3(this.x, this.y, this.z);
+                this.arrowFg.position.copy(pos);
+                this.arrowFb.position.copy(pos);
+                this.arrowFd.position.copy(pos);
+
+                // Set direction and lengths
+                // Gravity Fg (pointing down)
+                const fgLen = this.fg * vectorScale;
+                this.arrowFg.setLength(Math.max(0.1, fgLen), Math.min(0.2, fgLen*0.4), 0.05);
+                this.arrowFg.visible = showVectors && fgLen > 0.01;
+
+                // Buoyant Fb (pointing up)
+                const fbLen = this.fb * vectorScale;
+                this.arrowFb.setLength(Math.max(0.1, fbLen), Math.min(0.2, fbLen*0.4), 0.05);
+                this.arrowFb.visible = showVectors && fbLen > 0.01;
+
+                // Air drag Fd (opposing velocity vector)
+                const vMag = Math.hypot(this.vx, this.vy, this.vz);
+                if (vMag > 0.01 && showVectors) {
+                    const dragDir = new THREE.Vector3(-this.vx, -this.vy, -this.vz).normalize();
+                    const fdLen = this.fdMag * vectorScale * 2; // amplify visually
+                    this.arrowFd.setDirection(dragDir);
+                    this.arrowFd.setLength(Math.max(0.1, fdLen), Math.min(0.2, fdLen*0.4), 0.05);
+                    this.arrowFd.visible = fdLen > 0.01;
+                } else {
+                    this.arrowFd.visible = false;
                 }
             }
 
             pop() {
                 synth.playPop();
-                // Spawn a few soap drop particles
-                for (let i = 0; i < 8; i++) {
-                    activeParticles.push(new PopParticle(this.x, this.y, this.color));
+                // Spawn popping bubbles dust
+                for (let i = 0; i < 15; i++) {
+                    activeParticles3D.push(new PopParticle3D(this.x, this.y, this.z));
                 }
-                // Mark for deletion
                 this.markedForDeletion = true;
+                scene.remove(this.mesh);
+                scene.remove(this.outline);
+                scene.remove(this.arrowFg);
+                scene.remove(this.arrowFb);
+                scene.remove(this.arrowFd);
+                scene.remove(this.trailLine);
             }
 
-            draw(ctx) {
-                // Draw trails
-                if (showTrails && this.trail.length > 1) {
-                    ctx.save();
-                    ctx.strokeStyle = this.color;
-                    ctx.lineWidth = 2;
-                    ctx.globalAlpha = 0.25;
-                    ctx.setLineDash([2, 4]);
-                    ctx.beginPath();
-                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
-                    for (let i = 1; i < this.trail.length; i++) {
-                        ctx.lineTo(this.trail[i].x, this.trail[i].y);
-                    }
-                    ctx.stroke();
-                    ctx.restore();
-                }
-
-                // Draw main body shape
-                ctx.save();
-                ctx.translate(this.x, this.y);
-
-                // Add glassmorphic glowing circle backdrop
-                const highlightGrad = ctx.createRadialGradient(0, 0, 1, 0, 0, this.radius);
-                highlightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
-                highlightGrad.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
-                ctx.fillStyle = highlightGrad;
-                ctx.beginPath();
-                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Object-specific vector design drawings
-                ctx.strokeStyle = this.color;
-                ctx.lineWidth = selectedObject === this ? 3 : 2;
-
-                // Drop shadows of glow
-                if (selectedObject === this) {
-                    ctx.shadowColor = this.color;
-                    ctx.shadowBlur = 12;
-                }
-
-                if (this.renderType === 'anvil') {
-                    // Draw a vector steel anvil
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    // Flat top plate
-                    ctx.moveTo(-24, -12);
-                    ctx.lineTo(12, -12);
-                    // Horn curved tip
-                    ctx.quadraticCurveTo(28, -12, 28, -4);
-                    ctx.quadraticCurveTo(18, -4, 12, 0);
-                    // Base slope
-                    ctx.lineTo(20, 16);
-                    ctx.lineTo(-20, 16);
-                    ctx.lineTo(-12, 0);
-                    // Tail block
-                    ctx.lineTo(-24, -2);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
-                } else if (this.renderType === 'bowling') {
-                    // Draw bowling ball
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    // Holes
-                    ctx.fillStyle = '#05070c';
-                    ctx.beginPath();
-                    ctx.arc(-5, -6, 3, 0, Math.PI*2);
-                    ctx.arc(5, -6, 3, 0, Math.PI*2);
-                    ctx.arc(0, 2, 3, 0, Math.PI*2);
-                    ctx.fill();
-                } else if (this.renderType === 'football') {
-                    // Draw football ellipsoid shape
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    // Oval approximation
-                    ctx.ellipse(0, 0, this.radius * 1.25, this.radius * 0.8, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    // Laces
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2.5;
-                    ctx.beginPath();
-                    ctx.moveTo(-12, 0);
-                    ctx.lineTo(12, 0);
-                    // vertical cross laces
-                    for (let x = -8; x <= 8; x += 4) {
-                        ctx.moveTo(x, -3);
-                        ctx.lineTo(x, 3);
-                    }
-                    ctx.stroke();
-                } else if (this.renderType === 'balloon') {
-                    // Draw balloon string
-                    ctx.save();
-                    ctx.shadowBlur = 0; // disable string shadow
-                    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-                    ctx.lineWidth = 1.2;
-                    ctx.beginPath();
-                    ctx.moveTo(0, this.radius);
-                    ctx.bezierCurveTo(-5, this.radius + 10, 5, this.radius + 20, 0, this.radius + 35);
-                    ctx.stroke();
-                    ctx.restore();
-
-                    // Balloon body (egg shape)
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.ellipse(0, -2, this.radius * 0.9, this.radius * 1.1, 0, 0, Math.PI*2);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    // Little triangle knot at base
-                    ctx.beginPath();
-                    ctx.moveTo(0, this.radius - 2);
-                    ctx.lineTo(-4, this.radius + 2);
-                    ctx.lineTo(4, this.radius + 2);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
-
-                    // Reflection highlight
-                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                    ctx.beginPath();
-                    ctx.ellipse(-8, -10, 4, 8, Math.PI/4, 0, Math.PI*2);
-                    ctx.fill();
-                } else if (this.renderType === 'bubble') {
-                    // Shiny Soap Bubble
-                    ctx.strokeStyle = this.color;
-                    ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    // Shiny reflection glint
-                    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-                    ctx.lineWidth = 1.5;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.radius - 3, -Math.PI*0.8, -Math.PI*0.2);
-                    ctx.stroke();
-                } else if (this.renderType === 'feather') {
-                    // Feather shape (barb + shaft)
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.moveTo(-this.radius, this.radius);
-                    ctx.quadraticCurveTo(0, -this.radius, this.radius, -this.radius);
-                    ctx.quadraticCurveTo(this.radius * 0.4, 0, -this.radius, this.radius);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
-
-                    // Shaft
-                    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.moveTo(-this.radius * 1.1, this.radius * 1.1);
-                    ctx.lineTo(this.radius, -this.radius);
-                    ctx.stroke();
-                } else {
-                    // Default circle placeholder
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
-                }
-
-                ctx.restore();
-
-                // Draw Forces Vector Arrows
-                if (showVectors) {
-                    this.drawVectorArrows(ctx);
-                }
-            }
-
-            // Draw dynamic force vector arrows overlaid on the objects
-            drawVectorArrows(ctx) {
-                // Vector scaling factor (translates force in Newtons to pixel arrows)
-                const arrowScale = 1.8;
-
-                ctx.save();
-                ctx.translate(this.x, this.y);
-
-                // 1. Gravity Vector (Red arrow pointing straight down)
-                const fgLen = this.fg * arrowScale;
-                if (fgLen > 2) {
-                    this.drawArrow(ctx, 0, 0, 0, fgLen, '#ef4444', 3, 'Fg');
-                }
-
-                // 2. Buoyancy Vector (Green arrow pointing straight up)
-                const fbLen = this.fb * arrowScale;
-                if (fbLen > 2) {
-                    this.drawArrow(ctx, 0, 0, 0, -fbLen, '#10b981', 3, 'Fb');
-                }
-
-                // 3. Fluid Drag Vector (Blue arrow opposing velocity)
-                const fdxLen = this.fdx * arrowScale * 4; // amplified slightly for visual clarity
-                const fdyLen = this.fdy * arrowScale * 4;
-                if (Math.hypot(fdxLen, fdyLen) > 2) {
-                    this.drawArrow(ctx, 0, 0, fdxLen, fdyLen, '#38bdf8', 2.5, 'Fd');
-                }
-
-                ctx.restore();
-            }
-
-            drawArrow(ctx, fromX, fromY, toX, toY, color, width = 2, label = '') {
-                ctx.save();
-                ctx.strokeStyle = color;
-                ctx.fillStyle = color;
-                ctx.lineWidth = width;
-
-                // Draw shaft
-                ctx.beginPath();
-                ctx.moveTo(fromX, fromY);
-                ctx.lineTo(toX, toY);
-                ctx.stroke();
-
-                // Draw arrowhead
-                const angle = Math.atan2(toY - fromY, toX - fromX);
-                const headlen = 8; // length of head in pixels
-                ctx.beginPath();
-                ctx.moveTo(toX, toY);
-                ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
-                ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
-                ctx.closePath();
-                ctx.fill();
-
-                // Draw label at tip of arrow
-                if (label) {
-                    ctx.font = 'bold 10px sans-serif';
-                    ctx.fillText(label, toX + 5 * Math.cos(angle), toY + 5 * Math.sin(angle) + 3);
-                }
-
-                ctx.restore();
+            destroy() {
+                scene.remove(this.mesh);
+                scene.remove(this.outline);
+                scene.remove(this.arrowFg);
+                scene.remove(this.arrowFb);
+                scene.remove(this.arrowFd);
+                scene.remove(this.trailLine);
             }
         }
 
-        // Pop Bubble Particle
-        class PopParticle {
-            constructor(x, y, color) {
+        // 3D Pop Particle
+        class PopParticle3D {
+            constructor(x, y, z) {
+                const geo = new THREE.SphereGeometry(0.03, 4, 4);
+                const mat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.8 });
+                this.mesh = new THREE.Mesh(geo, mat);
+                
                 this.x = x;
                 this.y = y;
+                this.z = z;
+                this.mesh.position.set(x, y, z);
+                scene.add(this.mesh);
+
                 const angle = Math.random() * Math.PI * 2;
-                const speed = 50 + Math.random() * 100;
-                this.vx = Math.cos(angle) * speed;
-                this.vy = Math.sin(angle) * speed;
+                const polar = Math.random() * Math.PI;
+                const speed = 2 + Math.random() * 4;
+                
+                this.vx = speed * Math.sin(polar) * Math.cos(angle);
+                this.vy = speed * Math.sin(polar) * Math.sin(angle);
+                this.vz = speed * Math.cos(polar);
+
                 this.alpha = 1.0;
-                this.decay = 0.03 + Math.random() * 0.04;
-                this.color = color;
-                this.size = 2 + Math.random() * 3;
+                this.decay = 0.04 + Math.random() * 0.04;
             }
 
             update(dt) {
                 this.x += this.vx * dt;
                 this.y += this.vy * dt;
+                this.z += this.vz * dt;
                 this.alpha -= this.decay;
-            }
 
-            draw(ctx) {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
-                ctx.fill();
-                ctx.restore();
+                this.mesh.position.set(this.x, this.y, this.z);
+                this.mesh.material.opacity = this.alpha;
+                
+                if (this.alpha <= 0) {
+                    scene.remove(this.mesh);
+                }
             }
         }
 
-        let activeParticles = [];
+        let activeParticles3D = [];
 
-        // UI Event Listeners & Sliders configuration
-        function updateSliders() {
+        // Spawn Objects in 3D
+        function spawnObject3D(type) {
+            const template = TEMPLATES_3D[type];
+            if (!template) return;
+
+            // Spawn random X/Z, top-level Y
+            const rx = (Math.random() - 0.5) * 8;
+            const ry = 12 + Math.random() * 3;
+            const rz = (Math.random() - 0.5) * 8;
+
+            const newObj = new PhysicsObject3D(rx, ry, rz, template);
+            activeObjects3D.push(newObj);
+
+            // Auto select
+            selectObject(newObj);
+        }
+
+        function selectObject(obj) {
+            // Unselect previous
+            activeObjects3D.forEach(o => o.outline.visible = false);
+            selectedObject3D = obj;
+            if (selectedObject3D) {
+                selectedObject3D.outline.visible = true;
+            }
+            chartHistory = [];
+            updateLiveEquations3D();
+        }
+
+        // Camera views toggles
+        function setCameraView(view) {
+            document.querySelectorAll('.camera-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`cam-${view}`).classList.add('active');
+
+            if (view === 'front') {
+                camera.position.set(0, 8, 24);
+                controls.target.set(0, 7, 0);
+            } else if (view === 'top') {
+                camera.position.set(0, 24, 0.1);
+                controls.target.set(0, 7, 0);
+            } else {
+                // Orbit/default angle
+                camera.position.set(0, 10, 22);
+                controls.target.set(0, 7, 0);
+            }
+            controls.update();
+        }
+
+        function updateSliders3D() {
             gravity = parseFloat(document.getElementById('slide-gravity').value);
             document.getElementById('val-gravity').innerText = gravity.toFixed(1);
 
@@ -1390,7 +1629,10 @@
             document.getElementById('val-density').innerText = airDensity.toFixed(1);
 
             windSpeed = parseFloat(document.getElementById('slide-wind').value);
-            document.getElementById('val-wind').innerText = windSpeed;
+            document.getElementById('val-wind').innerText = windSpeed.toFixed(1);
+
+            windAngle = parseFloat(document.getElementById('slide-wind-dir').value);
+            document.getElementById('val-wind-dir').innerText = windAngle;
 
             borderElasticity = parseFloat(document.getElementById('slide-bounce').value);
             document.getElementById('val-bounce').innerText = borderElasticity.toFixed(2);
@@ -1398,11 +1640,10 @@
             timeScale = parseFloat(document.getElementById('slide-timescale').value);
             document.getElementById('val-timescale').innerText = timeScale.toFixed(1);
 
-            // Update Badge headers
-            updateBadgeHUD();
+            updateBadgeHUD3D();
         }
 
-        function updateBadgeHUD() {
+        function updateBadgeHUD3D() {
             const envText = document.getElementById('hud-env');
             if (gravity === 0 && airDensity === 0) {
                 envText.innerText = "Vacuum Orbit (0G)";
@@ -1416,317 +1657,166 @@
                 envText.innerText = `Custom (${gravity} m/s², ρ: ${airDensity})`;
             }
 
-            const forcesText = document.getElementById('hud-forces');
-            let forcesList = ["Gravity"];
-            if (airDensity > 0) forcesList.push("Drag");
-            if (airDensity > 0) forcesList.push("Buoyancy");
-            if (windSpeed !== 0) forcesList.push("Wind");
-            forcesText.innerText = forcesList.join(" + ");
+            const windText = document.getElementById('hud-wind');
+            if (windSpeed === 0) {
+                windText.innerText = "None";
+            } else {
+                windText.innerText = `${windSpeed} m/s @ ${windAngle}°`;
+            }
         }
 
-        function resetForces() {
+        function resetSliders3D() {
             document.getElementById('slide-gravity').value = 9.8;
             document.getElementById('slide-density').value = 1.2;
             document.getElementById('slide-wind').value = 0;
+            document.getElementById('slide-wind-dir').value = 0;
             document.getElementById('slide-bounce').value = 0.6;
             document.getElementById('slide-timescale').value = 1.0;
-            updateSliders();
+            updateSliders3D();
         }
 
-        function togglePause() {
+        function togglePause3D() {
             gamePaused = !gamePaused;
             document.getElementById('btn-pause').innerText = gamePaused ? "Resume Sim" : "Pause Sim";
         }
 
-        function stepFrame() {
-            if (!gamePaused) togglePause();
-            // Run physics update once
-            updatePhysics(DT);
+        function stepFrame3D() {
+            if (!gamePaused) togglePause3D();
+            updatePhysics3D(DT);
         }
 
         function clearSandbox() {
-            activeObjects = [];
-            selectedObject = null;
-            draggedObject = null;
+            activeObjects3D.forEach(o => o.destroy());
+            activeObjects3D = [];
+            selectObject(null);
             chartHistory = [];
-            clearChart();
-            updateLiveEquations();
+            clearChart3D();
         }
 
-        // Spawn factory
-        function spawnObject(type, x = null, y = null) {
-            const template = OBJECT_TEMPLATES[type];
-            if (!template) return;
-
-            // Spawn at random top-center if x/y are not specified
-            const sx = x !== null ? x : 100 + Math.random() * 400;
-            const sy = y !== null ? y : 80 + Math.random() * 80;
-
-            const newObj = new PhysicsObject(sx, sy, template);
-            activeObjects.push(newObj);
-            
-            // Auto select spawned object
-            selectedObject = newObj;
-            chartHistory = [];
-            updateLiveEquations();
-        }
-
-        // Archimedes buoyancy / Galileo vacuum pre-configured presets
-        function loadPreset(presetName) {
-            clearSandbox();
-            resetForces();
-
-            if (presetName === 'galileo') {
-                // Drop feather & anvil in zero atmosphere vacuum to prove constant acceleration
-                document.getElementById('slide-density').value = 0; // Vacuum!
-                document.getElementById('slide-gravity').value = 9.8;
-                updateSliders();
-                
-                spawnObject('anvil', 300, 60);
-                spawnObject('feather', 500, 60);
-                
-                selectedObject = activeObjects[0]; // anvil
-            } else if (presetName === 'terminal') {
-                // High air resistance dropping bowling ball vs feather to show terminal velocity
-                document.getElementById('slide-density').value = 3.5; // thick fluid
-                document.getElementById('slide-gravity').value = 12.0; // strong gravity
-                updateSliders();
-
-                spawnObject('bowling', 300, 50);
-                spawnObject('feather', 500, 50);
-
-                selectedObject = activeObjects[0];
-                setChartType('velocity');
-            } else if (presetName === 'buoyancy') {
-                // Balloon vs football to show helium buoyancy flotation
-                document.getElementById('slide-density').value = 1.8; // dense atmospheric gas
-                document.getElementById('slide-gravity').value = 9.8;
-                document.getElementById('slide-wind').value = 1.5; // slight right breeze
-                updateSliders();
-
-                spawnObject('balloon', 300, 450); // balloons spawn at bottom
-                spawnObject('football', 500, 80);
-
-                selectedObject = activeObjects[0]; // balloon
-            } else if (presetName === 'space') {
-                // Zero gravity floating drifting physics
-                document.getElementById('slide-gravity').value = 0;
-                document.getElementById('slide-density').value = 0;
-                updateSliders();
-
-                spawnObject('bowling', 250, 300);
-                spawnObject('football', 400, 260);
-                spawnObject('bubble', 550, 340);
-
-                // Give them minor initial drift speed
-                activeObjects[0].vx = 60;
-                activeObjects[0].vy = -20;
-                activeObjects[1].vx = -40;
-                activeObjects[1].vy = 50;
-
-                selectedObject = activeObjects[1]; // football
-            }
-            
-            updateBadgeHUD();
-        }
-
-        // MOUSE / TOUCH EVENTS FOR CANVAS DRAG-AND-DROP
-        canvas.addEventListener('mousedown', onMouseDown);
-        canvas.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
-
-        canvas.addEventListener('touchstart', onTouchStart, { passive: false });
-        canvas.addEventListener('touchmove', onTouchMove, { passive: false });
-        window.addEventListener('touchend', onTouchEnd);
-
-        function getCanvasMousePos(evt) {
-            const rect = canvas.getBoundingClientRect();
-            // Handle mouse vs touch coordinates
-            const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
-            const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
-            return {
-                x: (clientX - rect.left) / rect.width * canvas.width,
-                y: (clientY - rect.top) / rect.height * canvas.height
-            };
-        }
-
-        function onMouseDown(e) {
-            const mouse = getCanvasMousePos(e);
-            isMouseDown = true;
-            lastMouseX = mouse.x;
-            lastMouseY = mouse.y;
-            flickVelocityX = 0;
-            flickVelocityY = 0;
-
-            // Check if user clicked an object
-            let clickedObj = null;
-            // Iterate backwards to select the top-most layered object
-            for (let i = activeObjects.length - 1; i >= 0; i--) {
-                const obj = activeObjects[i];
-                const dist = Math.hypot(mouse.x - obj.x, mouse.y - obj.y);
-                if (dist < obj.radius + 8) {
-                    clickedObj = obj;
-                    break;
-                }
+        // Live Equations dynamic display
+        function updateLiveEquations3D() {
+            const container = document.getElementById('calc-body');
+            if (!selectedObject3D) {
+                container.innerHTML = `No object selected.<br><span style="color:#64748b;">Click on any falling body in the sandbox to inspect forces and equations in real-time.</span>`;
+                return;
             }
 
-            if (clickedObj) {
-                draggedObject = clickedObj;
-                selectedObject = clickedObj;
-                draggedObject.isDragging = true;
-                draggedObject.vx = 0;
-                draggedObject.vy = 0;
-                draggedObject.trail = [];
-                dragOffsetX = mouse.x - clickedObj.x;
-                dragOffsetY = mouse.y - clickedObj.y;
-                
-                // Reset plot for new selection
-                chartHistory = [];
-                updateLiveEquations();
-            } else {
-                // Deselect if clicking blank canvas
-                selectedObject = null;
-                updateLiveEquations();
+            const mass = selectedObject3D.mass;
+            const vol = selectedObject3D.volume;
+            const area = selectedObject3D.getCrossSectionalArea();
+
+            const speed = Math.hypot(selectedObject3D.vx, selectedObject3D.vy, selectedObject3D.vz);
+
+            let terminalVel = "N/A (Space)";
+            if (gravity > 0 && airDensity > 0) {
+                const effWeightAccel = Math.abs(mass * gravity - airDensity * vol * gravity);
+                const termSpeed = Math.sqrt((2 * effWeightAccel) / (airDensity * selectedObject3D.dragCoeff * area));
+                terminalVel = `${termSpeed.toFixed(2)} m/s`;
             }
+
+            container.innerHTML = `
+                <div>Object: <span class="dynamic-value">${selectedObject3D.name}</span></div>
+                <div>Mass (m): <span class="dynamic-value">${mass.toFixed(3)} kg</span></div>
+                <div>Volume (V): <span class="dynamic-value">${vol.toFixed(4)} m³</span></div>
+                <div>Cross Area (A): <span class="dynamic-value">${area.toFixed(4)} m²</span></div>
+                <div style="margin-top:6px; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px;">
+                    Fg (Gravity): <span class="dynamic-value" style="color:#ef4444;">${selectedObject3D.fg.toFixed(2)} N</span>
+                </div>
+                <div>
+                    Fb (Buoyancy): <span class="dynamic-value" style="color:#10b981;">${selectedObject3D.fb.toFixed(2)} N</span>
+                </div>
+                <div>
+                    Fd (Air Drag): <span class="dynamic-value" style="color:#0ea5e9;">${selectedObject3D.fdMag.toFixed(2)} N</span>
+                </div>
+                <div style="margin-top:6px; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px;">
+                    Current Speed: <span class="dynamic-value" style="color:#fbbf24;">${speed.toFixed(2)} m/s</span>
+                </div>
+                <div>
+                    Terminal Speed (V_t): <span class="dynamic-value" style="color:#e879f9;">${terminalVel}</span>
+                </div>
+            `;
         }
 
-        function onMouseMove(e) {
-            if (!isMouseDown) return;
-            const mouse = getCanvasMousePos(e);
+        // Circular Collision Resolution in 3D
+        function resolve3DCollisions() {
+            if (activeObjects3D.length < 2) return;
 
-            // Calculate flick vector speeds
-            flickVelocityX = (mouse.x - lastMouseX) / DT;
-            flickVelocityY = (mouse.y - lastMouseY) / DT;
-
-            lastMouseX = mouse.x;
-            lastMouseY = mouse.y;
-
-            if (draggedObject) {
-                draggedObject.x = mouse.x - dragOffsetX;
-                draggedObject.y = mouse.y - dragOffsetY;
-
-                // Clamp to canvas borders while dragging
-                draggedObject.x = Math.max(draggedObject.radius, Math.min(canvas.width - draggedObject.radius, draggedObject.x));
-                draggedObject.y = Math.max(draggedObject.radius, Math.min(GROUND_Y - draggedObject.radius, draggedObject.y));
-            }
-        }
-
-        function onMouseUp() {
-            isMouseDown = false;
-            if (draggedObject) {
-                draggedObject.isDragging = false;
-                
-                // Apply release flick velocity (cap it so objects don't go hyper-speed)
-                const maxFlick = 800;
-                draggedObject.vx = Math.max(-maxFlick, Math.min(maxFlick, flickVelocityX));
-                draggedObject.vy = Math.max(-maxFlick, Math.min(maxFlick, flickVelocityY));
-                
-                draggedObject = null;
-            }
-        }
-
-        function onTouchStart(e) {
-            e.preventDefault();
-            onMouseDown(e);
-        }
-
-        function onTouchMove(e) {
-            e.preventDefault();
-            onMouseMove(e);
-        }
-
-        function onTouchEnd() {
-            onMouseUp();
-        }
-
-        // CIRCLE-CIRCLE COLLISIONS (Elastic interaction resolution)
-        function resolveCollisions() {
-            if (activeObjects.length < 2) return;
-
-            for (let i = 0; i < activeObjects.length; i++) {
-                const o1 = activeObjects[i];
+            for (let i = 0; i < activeObjects3D.length; i++) {
+                const o1 = activeObjects3D[i];
                 if (o1.isDragging) continue;
 
-                for (let j = i + 1; j < activeObjects.length; j++) {
-                    const o2 = activeObjects[j];
+                for (let j = i + 1; j < activeObjects3D.length; j++) {
+                    const o2 = activeObjects3D[j];
                     if (o2.isDragging) continue;
 
                     const dx = o2.x - o1.x;
                     const dy = o2.y - o1.y;
-                    const dist = Math.hypot(dx, dy);
+                    const dz = o2.z - o1.z;
+                    const dist = Math.hypot(dx, dy, dz);
                     const minDist = o1.radius + o2.radius;
 
                     if (dist < minDist) {
-                        // 1. Collision normal
                         const nx = dx / dist;
                         const ny = dy / dist;
+                        const nz = dz / dist;
 
-                        // 2. Separate overlapping bodies (mass weighted projection)
+                        // Separate overlapping bodies
                         const overlap = minDist - dist;
                         const mSum = o1.mass + o2.mass;
-                        
-                        // Push them apart
+
                         o1.x -= overlap * nx * (o2.mass / mSum);
                         o1.y -= overlap * ny * (o2.mass / mSum);
+                        o1.z -= overlap * nz * (o2.mass / mSum);
                         o2.x += overlap * nx * (o1.mass / mSum);
                         o2.y += overlap * ny * (o1.mass / mSum);
+                        o2.z += overlap * nz * (o1.mass / mSum);
 
-                        // 3. Elastic impulse bounce swapping
+                        // Elastic impulse bounce
                         const rvx = o2.vx - o1.vx;
                         const rvy = o2.vy - o1.vy;
-                        
-                        // Relative speed projection along normal
-                        const vNormal = rvx * nx + rvy * ny;
+                        const rvz = o2.vz - o1.vz;
 
-                        // Only bounce if they are moving towards each other
+                        const vNormal = rvx * nx + rvy * ny + rvz * nz;
+
                         if (vNormal < 0) {
-                            // Combined coefficient of restitution
                             const e = Math.min(o1.elasticity, o2.elasticity);
-                            const impulseScalar = -(1 + e) * vNormal / (1 / o1.mass + 1 / o2.mass);
+                            const impulse = -(1 + e) * vNormal / (1 / o1.mass + 1 / o2.mass);
 
-                            // Apply impulse
-                            o1.vx -= (impulseScalar * nx) / o1.mass;
-                            o1.vy -= (impulseScalar * ny) / o1.mass;
-                            o2.vx += (impulseScalar * nx) / o2.mass;
-                            o2.vy += (impulseScalar * ny) / o2.mass;
+                            o1.vx -= (impulse * nx) / o1.mass;
+                            o1.vy -= (impulse * ny) / o1.mass;
+                            o1.vz -= (impulse * nz) / o1.mass;
+                            o2.vx += (impulse * nx) / o2.mass;
+                            o2.vy += (impulse * ny) / o2.mass;
+                            o2.vz += (impulse * nz) / o2.mass;
 
-                            // Play bump sound based on collision speed
-                            const bumpVel = Math.abs(vNormal) * METERS_PER_PIXEL;
-                            if (bumpVel > 0.2) {
-                                synth.playImpact(Math.max(o1.mass, o2.mass), bumpVel * 10);
+                            if (Math.abs(vNormal) > 0.5) {
+                                synth.playImpact(Math.max(o1.mass, o2.mass), vNormal * 10);
                             }
 
-                            // Bubbles pop on heavy impacts
-                            if (o1.isPoppable && bumpVel > 0.8) o1.pop();
-                            if (o2.isPoppable && bumpVel > 0.8) o2.pop();
+                            if (o1.isPoppable && Math.abs(vNormal) > 1.0) o1.pop();
+                            if (o2.isPoppable && Math.abs(vNormal) > 1.0) o2.pop();
                         }
                     }
                 }
             }
         }
 
-        // Live physics step integration
-        function updatePhysics(dt) {
-            // Delete popped bubbles
-            activeObjects = activeObjects.filter(obj => !obj.markedForDeletion);
+        // Live physics loop step
+        function updatePhysics3D(dt) {
+            activeObjects3D = activeObjects3D.filter(obj => !obj.markedForDeletion);
 
-            // Update all physics states
-            activeObjects.forEach(obj => obj.update(dt));
+            activeObjects3D.forEach(obj => obj.update(dt));
+            resolve3DCollisions();
 
-            // Resolve circle-circle contact collision responses
-            resolveCollisions();
-
-            // Record data plots for oscilloscope chart
-            if (selectedObject && !selectedObject.isDragging) {
+            // Record curves
+            if (selectedObject3D && !selectedObject3D.isDragging) {
                 totalSimTime += dt;
                 
                 let plotVal = 0;
                 if (chartType === 'velocity') {
-                    // Velocity in m/s (absolute magnitude or vertical vy)
-                    plotVal = -selectedObject.vy * METERS_PER_PIXEL; // Negate to show upwards motion properly
+                    plotVal = selectedObject3D.vy; // Vertical Y velocity
                 } else {
-                    // Height in meters from ground line
-                    plotVal = (GROUND_Y - selectedObject.y) * METERS_PER_PIXEL;
+                    plotVal = selectedObject3D.y; // Height Y
                 }
 
                 chartHistory.push({
@@ -1734,7 +1824,6 @@
                     v: plotVal
                 });
 
-                // Cap history length for rendering
                 if (chartHistory.length > 250) {
                     chartHistory.shift();
                 }
@@ -1742,122 +1831,14 @@
                 totalSimTime = 0;
             }
 
-            // Update equations card
-            updateLiveEquations();
+            updateLiveEquations3D();
         }
 
-        // Live equations layout solver
-        function updateLiveEquations() {
-            const container = document.getElementById('calc-body');
-            if (!selectedObject) {
-                container.innerHTML = `No object selected.<br><span style="color:#64748b;">Click on any falling body in the sandbox to inspect forces and equations in real-time.</span>`;
-                return;
-            }
-
-            const area = selectedObject.getCrossSectionalArea();
-            const mass = selectedObject.mass;
-            const vol = selectedObject.volume;
-            
-            // Live calculated values in Newtons (N)
-            const g_force = selectedObject.fg;
-            const b_force = selectedObject.fb;
-            const drag_mag = Math.hypot(selectedObject.fdx, selectedObject.fdy);
-            
-            // Relative speed
-            const speed_ms = Math.hypot(selectedObject.vx, selectedObject.vy) * METERS_PER_PIXEL;
-            
-            // Terminal velocity calculation
-            let termVelText = "N/A (Space)";
-            if (gravity > 0 && airDensity > 0) {
-                // If buoyancy exceeds gravity, terminal velocity is upwards (negative)
-                const effectiveMassAccel = Math.abs(mass * gravity - airDensity * vol * gravity);
-                const termSpeed = Math.sqrt((2 * effectiveMassAccel) / (airDensity * selectedObject.dragCoeff * area));
-                termVelText = `${termSpeed.toFixed(2)} m/s`;
-            }
-
-            container.innerHTML = `
-                <div>Object: <span class="dynamic-value">${selectedObject.name}</span></div>
-                <div>Mass (m): <span class="dynamic-value">${mass.toFixed(3)} kg</span></div>
-                <div>Volume (V): <span class="dynamic-value">${vol.toFixed(4)} m³</span></div>
-                <div>Cross Area (A): <span class="dynamic-value">${area.toFixed(4)} m²</span></div>
-                <div style="margin-top:6px; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px;">
-                    Fg (Gravity): <span class="dynamic-value" style="color:#ef4444;">${g_force.toFixed(2)} N</span>
-                </div>
-                <div>
-                    Fb (Buoyancy): <span class="dynamic-value" style="color:#10b981;">${b_force.toFixed(2)} N</span>
-                </div>
-                <div>
-                    Fd (Air Drag): <span class="dynamic-value" style="color:#0ea5e9;">${drag_mag.toFixed(2)} N</span>
-                </div>
-                <div style="margin-top:6px; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px;">
-                    Current Speed: <span class="dynamic-value" style="color:#fbbf24;">${speed_ms.toFixed(2)} m/s</span>
-                </div>
-                <div>
-                    Terminal Speed (V_t): <span class="dynamic-value" style="color:#e879f9;">${termVelText}</span>
-                </div>
-            `;
-        }
-
-        // Draw grids & pitch heights
-        function drawScene() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw educational height rulers
-            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-            ctx.lineWidth = 1;
-            const stepY = 50;
-            ctx.fillStyle = '#64748b';
-            ctx.font = '9px monospace';
-            
-            // Horizontal lines with height measurements
-            for (let y = stepY; y < GROUND_Y; y += stepY) {
-                ctx.beginPath();
-                ctx.moveTo(50, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-
-                // Height from ground in meters
-                const h_meters = (GROUND_Y - y) * METERS_PER_PIXEL;
-                ctx.fillText(`${h_meters.toFixed(1)}m`, 12, y + 3);
-            }
-
-            // Draw grid vertical pillars
-            for (let x = 100; x < canvas.width; x += 100) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, GROUND_Y);
-                ctx.stroke();
-            }
-
-            // Draw Ground Platform (Frosted steel-like look)
-            ctx.fillStyle = '#1e293b';
-            ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
-
-            // Draw glowing ground green border line
-            ctx.strokeStyle = '#10b981';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(0, GROUND_Y);
-            ctx.lineTo(canvas.width, GROUND_Y);
-            ctx.stroke();
-
-            // Draw background indicator info
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.font = '11px sans-serif';
-            ctx.fillText("Physics Lab Drop Zone", canvas.width / 2 - 60, GROUND_Y + 30);
-            
-            // Draw all active objects
-            activeObjects.forEach(obj => obj.draw(ctx));
-
-            // Draw particles
-            activeParticles.forEach(p => p.draw(ctx));
-        }
-
-        // Oscilloscope graph plotter drawer
-        function drawChart() {
+        // Oscilloscope drawing
+        function drawChart3D() {
             chartCtx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
 
-            // Draw graph grids
+            // Grids
             chartCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
             chartCtx.lineWidth = 1;
             for (let i = 20; i < chartCanvas.height; i += 20) {
@@ -1867,19 +1848,17 @@
                 chartCtx.stroke();
             }
 
-            if (!selectedObject || chartHistory.length === 0) {
+            if (!selectedObject3D || chartHistory.length === 0) {
                 chartCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
                 chartCtx.font = '10px sans-serif';
-                chartCtx.fillText("Waiting for active data...", 80, 60);
+                chartCtx.fillText("Waiting for active data...", 85, 60);
                 return;
             }
 
-            // Draw curves
             chartCtx.strokeStyle = chartType === 'velocity' ? '#38bdf8' : '#10b981';
-            chartCtx.lineWidth = 2.2;
+            chartCtx.lineWidth = 2;
             chartCtx.beginPath();
 
-            // Find max bounds in history to auto-scale Y axis
             let maxVal = 0.1;
             let minVal = 0;
             chartHistory.forEach(pt => {
@@ -1889,9 +1868,7 @@
             const yRange = maxVal - minVal;
 
             chartHistory.forEach((pt, idx) => {
-                // X coordinates map from index ratio
                 const cx = (idx / 250) * chartCanvas.width;
-                // Y coordinates map to canvas size
                 const normalized = (pt.v - minVal) / yRange;
                 const cy = chartCanvas.height - 15 - normalized * (chartCanvas.height - 30);
                 
@@ -1903,66 +1880,259 @@
             });
             chartCtx.stroke();
 
-            // Labels
             chartCtx.fillStyle = '#94a3b8';
             chartCtx.font = '9px monospace';
-            chartCtx.fillText(chartType === 'velocity' ? 'Velocity (m/s)' : 'Height (m)', 10, 15);
+            chartCtx.fillText(chartType === 'velocity' ? 'Velocity Y (m/s)' : 'Height Y (m)', 10, 15);
             chartCtx.fillText(`Max: ${maxVal.toFixed(1)}`, chartCanvas.width - 70, 15);
         }
 
-        function setChartType(type) {
+        function setChartType3D(type) {
             chartType = type;
             chartHistory = [];
             document.getElementById('chart-y-height').style.borderColor = type === 'height' ? 'var(--info)' : 'var(--border-color)';
             document.getElementById('chart-y-velocity').style.borderColor = type === 'velocity' ? 'var(--info)' : 'var(--border-color)';
         }
 
-        function clearChart() {
+        function clearChart3D() {
             chartHistory = [];
         }
 
-        // Particles manager update
-        function updateParticles(dt) {
-            activeParticles.forEach(p => p.update(dt));
-            activeParticles = activeParticles.filter(p => p.alpha > 0);
+        // Preset Scenarios
+        function loadPreset3D(presetName) {
+            clearSandbox();
+            resetSliders3D();
+
+            if (presetName === 'galileo') {
+                document.getElementById('slide-density').value = 0; // Vacuum!
+                document.getElementById('slide-gravity').value = 9.8;
+                updateSliders3D();
+
+                spawnObject3D('anvil');
+                activeObjects3D[0].x = -2;
+                activeObjects3D[0].y = 12;
+                activeObjects3D[0].z = 0;
+
+                spawnObject3D('feather');
+                activeObjects3D[1].x = 2;
+                activeObjects3D[1].y = 12;
+                activeObjects3D[1].z = 0;
+
+                selectObject(activeObjects3D[0]);
+            } else if (presetName === 'terminal') {
+                document.getElementById('slide-density').value = 3.5; // Thick atmosphere
+                document.getElementById('slide-gravity').value = 12.0;
+                updateSliders3D();
+
+                spawnObject3D('bowling');
+                activeObjects3D[0].x = -2;
+                activeObjects3D[0].y = 13;
+                activeObjects3D[0].z = 0;
+
+                spawnObject3D('feather');
+                activeObjects3D[1].x = 2;
+                activeObjects3D[1].y = 13;
+                activeObjects3D[1].z = 0;
+
+                selectObject(activeObjects3D[0]);
+            } else if (presetName === 'buoyancy') {
+                document.getElementById('slide-density').value = 2.0;
+                document.getElementById('slide-gravity').value = 9.8;
+                document.getElementById('slide-wind').value = 2.5; // wind blows right
+                updateSliders3D();
+
+                spawnObject3D('balloon');
+                activeObjects3D[0].x = -2;
+                activeObjects3D[0].y = 2.0; // balloon spawns at bottom
+                activeObjects3D[0].z = 0;
+
+                spawnObject3D('bowling');
+                activeObjects3D[1].x = 2;
+                activeObjects3D[1].y = 13;
+                activeObjects3D[1].z = 0;
+
+                selectObject(activeObjects3D[0]);
+            } else if (presetName === 'space') {
+                document.getElementById('slide-gravity').value = 0;
+                document.getElementById('slide-density').value = 0;
+                updateSliders3D();
+
+                spawnObject3D('bowling');
+                activeObjects3D[0].x = -2;
+                activeObjects3D[0].y = 7;
+                activeObjects3D[0].z = 0;
+                activeObjects3D[0].vx = 3.0;
+                activeObjects3D[0].vy = -1.0;
+
+                spawnObject3D('football');
+                activeObjects3D[1].x = 2;
+                activeObjects3D[1].y = 6;
+                activeObjects3D[1].z = 0;
+                activeObjects3D[1].vx = -2.0;
+                activeObjects3D[1].vy = 2.0;
+
+                selectObject(activeObjects3D[0]);
+            }
+
+            updateBadgeHUD3D();
         }
 
-        // Toggles mapping
+        // 3D dragging raycast event logic
+        function onDocumentMouseDown(e) {
+            e.preventDefault();
+
+            // Screen space normalized
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // Intersect active objects meshes
+            const meshes = activeObjects3D.map(o => o.mesh);
+            const intersects = raycaster.intersectObjects(meshes, true);
+
+            if (intersects.length > 0) {
+                // Find parent object matching clicked mesh
+                let hitMesh = intersects[0].object;
+                while (hitMesh.parent && hitMesh.parent !== scene) {
+                    hitMesh = hitMesh.parent;
+                }
+
+                const clickedObj = activeObjects3D.find(o => o.mesh === hitMesh);
+                
+                if (clickedObj) {
+                    isMouseDown = true;
+                    draggedObject3D = clickedObj;
+                    draggedObject3D.isDragging = true;
+                    
+                    // Freeze velocities while dragging
+                    draggedObject3D.vx = 0;
+                    draggedObject3D.vy = 0;
+                    draggedObject3D.vz = 0;
+                    draggedObject3D.trailPoints = [];
+
+                    // Setup drag plane perpendicular to camera look vector
+                    camera.getWorldDirection(planeNormal);
+                    planeNormal.negate(); // point towards camera
+                    dragPlane.setFromNormalAndCoplanarPoint(planeNormal, draggedObject3D.mesh.position);
+
+                    // Offset click position
+                    if (raycaster.ray.intersectPlane(dragPlane, planeIntersection)) {
+                        lastInteractionPoint.copy(planeIntersection);
+                    }
+
+                    selectObject(clickedObj);
+                    controls.enabled = false; // disable orbit controls while dragging
+                }
+            }
+        }
+
+        function onDocumentMouseMove(e) {
+            if (!isMouseDown) return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            if (draggedObject3D && raycaster.ray.intersectPlane(dragPlane, planeIntersection)) {
+                // Flick velocity in 3D
+                flickVelocity.copy(planeIntersection).sub(lastInteractionPoint).multiplyScalar(1 / DT);
+                lastInteractionPoint.copy(planeIntersection);
+
+                // Set object coordinates
+                draggedObject3D.x = planeIntersection.x;
+                draggedObject3D.y = planeIntersection.y;
+                draggedObject3D.z = planeIntersection.z;
+
+                // Clamp limits
+                const limit = 8 - draggedObject3D.radius;
+                draggedObject3D.x = Math.max(-limit, Math.min(limit, draggedObject3D.x));
+                draggedObject3D.y = Math.max(draggedObject3D.radius, Math.min(16 - draggedObject3D.radius, draggedObject3D.y));
+                draggedObject3D.z = Math.max(-limit, Math.min(limit, draggedObject3D.z));
+            }
+        }
+
+        function onDocumentMouseUp() {
+            isMouseDown = false;
+            if (draggedObject3D) {
+                draggedObject3D.isDragging = false;
+
+                // Flick throw velocities
+                const maxSpeed = 12;
+                draggedObject3D.vx = Math.max(-maxSpeed, Math.min(maxSpeed, flickVelocity.x));
+                draggedObject3D.vy = Math.max(-maxSpeed, Math.min(maxSpeed, flickVelocity.y));
+                draggedObject3D.vz = Math.max(-maxSpeed, Math.min(maxSpeed, flickVelocity.z));
+
+                draggedObject3D = null;
+            }
+            controls.enabled = true; // restore orbit camera
+        }
+
+        // Register drag events on 3D container
+        container3d.addEventListener('mousedown', onDocumentMouseDown);
+        container3d.addEventListener('mousemove', onDocumentMouseMove);
+        window.addEventListener('mouseup', onDocumentMouseUp);
+
+        // Toggle triggers
         document.getElementById('toggle-vectors').addEventListener('change', (e) => {
             showVectors = e.target.checked;
+            activeObjects3D.forEach(o => {
+                o.arrowFg.visible = showVectors;
+                o.arrowFb.visible = showVectors;
+                o.arrowFd.visible = showVectors;
+            });
         });
 
         document.getElementById('toggle-trails').addEventListener('change', (e) => {
             showTrails = e.target.checked;
+            activeObjects3D.forEach(o => o.trailLine.visible = showTrails);
         });
 
-        // Frame update loop
-        function mainLoop() {
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = container3d.clientWidth / container3d.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container3d.clientWidth, container3d.clientHeight);
+        });
+
+        // 3D Rendering Frame Loop
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
             if (!gamePaused) {
-                // TimeScale factor allows fluid slow motion
                 const scaledDt = DT * timeScale;
                 
-                // Physics sub-stepping for collision stability
+                // Sub-stepping for collision physics stability
                 const subSteps = 3;
                 const stepDt = scaledDt / subSteps;
                 for (let i = 0; i < subSteps; i++) {
-                    updatePhysics(stepDt);
+                    updatePhysics3D(stepDt);
                 }
 
-                updateParticles(scaledDt);
+                // Update bubble pop particles
+                activeParticles3D.forEach(p => p.update(scaledDt));
+                activeParticles3D = activeParticles3D.filter(p => p.alpha > 0);
             }
 
-            drawScene();
-            drawChart();
-            requestAnimationFrame(mainLoop);
+            // Camera damping
+            controls.update();
+
+            // Render WebGL
+            renderer.render(scene, camera);
+
+            // Render 2D oscilloscope
+            drawChart3D();
         }
 
-        // Initialize sandbox with a couple of balls
-        resetForces();
-        loadPreset('buoyancy'); // load default scenario
-        setChartType('velocity');
+        // Init Setup
+        resetSliders3D();
+        setChartType3D('velocity');
+        updateBadgeHUD3D();
 
-        mainLoop();
+        // Start render loop
+        animate3D();
     </script>
 </body>
 </html>
