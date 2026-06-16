@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumLab 3D - Interactive Physics & Creatures Sandbox</title>
+    <title>QuantumLab 3D - Interactive Physics, Creatures & Vehicles Sandbox</title>
     <!-- Modern typography -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     
@@ -198,7 +198,7 @@
 
         /* Group Dividers */
         .group-title {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
@@ -219,12 +219,12 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            padding: 10px 14px;
+            padding: 8px 12px;
             cursor: pointer;
             transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .spawn-card:hover {
@@ -234,9 +234,9 @@
         }
 
         .spawn-icon {
-            font-size: 1.4rem;
-            width: 32px;
-            height: 32px;
+            font-size: 1.3rem;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -250,13 +250,13 @@
         }
 
         .spawn-name {
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: #f3f4f6;
         }
 
         .spawn-details {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             color: #9ca3af;
         }
 
@@ -572,7 +572,7 @@
         <div class="logo">
             <div class="logo-icon">⚛️</div>
             <h1>QuantumLab 3D</h1>
-            <span class="btn" style="padding: 2px 8px; font-size: 0.7rem; color: #a78bfa; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.2); text-transform: uppercase;">Creatures & Physics Lab</span>
+            <span class="btn" style="padding: 2px 8px; font-size: 0.7rem; color: #a78bfa; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.2); text-transform: uppercase;">Vehicles & Biomes Lab</span>
         </div>
         <div class="header-actions">
             <a href="../../index.html" class="btn">
@@ -595,8 +595,46 @@
             <!-- Tab Content 1: Spawn Library -->
             <div id="tab-spawn" class="tab-content active">
                 <div class="spawn-grid">
-                    <p style="font-size: 0.73rem; color:#64748b;">Drop static props or living creatures into the WebGL lab and see how animal adaptations alter fluid dynamics!</p>
                     
+                    <div class="group-title">🌍 Select Biome & Terrain</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:6px;">
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('earth')">🌍 Earth Meadow</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('ocean')">🌊 Deep Ocean</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('mars')">🪐 Mars Desert</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('jupiter')">⚡ Jupiter Core</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem; grid-column: span 2;" onclick="setBiome3D('space')">🌌 Outer Space Vacuum</button>
+                    </div>
+
+                    <div class="group-title">🏎️ Engine Vehicles & Aircrafts</div>
+                    <div class="spawn-card" onclick="spawnObject3D('f1car')">
+                        <div class="spawn-icon">🏎️</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">F1 Racing Car</span>
+                            <span class="spawn-details">800 kg • Drives horizontally on ground</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject3D('aircraft')">
+                        <div class="spawn-icon">✈️</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Fighter Jet</span>
+                            <span class="spawn-details">15000 kg • Jets forward & glides</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject3D('submarine')">
+                        <div class="spawn-icon">⚓</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Submarine</span>
+                            <span class="spawn-details">50000 kg • Ballast adjusts buoyancy</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject3D('hotair')">
+                        <div class="spawn-icon">🎈</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Hot Air Balloon</span>
+                            <span class="spawn-details">800 kg • Burner rises periodically</span>
+                        </div>
+                    </div>
+
                     <div class="group-title">🐾 Living Creatures</div>
                     <div class="spawn-card" onclick="spawnObject3D('bird')">
                         <div class="spawn-icon">🦅</div>
@@ -609,7 +647,7 @@
                         <div class="spawn-icon">🐟</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Wiggling Fish</span>
-                            <span class="spawn-details">1.2 kg • Dense • Wiggles tail fin</span>
+                            <span class="spawn-details">1.2 kg • Streamlined body</span>
                         </div>
                     </div>
                     <div class="spawn-card" onclick="spawnObject3D('squirrel')">
@@ -623,7 +661,7 @@
                         <div class="spawn-icon">🐘</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Heavy Elephant</span>
-                            <span class="spawn-details">3000 kg • Rumbles ground on lands</span>
+                            <span class="spawn-details">3000 kg • Shakes ground on lands</span>
                         </div>
                     </div>
 
@@ -632,46 +670,15 @@
                         <div class="spawn-icon">🛠️</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Heavy Anvil</span>
-                            <span class="spawn-details">50.0 kg • Flat & Metallic</span>
+                            <span class="spawn-details">50.0 kg • Solid Steel</span>
                         </div>
                     </div>
                     <div class="spawn-card" onclick="spawnObject3D('bowling')">
                         <div class="spawn-icon" style="color:#818cf8;">🎳</div>
                         <div class="spawn-info">
                             <span class="spawn-name">Bowling Ball</span>
-                            <span class="spawn-details">7.2 kg • Solid Sphere</span>
+                            <span class="spawn-details">7.2 kg • Shiny Sphere</span>
                         </div>
-                    </div>
-                    <div class="spawn-card" onclick="spawnObject3D('balloon')">
-                        <div class="spawn-icon" style="color:#f87171;">🎈</div>
-                        <div class="spawn-info">
-                            <span class="spawn-name">Helium Balloon</span>
-                            <span class="spawn-details">0.003 kg (Shell) • 14L Vol</span>
-                        </div>
-                    </div>
-                    <div class="spawn-card" onclick="spawnObject3D('bubble')">
-                        <div class="spawn-icon" style="color:#38bdf8;">🫧</div>
-                        <div class="spawn-info">
-                            <span class="spawn-name">Soap Bubble</span>
-                            <span class="spawn-details">0.0001 kg • Air Floating</span>
-                        </div>
-                    </div>
-                    <div class="spawn-card" onclick="spawnObject3D('feather')">
-                        <div class="spawn-icon" style="color:#cbd5e1;">🪶</div>
-                        <div class="spawn-info">
-                            <span class="spawn-name">Soft Feather</span>
-                            <span class="spawn-details">0.002 kg • Aerodynamic Drag</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="border-top:1px solid var(--border-color); padding-top:10px;">
-                    <span style="font-size: 0.85rem; font-weight: 700; color: #93c5fd;">Lab Presets</span>
-                    <div class="preset-list" style="margin-top:8px;">
-                        <button class="preset-btn" onclick="loadPreset3D('galileo')">🏛️ Galileo's Vacuum Drop</button>
-                        <button class="preset-btn" onclick="loadPreset3D('terminal')">🌬️ Terminal Velocity Comparison</button>
-                        <button class="preset-btn" onclick="loadPreset3D('buoyancy')">🎈 Archimedean Buoyancy Test</button>
-                        <button class="preset-btn" onclick="loadPreset3D('space')">🛰️ Zero-G Space Drift</button>
                     </div>
                 </div>
             </div>
@@ -681,14 +688,26 @@
                 <p style="font-size:0.75rem; color:#64748b;">Collapse or expand the cards below to study physics sandbox properties:</p>
                 
                 <div class="lesson-card">
-                    <div class="lesson-header" onclick="toggleLesson('lesson5')">
-                        <span>🧬 Biomechanics & Lift</span>
+                    <div class="lesson-header" onclick="toggleLesson('lesson6')">
+                        <span>🌊 Fluid density (Biomes)</span>
                         <span>▼</span>
                     </div>
-                    <div class="lesson-body" id="lesson5">
-                        <p>Living creatures adapt to gravity and fluid dynamics in fascinating ways:</p>
-                        <p>● <strong>Active Wing Flapping (Bird)</strong>: Flapping pushes air downward, generating a counter-acting upward <strong>lift force</strong>. In this sandbox, a falling bird flaps to add upward force, slowing its fall drastically.</p>
-                        <p>● <strong>Gliding Membranes (Squirrel)</strong>: Animals like flying squirrels increase their surface area dynamically. In flight, they stretch skin membranes, causing their drag coefficient ($C_d$) to jump from $0.6$ to $1.6$, trapping air to glide safely.</p>
+                    <div class="lesson-body" id="lesson6">
+                        <p>How does medium density alter behavior?</p>
+                        <p>In the <strong>Deep Ocean Biome</strong>, fluid density ($\rho$) leaps from standard air density ($1.2\text{ kg/m}^3$) to **$1000\text{ kg/m}^3$**!</p>
+                        <p>According to Archimedes' Principle, the upward buoyant force ($F_b = \rho V g$) increases by over 800 times. Most lightweight objects float immediately. Only objects denser than water (anvils, bowling balls, submarines) will sink.</p>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="lesson-header" onclick="toggleLesson('lesson7')">
+                        <span>⚙️ Engine Propulsion & Ballast</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="lesson-body" id="lesson7">
+                        <p>Mechanical vehicle physics properties:</p>
+                        <p>● <strong>Submarine Ballast Tanks</strong>: Submarines achieve neutral buoyancy by pumping water in and out of ballast tanks, adjusting their volume density to match the fluid density. Watch it hover in the ocean biome!</p>
+                        <p>● <strong>Jet Engine Thrust</strong>: Aircraft accelerate forward by burning fuel and throwing exhaust backwards. The forward propulsion force overcomes drag.</p>
                     </div>
                 </div>
 
@@ -699,9 +718,8 @@
                     </div>
                     <div class="lesson-body" id="lesson1">
                         <p>In a vacuum (air density = 0), all objects fall with the exact same constant gravitational acceleration, regardless of their weight!</p>
-                        <p>This is because the gravitational force is directly proportional to mass ($F = m \cdot g$), but acceleration is $a = F/m$. Substituting these together, the mass variable cancels out mathematically:</p>
                         <span class="lesson-formula">a = F / m = (m * g) / m = g</span>
-                        <p>Use the <strong>Vacuum Drop</strong> preset to drop an anvil and a feather together without air resistance, proving they land simultaneously.</p>
+                        <p>Drop an anvil and a bowling ball in space to prove they accelerate identically.</p>
                     </div>
                 </div>
 
@@ -713,22 +731,7 @@
                     <div class="lesson-body" id="lesson2">
                         <p>When dropping objects in normal atmosphere, a friction force called <strong>fluid drag</strong> ($F_d$) acts in opposition to the velocity vector:</p>
                         <span class="lesson-formula">Fd = 0.5 * ρ * v² * Cd * A</span>
-                        <p>As the object accelerates, its speed ($v$) increases, which increases drag. Eventually, the upward drag force equals the downward gravitational force.</p>
-                        <p>At this point, the net force is zero ($F_{net} = 0$), acceleration stops, and the object travels at a constant terminal velocity ($V_t$).</p>
-                    </div>
-                </div>
-
-                <div class="lesson-card">
-                    <div class="lesson-header" onclick="toggleLesson('lesson3')">
-                        <span>3. Archimedes' Buoyancy</span>
-                        <span>▼</span>
-                    </div>
-                    <div class="lesson-body" id="lesson3">
-                        <p>Fluid pressure increases with depth, producing a net upward force called the <strong>buoyant force</strong> ($F_b$).</p>
-                        <p>Archimedes' Principle states that this force equals the weight of the fluid displaced by the object:</p>
-                        <span class="lesson-formula">Fb = ρ * V * g</span>
-                        <p>A helium balloon floats upward because its displaced volume is large, making $F_b$ greater than the gravitational pull of its very light latex shell.</p>
-                        <p>If you remove air density, $F_b$ drops to zero, and the helium balloon falls to the ground like a stone!</p>
+                        <p>As speed ($v$) increases, drag increases until upward drag equals downward gravity ($F_d = F_g$). At this point, net force is zero and velocity remains constant.</p>
                     </div>
                 </div>
             </div>
@@ -740,7 +743,7 @@
             <div class="canvas-hud-top">
                 <div class="canvas-badge">
                     <span style="color:#a78bfa;">Atmosphere:</span>
-                    <span id="hud-env">Earth (Normal)</span>
+                    <span id="hud-env">Earth Meadow (Normal)</span>
                 </div>
                 <div class="canvas-badge">
                     <span style="color:#0ea5e9;">Wind:</span>
@@ -807,10 +810,10 @@
                     <!-- Air Density -->
                     <div class="slider-card">
                         <div class="slider-label">
-                            <span>Air Density (Fluid ρ)</span>
+                            <span>Fluid Density (ρ)</span>
                             <span><span class="slider-value" id="val-density">1.2</span> kg/m³</span>
                         </div>
-                        <input type="range" class="input-slider" id="slide-density" min="0" max="5" step="0.1" value="1.2" oninput="updateSliders3D()">
+                        <input type="range" class="input-slider" id="slide-density" min="0" max="1000" step="1" value="1.2" oninput="updateSliders3D()">
                     </div>
 
                     <!-- Wind Speed -->
@@ -921,7 +924,7 @@
                 gain.connect(this.ctx.destination);
 
                 if (mass >= 40) {
-                    // Anvil
+                    // Anvil / Vehicles
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(80, this.ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(10, this.ctx.currentTime + 0.35);
@@ -948,7 +951,7 @@
                     osc.start();
                     osc.stop(this.ctx.currentTime + 0.25);
                 } else {
-                    // Balloon / small animal landing
+                    // Balloon
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(440, this.ctx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.1);
@@ -981,117 +984,129 @@
                 osc.stop(this.ctx.currentTime + 0.06);
             }
 
-            // Synth animal tweets
             playBirdChirp() {
                 this.init();
                 if (!this.ctx) return;
-
                 const now = this.ctx.currentTime;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
-
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(800, now);
                 osc.frequency.exponentialRampToValueAtTime(1600, now + 0.08);
-                osc.frequency.exponentialRampToValueAtTime(1000, now + 0.15);
-
                 gain.gain.setValueAtTime(0.06, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
-
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 osc.start(now);
-                osc.stop(now + 0.18);
+                osc.stop(now + 0.12);
             }
 
             playFishSplash() {
                 this.init();
                 if (!this.ctx) return;
-
                 const now = this.ctx.currentTime;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-                const filter = this.ctx.createBiquadFilter();
-
-                osc.connect(filter);
-                filter.connect(gain);
+                osc.connect(gain);
                 gain.connect(this.ctx.destination);
-
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(180, now);
-                osc.frequency.exponentialRampToValueAtTime(40, now + 0.15);
-
-                filter.type = 'bandpass';
-                filter.frequency.setValueAtTime(250, now);
-                filter.frequency.exponentialRampToValueAtTime(80, now + 0.15);
-
-                gain.gain.setValueAtTime(0.12, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
-
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
                 osc.start(now);
-                osc.stop(now + 0.18);
+                osc.stop(now + 0.12);
             }
 
             playSquirrelSqueak() {
                 this.init();
                 if (!this.ctx) return;
-
                 const now = this.ctx.currentTime;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
-
-                osc.type = 'triangle';
+                osc.type = 'sine';
                 osc.frequency.setValueAtTime(1000, now);
                 osc.frequency.exponentialRampToValueAtTime(1500, now + 0.05);
-
-                gain.gain.setValueAtTime(0.04, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
-
+                gain.gain.setValueAtTime(0.03, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
                 osc.start(now);
-                osc.stop(now + 0.08);
+                osc.stop(now + 0.07);
             }
 
             playElephantCall() {
                 this.init();
                 if (!this.ctx) return;
-
                 const now = this.ctx.currentTime;
-                // Double oscillator for brassy elephant trumpet
                 const osc1 = this.ctx.createOscillator();
                 const osc2 = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 const filter = this.ctx.createBiquadFilter();
-
                 osc1.type = 'sawtooth';
                 osc2.type = 'sawtooth';
-
-                osc1.frequency.setValueAtTime(200, now);
-                osc1.frequency.linearRampToValueAtTime(280, now + 0.15);
-                osc1.frequency.exponentialRampToValueAtTime(150, now + 0.45);
-
-                osc2.frequency.setValueAtTime(205, now);
-                osc2.frequency.linearRampToValueAtTime(288, now + 0.15);
-                osc2.frequency.exponentialRampToValueAtTime(152, now + 0.45);
-
+                osc1.frequency.setValueAtTime(180, now);
+                osc1.frequency.linearRampToValueAtTime(260, now + 0.15);
+                osc1.frequency.exponentialRampToValueAtTime(120, now + 0.45);
+                osc2.frequency.setValueAtTime(185, now);
+                osc2.frequency.linearRampToValueAtTime(268, now + 0.15);
+                osc2.frequency.exponentialRampToValueAtTime(122, now + 0.45);
                 filter.type = 'peaking';
                 filter.frequency.setValueAtTime(800, now);
-
                 osc1.connect(filter);
                 osc2.connect(filter);
                 filter.connect(gain);
                 gain.connect(this.ctx.destination);
-
                 gain.gain.setValueAtTime(0.18, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-
                 osc1.start(now);
                 osc2.start(now);
                 osc1.stop(now + 0.5);
                 osc2.stop(now + 0.5);
+            }
+
+            // Sonar ping sound for submarine
+            playSonarPing() {
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1200, now);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                osc.start(now);
+                osc.stop(now + 1.25);
+            }
+
+            // High pitch engine whine for F1 car
+            playF1Engine(speedPercent) {
+                this.init();
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                const baseFreq = 100 + speedPercent * 350;
+                osc.frequency.setValueAtTime(baseFreq, now);
+                osc.frequency.linearRampToValueAtTime(baseFreq + 20, now + 0.05);
+                
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(baseFreq * 2.5, now);
+                
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                gain.gain.setValueAtTime(0.02 * speedPercent, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                
+                osc.start(now);
+                osc.stop(now + 0.07);
             }
         }
 
@@ -1173,12 +1188,10 @@
         scene.add(dirLight);
 
         // Grid Chamber Box representation
-        // Chamber dimensions: 16m wide (X: -8 to 8), 16m high (Y: 0 to 16), 16m deep (Z: -8 to 8)
         const gridHelper = new THREE.GridHelper(16, 16, 0x8b5cf6, 0x334155);
         gridHelper.position.y = 0.01;
         scene.add(gridHelper);
 
-        // Glowing metal corner boundary framework
         const boundsGeometry = new THREE.BoxGeometry(16, 16, 16);
         const boundsEdges = new THREE.EdgesGeometry(boundsGeometry);
         const boundsLine = new THREE.LineSegments(boundsEdges, new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.3 }));
@@ -1188,7 +1201,7 @@
         // Flat dark steel ground platform
         const groundGeo = new THREE.PlaneGeometry(30, 30);
         const groundMat = new THREE.MeshStandardMaterial({ 
-            color: 0x0f172a, 
+            color: 0x15803d, // meadow green by default
             roughness: 0.7, 
             metalness: 0.2 
         });
@@ -1198,11 +1211,9 @@
         scene.add(ground);
 
         // Height Ruler markers in 3D
-        // Draw ticks every 2 meters
         const ticksGroup = new THREE.Group();
         const rulerMat = new THREE.MeshBasicMaterial({ color: 0x64748b });
         for (let y = 2; y <= 16; y += 2) {
-            // horizontal tick cylinders
             const tickGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.6, 8);
             const tick = new THREE.Mesh(tickGeo, rulerMat);
             tick.rotation.z = Math.PI / 2;
@@ -1230,7 +1241,7 @@
         let selectedObject3D = null;
         let draggedObject3D = null;
 
-        // Visual effects (camera rumbling for elephant landing)
+        // Visual effects
         let cameraRumbleIntensity = 0;
 
         // Interaction Raycasting
@@ -1245,83 +1256,350 @@
         let flickVelocity = new THREE.Vector3();
 
         // 2D Plotter variables
-        const chartCanvas = document.getElementById('chart-canvas');
-        const chartCtx = chartCanvas.getContext('2d');
         let chartType = 'velocity';
         let chartHistory = [];
         let totalSimTime = 0;
 
+        // Biomes specifications
+        const BIOMES = {
+            earth: {
+                name: "Earth Meadow",
+                gravity: 9.8,
+                density: 1.2,
+                bounce: 0.60,
+                color: 0x15803d, // Meadow Green
+                fogColor: 0x080c14,
+                description: "Standard Earth conditions. Grassy ground. Moderately dense air."
+            },
+            ocean: {
+                name: "Deep Ocean",
+                gravity: 9.8,
+                density: 1000.0, // Water density is 1000 kg/m^3!
+                bounce: 0.10,     // Low bounce in thick water
+                color: 0x1d4ed8, // Water Blue
+                fogColor: 0x071120,
+                description: "Submerged in water. Buoyant forces are massive! Most objects will float."
+            },
+            mars: {
+                name: "Mars Desert",
+                gravity: 3.7,
+                density: 0.02, // thin atmosphere
+                bounce: 0.50,
+                color: 0xb45309, // Rust red desert
+                fogColor: 0x170b06,
+                description: "Low gravity and thin carbon dioxide air. Feathers fall almost like rocks."
+            },
+            jupiter: {
+                name: "Jupiter Core",
+                gravity: 24.8,
+                density: 5.0, // thick super-dense fluid
+                bounce: 0.20,
+                color: 0x7c2d12, // Liquid core
+                fogColor: 0x240e05,
+                description: "Crushing gravity and extremely dense metallic fluid atmosphere."
+            },
+            space: {
+                name: "Outer Space",
+                gravity: 0.0,
+                density: 0.0, // vacuum
+                bounce: 0.80,
+                color: 0x020617, // Space black
+                fogColor: 0x000000,
+                description: "Zero gravity and vacuum. Objects drift endlessly in a straight line."
+            }
+        };
+
         // 3D Object Templates
         const TEMPLATES_3D = {
+            f1car: {
+                name: 'F1 Racing Car',
+                mass: 800.0,
+                volume: 0.8,
+                radius: 0.8,
+                dragCoeff: 0.70,
+                elasticity: 0.20,
+                color: 0xef4444,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    
+                    // Main aerodynamic body
+                    const chassis = new THREE.Mesh(
+                        new THREE.BoxGeometry(1.5, 0.2, 0.6),
+                        new THREE.MeshStandardMaterial({ color: 0xd92626, roughness: 0.2, metalness: 0.8 })
+                    );
+                    chassis.castShadow = true;
+                    group.add(chassis);
+
+                    // Spoiler rear wing
+                    const spoiler = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.2, 0.3, 0.8),
+                        new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.5 })
+                    );
+                    spoiler.position.set(-0.7, 0.2, 0);
+                    spoiler.castShadow = true;
+                    group.add(spoiler);
+
+                    // Front nose cone wing
+                    const nose = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.3, 0.1, 0.7),
+                        new THREE.MeshStandardMaterial({ color: 0xd92626, roughness: 0.2 })
+                    );
+                    nose.position.set(0.8, -0.05, 0);
+                    nose.castShadow = true;
+                    group.add(nose);
+
+                    // 4 Wheels
+                    const wheelGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.18, 12);
+                    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 });
+                    
+                    const w1 = new THREE.Mesh(wheelGeo, wheelMat); w1.name = "w1"; w1.rotation.x = Math.PI/2; w1.position.set(0.5, -0.1, 0.35);
+                    const w2 = new THREE.Mesh(wheelGeo, wheelMat); w2.name = "w2"; w2.rotation.x = Math.PI/2; w2.position.set(0.5, -0.1, -0.35);
+                    const w3 = new THREE.Mesh(wheelGeo, wheelMat); w3.name = "w3"; w3.rotation.x = Math.PI/2; w3.position.set(-0.5, -0.1, 0.35);
+                    const w4 = new THREE.Mesh(wheelGeo, wheelMat); w4.name = "w4"; w4.rotation.x = Math.PI/2; w4.position.set(-0.5, -0.1, -0.35);
+                    
+                    w1.castShadow = w2.castShadow = w3.castShadow = w4.castShadow = true;
+                    group.add(w1, w2, w3, w4);
+
+                    return group;
+                },
+                behavior: (obj, dt) => {
+                    const floorLimit = obj.radius;
+                    if (obj.y <= floorLimit + 0.05 && !obj.isDragging) {
+                        // Accelerate forward using engine thrust!
+                        const thrustAcc = 8.0 * DT;
+                        
+                        // Drive relative to wind or orientation
+                        obj.vx += thrustAcc;
+                        
+                        // Rotates wheels
+                        const wheels = ["w1", "w2", "w3", "w4"];
+                        wheels.forEach(name => {
+                            const w = obj.mesh.getObjectByName(name);
+                            if (w) w.rotateZ(-obj.vx * 0.1);
+                        });
+
+                        // Play engine roar pitch proportional to speed
+                        const speedPercent = Math.min(Math.abs(obj.vx) / 15, 1.0);
+                        if (Math.random() < 0.2) {
+                            synth.playF1Engine(speedPercent);
+                        }
+                    }
+                }
+            },
+            aircraft: {
+                name: 'Fighter Jet',
+                mass: 15000.0,
+                volume: 12.0,
+                radius: 1.2,
+                dragCoeff: 0.05, // super streamlined
+                elasticity: 0.10,
+                color: 0x94a3b8,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    
+                    // Nose Cone fuselage
+                    const jet = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.25, 1.8, 8),
+                        new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.4, metalness: 0.6 })
+                    );
+                    jet.rotation.z = -Math.PI / 2;
+                    jet.castShadow = true;
+                    group.add(jet);
+
+                    // Delta Wings
+                    const wing = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.8, 0.02, 1.6),
+                        new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.4 })
+                    );
+                    wing.position.set(-0.2, 0, 0);
+                    wing.castShadow = true;
+                    group.add(wing);
+
+                    // Flame Exhaust glowing cone
+                    const flame = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.15, 0.5, 8),
+                        new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.8 })
+                    );
+                    flame.rotation.z = Math.PI / 2;
+                    flame.position.set(-1.15, 0, 0);
+                    flame.name = "flame";
+                    group.add(flame);
+
+                    return group;
+                },
+                behavior: (obj, dt) => {
+                    // Aircraft flies if in fluid atmosphere!
+                    if (airDensity > 0 && !obj.isDragging) {
+                        const jetSpeed = Math.abs(obj.vx);
+                        // Forward thrust accelerates Jet!
+                        if (jetSpeed < 18) {
+                            obj.vx += 12.0 * DT;
+                        }
+
+                        // WING LIFT: generates upward lift proportional to speed squared
+                        const liftForce = 0.5 * airDensity * (obj.vx * obj.vx) * 0.45 * 0.8; 
+                        const liftAcc = liftForce / obj.mass;
+                        obj.vy += liftAcc * DT;
+
+                        // Animate flame glow flicker
+                        const flame = obj.mesh.getObjectByName("flame");
+                        if (flame) {
+                            flame.scale.set(1, 0.8 + Math.random() * 0.4, 1);
+                        }
+                    }
+                }
+            },
+            submarine: {
+                name: 'Submarine',
+                mass: 50000.0,
+                volume: 51.0, // density close to water (1000 kg/m^3)
+                radius: 1.3,
+                dragCoeff: 0.15,
+                elasticity: 0.10,
+                color: 0xfacc15,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    
+                    // Main Sub hull cylinder
+                    const hull = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.35, 0.35, 1.8, 16),
+                        new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.3, metalness: 0.2 })
+                    );
+                    hull.rotation.z = Math.PI / 2;
+                    hull.castShadow = true;
+                    group.add(hull);
+
+                    // Conning tower/sail
+                    const sail = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.3, 0.4, 0.25),
+                        new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.3 })
+                    );
+                    sail.position.set(0.2, 0.4, 0);
+                    sail.castShadow = true;
+                    group.add(sail);
+
+                    // Propeller blades at rear (wiggles)
+                    const prop = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.05, 0.4, 0.1),
+                        new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 })
+                    );
+                    prop.name = "prop";
+                    prop.position.set(-1.0, 0, 0);
+                    group.add(prop);
+
+                    return group;
+                },
+                behavior: (obj, dt) => {
+                    // Submarine ballast system adjusts displaced volume to achieve neutral buoyancy!
+                    // It will try to float neutrally at the current fluid density
+                    if (airDensity > 0 && !obj.isDragging) {
+                        // Dynamically adjusts volume displacement to match mass / fluid density
+                        const targetVol = obj.mass / airDensity;
+                        // Bob slightly around neutral ballast
+                        const bobbingFactor = 1.0 + Math.sin(Date.now() * 0.0025) * 0.03;
+                        obj.volume = targetVol * bobbingFactor;
+
+                        // Wiggle propeller
+                        const prop = obj.mesh.getObjectByName("prop");
+                        if (prop) prop.rotateX(0.25);
+
+                        // Sonar pings
+                        if (Math.random() < 0.004) synth.playSonarPing();
+                    }
+                }
+            },
+            hotair: {
+                name: 'Hot Air Balloon',
+                mass: 800.0,
+                volume: 2200.0,
+                radius: 1.8,
+                dragCoeff: 0.47,
+                elasticity: 0.30,
+                color: 0xef4444,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    
+                    // Giant striped envelope sphere
+                    const envelope = new THREE.Mesh(
+                        new THREE.SphereGeometry(1.6, 24, 24),
+                        new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.5 })
+                    );
+                    envelope.position.y = 1.2;
+                    envelope.scale.set(1, 1.25, 1);
+                    envelope.castShadow = true;
+                    group.add(envelope);
+
+                    // Basket box
+                    const basket = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.5, 0.4, 0.5),
+                        new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.9 })
+                    );
+                    basket.position.y = -1.2;
+                    basket.castShadow = true;
+                    group.add(basket);
+
+                    // Burner flame
+                    const flame = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.12, 0.4, 8),
+                        new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.0 })
+                    );
+                    flame.name = "flame";
+                    flame.position.y = -0.8;
+                    group.add(flame);
+
+                    return group;
+                },
+                behavior: (obj, dt) => {
+                    const flame = obj.mesh.getObjectByName("flame");
+                    
+                    // Burner triggers periodically to heat air and expand envelope volume (buoyancy)
+                    const cycle = Date.now() % 5000;
+                    if (cycle < 2000 && airDensity > 0 && !obj.isDragging) {
+                        // Burner ON: volume expands due to heated gas density delta!
+                        obj.volume = 2600.0;
+                        if (flame) {
+                            flame.material.opacity = 0.85;
+                            flame.scale.set(1, 0.8 + Math.random() * 0.4, 1);
+                        }
+                    } else {
+                        // Burner OFF: gas cools, volume shrinks back
+                        obj.volume = 2000.0;
+                        if (flame) flame.material.opacity = 0.0;
+                    }
+                }
+            },
             bird: {
                 name: 'Flapping Bird',
                 mass: 0.8,
                 volume: 0.0018,
                 radius: 0.5,
-                dragCoeff: 0.6, // base drag coefficient without flapping
+                dragCoeff: 0.6,
                 elasticity: 0.35,
                 color: 0x38bdf8,
                 buildGeometry: () => {
                     const group = new THREE.Group();
-                    
-                    // Bird head/body
-                    const body = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.24, 16, 16),
-                        new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4 })
-                    );
-                    body.castShadow = true;
-                    body.scale.set(1.4, 0.9, 0.9);
-                    group.add(body);
-
-                    // Yellow Beak
-                    const beak = new THREE.Mesh(
-                        new THREE.ConeGeometry(0.08, 0.2, 8),
-                        new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.2 })
-                    );
-                    beak.rotation.z = -Math.PI / 2;
-                    beak.position.set(0.3, 0, 0);
-                    group.add(beak);
-
-                    // Wing Left (flapping mesh part)
-                    const wingLeft = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.5, 0.02, 0.3),
-                        new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.5 })
-                    );
-                    wingLeft.position.set(0, 0, -0.25);
-                    wingLeft.name = "wingL";
-                    group.add(wingLeft);
-
-                    // Wing Right
-                    const wingRight = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.5, 0.02, 0.3),
-                        new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.5 })
-                    );
-                    wingRight.position.set(0, 0, 0.25);
-                    wingRight.name = "wingR";
-                    group.add(wingRight);
-
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 16), new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.4 }));
+                    body.castShadow = true; body.scale.set(1.4, 0.9, 0.9); group.add(body);
+                    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.2, 8), new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.2 }));
+                    beak.rotation.z = -Math.PI / 2; beak.position.set(0.3, 0, 0); group.add(beak);
+                    const wingLeft = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.02, 0.3), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.5 }));
+                    wingLeft.position.set(0, 0, -0.25); wingLeft.name = "wingL"; group.add(wingLeft);
+                    const wingRight = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.02, 0.3), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.5 }));
+                    wingRight.position.set(0, 0, 0.25); wingRight.name = "wingR"; group.add(wingRight);
                     return group;
                 },
                 behavior: (obj, dt) => {
-                    // Birds flap wings when falling
                     const left = obj.mesh.getObjectByName("wingL");
                     const right = obj.mesh.getObjectByName("wingR");
-                    
                     if (obj.vy < -0.1 && airDensity > 0 && !obj.isDragging) {
                         const flapSpeed = 22;
                         const wingRot = Math.sin(Date.now() * 0.001 * flapSpeed) * 0.8;
-                        
                         if (left) left.rotation.x = wingRot;
                         if (right) right.rotation.x = -wingRot;
-
-                        // ACTIVE LIFT FORCE: flap generates upward lift thrust proportional to wing sweep and air density!
                         const liftMagnitude = airDensity * 3.8 * Math.abs(obj.vy) * DT;
                         obj.vy += liftMagnitude / obj.mass;
-
-                        // Periodically tweet
                         if (Math.random() < 0.006) synth.playBirdChirp();
                     } else {
-                        // rest wings
                         if (left) left.rotation.x = 0;
                         if (right) right.rotation.x = 0;
                     }
@@ -1330,34 +1608,17 @@
             fish: {
                 name: 'Wiggling Fish',
                 mass: 1.2,
-                volume: 0.0012, // slightly denser than water/air (sinker)
+                volume: 0.0012,
                 radius: 0.45,
-                dragCoeff: 0.25, // very aerodynamic / hydro-streamlined
+                dragCoeff: 0.25,
                 elasticity: 0.15,
                 color: 0xf97316,
                 buildGeometry: () => {
                     const group = new THREE.Group();
-                    
-                    // Body
-                    const body = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.25, 16, 16),
-                        new THREE.MeshStandardMaterial({ color: 0xe04f16, roughness: 0.2, metalness: 0.1 })
-                    );
-                    body.scale.set(1.5, 0.8, 0.6);
-                    body.castShadow = true;
-                    group.add(body);
-
-                    // Tail joint container (wiggles)
-                    const tailFin = new THREE.Mesh(
-                        new THREE.ConeGeometry(0.12, 0.3, 4),
-                        new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.3 })
-                    );
-                    tailFin.rotation.z = Math.PI / 2;
-                    tailFin.position.set(-0.45, 0, 0);
-                    tailFin.name = "tail";
-                    tailFin.castShadow = true;
-                    group.add(tailFin);
-
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 16), new THREE.MeshStandardMaterial({ color: 0xe04f16, roughness: 0.2, metalness: 0.1 }));
+                    body.scale.set(1.5, 0.8, 0.6); body.castShadow = true; group.add(body);
+                    const tailFin = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.3, 4), new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.3 }));
+                    tailFin.rotation.z = Math.PI / 2; tailFin.position.set(-0.45, 0, 0); tailFin.name = "tail"; tailFin.castShadow = true; group.add(tailFin);
                     return group;
                 },
                 behavior: (obj, dt) => {
@@ -1365,8 +1626,6 @@
                     if (tail && Math.abs(obj.vx) + Math.abs(obj.vy) > 0.1 && !obj.isDragging) {
                         const wiggle = Math.sin(Date.now() * 0.015) * 0.5;
                         tail.rotation.y = wiggle;
-
-                        // Squeak splash sometimes
                         if (Math.random() < 0.005) synth.playFishSplash();
                     }
                 }
@@ -1376,98 +1635,47 @@
                 mass: 0.35,
                 volume: 0.0008,
                 radius: 0.4,
-                dragCoeff: 0.60, // starts compact
-                elasticity: 0.3,
+                dragCoeff: 0.60,
+                elasticity: 0.30,
                 color: 0xd97706,
                 buildGeometry: () => {
                     const group = new THREE.Group();
-                    
-                    // Squirrel body
-                    const body = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.2, 16, 16),
-                        new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.6 })
-                    );
-                    body.scale.set(1.3, 0.9, 0.9);
-                    body.castShadow = true;
-                    group.add(body);
-
-                    // Fluffy tail
-                    const tail = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.15, 8, 8),
-                        new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.8 })
-                    );
-                    tail.position.set(-0.35, 0.1, 0);
-                    tail.scale.set(1.6, 0.8, 0.8);
-                    group.add(tail);
-
-                    // Gliding skin flap membrane (scale up when falling to represent extension!)
-                    const flap = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.4, 0.01, 0.5),
-                        new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.6, transparent: true, opacity: 0.0 })
-                    );
-                    flap.name = "flap";
-                    flap.position.set(0, -0.05, 0);
-                    group.add(flap);
-
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.6 }));
+                    body.scale.set(1.3, 0.9, 0.9); body.castShadow = true; group.add(body);
+                    const tail = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.8 }));
+                    tail.position.set(-0.35, 0.1, 0); tail.scale.set(1.6, 0.8, 0.8); group.add(tail);
+                    const flap = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.01, 0.5), new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.6, transparent: true, opacity: 0.0 }));
+                    flap.name = "flap"; flap.position.set(0, -0.05, 0); group.add(flap);
                     return group;
                 },
                 behavior: (obj, dt) => {
                     const flap = obj.mesh.getObjectByName("flap");
-                    // Glides when falling fast in fluid!
                     if (obj.vy < -1.5 && airDensity > 0 && !obj.isDragging) {
-                        obj.dragCoeff = 1.60; // DYNAMIC DRAG ADAPTATION! Membrane catches air
-                        if (flap) {
-                            flap.material.opacity = 0.65; // show stretched membrane
-                        }
-                        // squirrel squeaks
+                        obj.dragCoeff = 1.60;
+                        if (flap) flap.material.opacity = 0.65;
                         if (Math.random() < 0.007) synth.playSquirrelSqueak();
                     } else {
-                        obj.dragCoeff = 0.60; // compact
+                        obj.dragCoeff = 0.60;
                         if (flap) flap.material.opacity = 0.0;
                     }
                 }
             },
             elephant: {
                 name: 'Heavy Elephant',
-                mass: 3000.0, // MASSIVE!
+                mass: 3000.0,
                 volume: 3.2,
                 radius: 1.2,
                 dragCoeff: 1.15,
-                elasticity: 0.1, // dead bounce
+                elasticity: 0.10,
                 color: 0x94a3b8,
                 buildGeometry: () => {
                     const group = new THREE.Group();
-                    
-                    // Giant body
-                    const body = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.9, 16, 16),
-                        new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7 })
-                    );
-                    body.scale.set(1.3, 1, 1);
-                    body.position.y = 0.3;
-                    body.castShadow = true;
-                    group.add(body);
-
-                    // Massive Head
-                    const head = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.5, 12, 12),
-                        new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7 })
-                    );
-                    head.position.set(1.0, 0.4, 0);
-                    head.castShadow = true;
-                    group.add(head);
-
-                    // Trunk
-                    const trunk = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.08, 0.14, 0.8, 8),
-                        new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7 })
-                    );
-                    trunk.position.set(1.4, 0.0, 0);
-                    trunk.rotation.z = -Math.PI / 6;
-                    trunk.castShadow = true;
-                    group.add(trunk);
-
-                    // 4 chunky legs
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.9, 16, 16), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7 }));
+                    body.scale.set(1.3, 1, 1); body.position.y = 0.3; body.castShadow = true; group.add(body);
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 12), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7 }));
+                    head.position.set(1.0, 0.4, 0); head.castShadow = true; group.add(head);
+                    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.14, 0.8, 8), new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.7 }));
+                    trunk.position.set(1.4, 0.0, 0); trunk.rotation.z = -Math.PI / 6; trunk.castShadow = true; group.add(trunk);
                     const legGeo = new THREE.CylinderGeometry(0.18, 0.22, 0.7, 8);
                     const legMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8 });
                     const l1 = new THREE.Mesh(legGeo, legMat); l1.position.set(0.5, -0.5, 0.4);
@@ -1476,12 +1684,7 @@
                     const l4 = new THREE.Mesh(legGeo, legMat); l4.position.set(-0.5, -0.5, -0.4);
                     l1.castShadow = l2.castShadow = l3.castShadow = l4.castShadow = true;
                     group.add(l1, l2, l3, l4);
-
                     return group;
-                },
-                behavior: (obj, dt) => {
-                    // Elephants drop like meteorites, check floor collision in main physics
-                    // to play a giant trumpeting roar
                 }
             },
             anvil: {
@@ -1639,14 +1842,12 @@
 
             update(dt) {
                 if (this.isDragging) {
-                    // Update outline mesh while dragging
                     this.mesh.position.set(this.x, this.y, this.z);
                     this.outline.update();
                     this.updateArrows();
                     return;
                 }
 
-                // Apply dynamic creature behaviors (flapping, gliding, etc.)
                 if (this.behavior) {
                     this.behavior(this, dt);
                 }
@@ -1660,7 +1861,6 @@
                 this.fb = airDensity * this.volume * g_accel;
 
                 // 3. 3D Air drag vector mapping relative wind
-                // wind calculations based on horizontal speed and angle
                 const windRad = windAngle * Math.PI / 180;
                 const windVx = windSpeed * Math.cos(windRad);
                 const windVz = windSpeed * Math.sin(windRad);
@@ -1746,15 +1946,15 @@
                 // Update Three.js mesh transforms
                 this.mesh.position.set(this.x, this.y, this.z);
                 
-                // Rotations in flight (especially feathers and balloons sway)
+                // Rotations in flight
                 if (this.name === 'Feather') {
                     const flutter = Math.sin(Date.now() * 0.004) * 0.4;
                     this.mesh.rotation.set(flutter, 0, flutter * 0.5);
                 } else if (this.name === 'Helium Balloon') {
                     const sway = Math.sin(Date.now() * 0.003) * 0.15 * (windSpeed + 1);
                     this.mesh.rotation.set(sway, 0, sway);
-                } else if (this.name === 'Flapping Bird' || this.name === 'Wiggling Fish' || this.name === 'Gliding Squirrel') {
-                    // Turn faces the movement direction
+                } else if (this.name === 'Flapping Bird' || this.name === 'Wiggling Fish' || this.name === 'Gliding Squirrel' || this.name === 'Fighter Jet' || this.name === 'Submarine') {
+                    // Turn faces the movement direction in 3D
                     if (Math.hypot(this.vx, this.vz) > 0.1) {
                         const angle = Math.atan2(-this.vz, this.vx);
                         this.mesh.rotation.y = angle;
@@ -1816,7 +2016,7 @@
                 const vMag = Math.hypot(this.vx, this.vy, this.vz);
                 if (vMag > 0.01 && showVectors) {
                     const dragDir = new THREE.Vector3(-this.vx, -this.vy, -this.vz).normalize();
-                    const fdLen = this.fdMag * vectorScale * 2; // amplify visually
+                    const fdLen = this.fdMag * vectorScale * 2;
                     this.arrowFd.setDirection(dragDir);
                     this.arrowFd.setLength(Math.max(0.1, fdLen), Math.min(0.2, fdLen*0.4), 0.05);
                     this.arrowFd.visible = fdLen > 0.01;
@@ -1896,9 +2096,9 @@
             const template = TEMPLATES_3D[type];
             if (!template) return;
 
-            // Spawn random X/Z, top-level Y
             const rx = (Math.random() - 0.5) * 8;
-            const ry = 12 + Math.random() * 3;
+            // Hot air balloon starts lower, aircraft/birds start higher
+            const ry = (type === 'hotair' || type === 'submarine') ? 2 + Math.random() * 2 : 12 + Math.random() * 3;
             const rz = (Math.random() - 0.5) * 8;
 
             const newObj = new PhysicsObject3D(rx, ry, rz, template);
@@ -1909,7 +2109,6 @@
         }
 
         function selectObject(obj) {
-            // Unselect previous
             activeObjects3D.forEach(o => o.outline.visible = false);
             selectedObject3D = obj;
             if (selectedObject3D) {
@@ -1937,12 +2136,30 @@
             controls.update();
         }
 
+        // BIOME MANAGER
+        function setBiome3D(biomeId) {
+            const biome = BIOMES[biomeId];
+            if (!biome) return;
+
+            // Update UI sliders values
+            document.getElementById('slide-gravity').value = biome.gravity;
+            document.getElementById('slide-density').value = biome.density;
+            document.getElementById('slide-bounce').value = biome.bounce;
+            
+            updateSliders3D();
+
+            // Animate visual changes
+            ground.material.color.setHex(biome.color);
+            scene.fog.color.setHex(biome.fogColor);
+            renderer.setClearColor(biome.fogColor);
+        }
+
         function updateSliders3D() {
             gravity = parseFloat(document.getElementById('slide-gravity').value);
             document.getElementById('val-gravity').innerText = gravity.toFixed(1);
 
             airDensity = parseFloat(document.getElementById('slide-density').value);
-            document.getElementById('val-density').innerText = airDensity.toFixed(1);
+            document.getElementById('val-density').innerText = airDensity;
 
             windSpeed = parseFloat(document.getElementById('slide-wind').value);
             document.getElementById('val-wind').innerText = windSpeed.toFixed(1);
@@ -1965,6 +2182,8 @@
                 envText.innerText = "Vacuum Orbit (0G)";
             } else if (gravity === 0) {
                 envText.innerText = "Zero-G Chamber";
+            } else if (airDensity === 1000) {
+                envText.innerText = "Deep Ocean (Submerged)";
             } else if (airDensity === 0) {
                 envText.innerText = `Vacuum Chamber (${gravity} m/s²)`;
             } else if (gravity === 9.8 && airDensity === 1.2) {
@@ -2013,7 +2232,7 @@
         function updateLiveEquations3D() {
             const container = document.getElementById('calc-body');
             if (!selectedObject3D) {
-                container.innerHTML = `No object selected.<br><span style="color:#64748b;">Click on any falling body in the sandbox to inspect forces and equations in real-time.</span>`;
+                container.innerHTML = `No object selected.<br><span style="color:#64748b;">Click on any body in the sandbox to inspect forces and equations in real-time.</span>`;
                 return;
             }
 
@@ -2076,7 +2295,6 @@
                         const ny = dy / dist;
                         const nz = dz / dist;
 
-                        // Separate overlapping bodies
                         const overlap = minDist - dist;
                         const mSum = o1.mass + o2.mass;
 
@@ -2087,7 +2305,6 @@
                         o2.y += overlap * ny * (o1.mass / mSum);
                         o2.z += overlap * nz * (o1.mass / mSum);
 
-                        // Elastic impulse bounce
                         const rvx = o2.vx - o1.vx;
                         const rvy = o2.vy - o1.vy;
                         const rvz = o2.vz - o1.vz;
@@ -2235,7 +2452,7 @@
 
                 selectObject(activeObjects3D[0]);
             } else if (presetName === 'terminal') {
-                document.getElementById('slide-density').value = 3.5; // Thick atmosphere
+                document.getElementById('slide-density').value = 3.5;
                 document.getElementById('slide-gravity').value = 12.0;
                 updateSliders3D();
 
@@ -2251,19 +2468,16 @@
 
                 selectObject(activeObjects3D[0]);
             } else if (presetName === 'buoyancy') {
-                document.getElementById('slide-density').value = 2.0;
-                document.getElementById('slide-gravity').value = 9.8;
-                document.getElementById('slide-wind').value = 2.5; // wind blows right
-                updateSliders3D();
+                setBiome3D('ocean'); // Set ocean context!
 
-                spawnObject3D('balloon');
-                activeObjects3D[0].x = -2;
-                activeObjects3D[0].y = 2.0; // balloon spawns at bottom
+                spawnObject3D('submarine');
+                activeObjects3D[0].x = -3;
+                activeObjects3D[0].y = 6.0;
                 activeObjects3D[0].z = 0;
 
                 spawnObject3D('bowling');
-                activeObjects3D[1].x = 2;
-                activeObjects3D[1].y = 13;
+                activeObjects3D[1].x = 3;
+                activeObjects3D[1].y = 12;
                 activeObjects3D[1].z = 0;
 
                 selectObject(activeObjects3D[0]);
@@ -2273,14 +2487,14 @@
                 updateSliders3D();
 
                 spawnObject3D('bowling');
-                activeObjects3D[0].x = -2;
+                activeObjects3D[0].x = -3;
                 activeObjects3D[0].y = 7;
                 activeObjects3D[0].z = 0;
                 activeObjects3D[0].vx = 3.0;
                 activeObjects3D[0].vy = -1.0;
 
-                spawnObject3D('fish');
-                activeObjects3D[1].x = 2;
+                spawnObject3D('aircraft');
+                activeObjects3D[1].x = 3;
                 activeObjects3D[1].y = 6;
                 activeObjects3D[1].z = 0;
                 activeObjects3D[1].vx = -2.0;
