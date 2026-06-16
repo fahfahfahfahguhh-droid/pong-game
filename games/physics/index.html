@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumLab - Interactive Physics Sandbox</title>
+    <!-- Modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --panel-bg: rgba(17, 24, 39, 0.75);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-glow: rgba(124, 58, 237, 0.4);
+            
+            --primary: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --success: #10b981;
+            --danger: #ef4444;
+            --info: #0ea5e9;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(124, 58, 237, 0.12) 0, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.1) 0, transparent 50%);
+            min-height: 100vh;
+            color: #f3f4f6;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            animation: spin 6s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #a78bfa, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: #e5e7eb;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: transparent;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.6);
+        }
+
+        /* Main Workspace Grid Layout */
+        .workspace {
+            display: grid;
+            grid-template-columns: 280px 1fr 340px;
+            gap: 20px;
+            padding: 20px;
+            flex-grow: 1;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Glassmorphic Panel Styles */
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #93c5fd;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Left Sidebar: Spawn Library */
+        .spawn-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .spawn-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .spawn-card:hover {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.15);
+        }
+
+        .spawn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .spawn-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .spawn-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f3f4f6;
+        }
+
+        .spawn-details {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        /* Preset Scenarios */
+        .preset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .preset-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            text-align: left;
+            cursor: pointer;
+            color: #d1d5db;
+            transition: all 0.15s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(14, 165, 233, 0.1);
+            border-color: var(--info);
+            color: #fff;
+        }
+
+        /* Center Canvas Sandbox Area */
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+        }
+
+        #sandbox-canvas {
+            background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            height: 600px;
+            cursor: crosshair;
+            box-shadow: inset 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Simulation Controls HUD overlays */
+        .canvas-hud-top {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .canvas-badge {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: auto;
+        }
+
+        .canvas-controls-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            padding: 14px 24px;
+            border-radius: 16px;
+        }
+
+        .control-group-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Custom Toggle Switch */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-switch {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .2s;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .slider-switch:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #fff;
+            transition: .2s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-switch {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider-switch:before {
+            transform: translateX(20px);
+        }
+
+        /* Right Sidebar: Lab Controls & Oscilloscope Chart */
+        .slider-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .slider-value {
+            color: var(--info);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .input-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            margin: 8px 0;
+        }
+
+        .input-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--info);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+            transition: transform 0.1s;
+        }
+
+        .input-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+
+        /* Oscilloscope Chart Canvas */
+        .chart-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        #chart-canvas {
+            background: #05070c;
+            border-radius: 8px;
+            width: 100%;
+            height: 120px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-actions {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Math Physics Equations Display Card */
+        .math-card {
+            background: rgba(124, 58, 237, 0.04);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .math-equation {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.82rem;
+            color: #c084fc;
+            padding: 6px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+
+        .math-calculation {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            line-height: 1.4;
+        }
+
+        .dynamic-value {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Sound controls & general footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #4b5563;
+            font-size: 0.85rem;
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">⚛️</div>
+            <h1>QuantumLab</h1>
+            <span class="btn" style="padding: 2px 8px; font-size: 0.7rem; color: #a78bfa; background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.2); text-transform: uppercase;">Physics Sandbox</span>
+        </div>
+        <div class="header-actions">
+            <a href="../../index.html" class="btn">
+                <span>◀ Back to Arcade</span>
+            </a>
+            <button class="btn btn-primary" onclick="clearSandbox()">Clear Sandbox</button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <div class="workspace">
+
+        <!-- LEFT PANEL: Spawn Library & Presets -->
+        <div class="panel">
+            <div>
+                <div class="panel-title">
+                    <span>1. Spawn Library</span>
+                    <span style="font-size: 0.75rem; color:#64748b;">Click to Drop</span>
+                </div>
+                <p style="font-size: 0.78rem; color:#64748b; margin-top:4px; margin-bottom:12px;">Choose an object to spawn in the lab. Drag, throw, or bump them together!</p>
+                <div class="spawn-grid">
+                    <div class="spawn-card" onclick="spawnObject('anvil')">
+                        <div class="spawn-icon" style="color:#94a3b8;">🛠️</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Anvil</span>
+                            <span class="spawn-details">Massive (50kg) • Aerodynamic</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject('bowling')">
+                        <div class="spawn-icon" style="color:#818cf8;">🎳</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Bowling Ball</span>
+                            <span class="spawn-details">Heavy (7.2kg) • Steel core</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject('football')">
+                        <div class="spawn-icon" style="color:#b45309;">🏈</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Football</span>
+                            <span class="spawn-details">Medium (0.4kg) • Elastic</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject('balloon')">
+                        <div class="spawn-icon" style="color:#f87171;">🎈</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Helium Balloon</span>
+                            <span class="spawn-details">Floats (10g) • High Volume</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject('bubble')">
+                        <div class="spawn-icon" style="color:#38bdf8;">🫧</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Soap Bubble</span>
+                            <span class="spawn-details">Featherweight (0.1g) • Pops</span>
+                        </div>
+                    </div>
+                    <div class="spawn-card" onclick="spawnObject('feather')">
+                        <div class="spawn-icon" style="color:#cbd5e1;">🪶</div>
+                        <div class="spawn-info">
+                            <span class="spawn-name">Feather</span>
+                            <span class="spawn-details">Light (2g) • Air Resistance</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="panel-title">
+                    <span>2. Lab Presets</span>
+                </div>
+                <p style="font-size: 0.78rem; color:#64748b; margin-top:4px; margin-bottom:12px;">Instant setups to demonstrate key physical concepts:</p>
+                <div class="preset-list">
+                    <button class="preset-btn" onclick="loadPreset('galileo')">🏛️ Galileo's Vacuum Drop</button>
+                    <button class="preset-btn" onclick="loadPreset('terminal')">🌬️ Terminal Velocity Plot</button>
+                    <button class="preset-btn" onclick="loadPreset('buoyancy')">🎈 Archimedean Buoyancy</button>
+                    <button class="preset-btn" onclick="loadPreset('space')">🛰️ Zero-G Drift (Space)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER PANEL: Interactive Sandbox Canvas -->
+        <div class="canvas-container">
+            <!-- HUD Overlays -->
+            <div class="canvas-hud-top">
+                <div class="canvas-badge">
+                    <span style="color:#38bdf8;">Environment:</span>
+                    <span id="hud-env">Earth (Normal)</span>
+                </div>
+                <div class="canvas-badge">
+                    <span style="color:#fb7185;">Active Forces:</span>
+                    <span id="hud-forces">Gravity + Drag + Buoyancy</span>
+                </div>
+            </div>
+
+            <!-- Main Canvas -->
+            <canvas id="sandbox-canvas" width="800" height="600"></canvas>
+
+            <!-- Bottom HUD Controls -->
+            <div class="canvas-controls-bottom">
+                <div class="control-group-row">
+                    <button class="btn btn-primary" id="btn-pause" onclick="togglePause()">Pause Sim</button>
+                    <button class="btn" onclick="stepFrame()">Step Frame ⏭️</button>
+                    <button class="btn" onclick="resetForces()">Reset Sliders 🔄</button>
+                </div>
+                <div class="control-group-row">
+                    <label class="switch-container">
+                        <span class="switch">
+                            <input type="checkbox" id="toggle-vectors" checked>
+                            <span class="slider-switch"></span>
+                        </span>
+                        <span>Show Forces (Vectors)</span>
+                    </label>
+                    <label class="switch-container">
+                        <span class="switch">
+                            <input type="checkbox" id="toggle-trails" checked>
+                            <span class="slider-switch"></span>
+                        </span>
+                        <span>Show Trails</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: Lab Adjustments & Chart Readings -->
+        <div class="panel">
+            <div>
+                <div class="panel-title">
+                    <span>3. Lab Environment</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">
+                    <!-- Gravity Slider -->
+                    <div class="slider-card">
+                        <div class="slider-label">
+                            <span>Gravity acceleration</span>
+                            <span><span class="slider-value" id="val-gravity">9.8</span> m/s²</span>
+                        </div>
+                        <input type="range" class="input-slider" id="slide-gravity" min="0" max="25" step="0.1" value="9.8" oninput="updateSliders()">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
+                            <span>Space (0)</span>
+                            <span>Moon (1.6)</span>
+                            <span>Earth (9.8)</span>
+                            <span>Jupiter (24.8)</span>
+                        </div>
+                    </div>
+
+                    <!-- Air Density Slider -->
+                    <div class="slider-card">
+                        <div class="slider-label">
+                            <span>Air Density (Fluid ρ)</span>
+                            <span><span class="slider-value" id="val-density">1.2</span> kg/m³</span>
+                        </div>
+                        <input type="range" class="input-slider" id="slide-density" min="0" max="6" step="0.1" value="1.2" oninput="updateSliders()">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
+                            <span>Vacuum (0)</span>
+                            <span>Thin Air (0.5)</span>
+                            <span>Sea Level (1.2)</span>
+                            <span>Dense Fluid (6)</span>
+                        </div>
+                    </div>
+
+                    <!-- Wind Slider -->
+                    <div class="slider-card">
+                        <div class="slider-label">
+                            <span>Cross Wind Speed</span>
+                            <span><span class="slider-value" id="val-wind">0</span> m/s</span>
+                        </div>
+                        <input type="range" class="input-slider" id="slide-wind" min="-15" max="15" step="0.5" value="0" oninput="updateSliders()">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
+                            <span>⬅ Left (-15)</span>
+                            <span>None (0)</span>
+                            <span>Right (15) ➡</span>
+                        </div>
+                    </div>
+
+                    <!-- Elasticity Slider -->
+                    <div class="slider-card">
+                        <div class="slider-label">
+                            <span>Surface Bounciness (CoR)</span>
+                            <span><span class="slider-value" id="val-bounce">0.60</span></span>
+                        </div>
+                        <input type="range" class="input-slider" id="slide-bounce" min="0" max="1" step="0.05" value="0.6" oninput="updateSliders()">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
+                            <span>Clay (0)</span>
+                            <span>Rubber (0.6)</span>
+                            <span>Superball (1.0)</span>
+                        </div>
+                    </div>
+
+                    <!-- Slow Motion Slider -->
+                    <div class="slider-card">
+                        <div class="slider-label">
+                            <span>Time Scale (Speed)</span>
+                            <span><span class="slider-value" id="val-timescale">1.0</span>x</span>
+                        </div>
+                        <input type="range" class="input-slider" id="slide-timescale" min="0.1" max="1.5" step="0.1" value="1" oninput="updateSliders()">
+                        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
+                            <span>Slow Mo (0.1x)</span>
+                            <span>Normal (1.0x)</span>
+                            <span>Fast (1.5x)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Readings Chart -->
+            <div class="chart-box">
+                <div class="panel-title" style="border:none; padding:0;">
+                    <span>4. Oscilloscope Plotter</span>
+                    <span style="font-size:0.75rem; color:#10b981; animation: blink 2s infinite;">● Live</span>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:2px;">
+                    <button class="btn" style="flex:1; padding:4px 8px; font-size:0.75rem;" id="chart-y-height" onclick="setChartType('height')">Height Plot</button>
+                    <button class="btn" style="flex:1; padding:4px 8px; font-size:0.75rem;" id="chart-y-velocity" onclick="setChartType('velocity')">Velocity Plot</button>
+                </div>
+                <canvas id="chart-canvas" width="310" height="120"></canvas>
+                <div class="chart-actions">
+                    <span id="chart-desc">Plots currently selected object</span>
+                    <span style="color:#0ea5e9; cursor:pointer;" onclick="clearChart()">Clear Curve</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Physics Formulas Card -->
+            <div class="math-card">
+                <div class="panel-title" style="border:none; padding:0; color:#c084fc;">
+                    <span>5. Live Equation Solver</span>
+                </div>
+                <div id="equation-display">
+                    <div class="math-equation">Fg = m * g</div>
+                    <div class="math-calculation" id="calc-body">Select an object to inspect equations.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Web Audio API Synthesizer -->
+    <script>
+        class LabSynth {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            // Synthesize ground impact sound based on mass and impact speed
+            playImpact(mass, velocity) {
+                this.init();
+                if (!this.ctx) return;
+
+                const speed = Math.abs(velocity);
+                const volume = Math.min(speed / 200, 0.4); // Volume proportional to speed
+                if (volume < 0.02) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const filter = this.ctx.createBiquadFilter();
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                // Design sound characteristics based on mass
+                if (mass >= 40) {
+                    // Massive thud (Anvil)
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(80, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(10, this.ctx.currentTime + 0.35);
+
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(300, this.ctx.currentTime);
+                    filter.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.35);
+
+                    gain.gain.setValueAtTime(volume * 1.5, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.4);
+                } else if (mass >= 5) {
+                    // Bowling Ball thud
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.2);
+
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(200, this.ctx.currentTime);
+
+                    gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.25);
+                } else if (mass >= 0.3) {
+                    // Elastic Bounce (Football)
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.15);
+
+                    gain.gain.setValueAtTime(volume * 0.8, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.18);
+                } else if (mass > 0.0005) {
+                    // Squeaky rub/bounce (Balloon)
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.1);
+
+                    gain.gain.setValueAtTime(volume * 0.3, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.12);
+                }
+            }
+
+            // Bubble pop sound
+            playPop() {
+                this.init();
+                if (!this.ctx) return;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1400, this.ctx.currentTime + 0.05);
+
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.06);
+            }
+        }
+
+        const synth = new LabSynth();
+    </script>
+
+    <!-- Lab Physics Loop & Canvas Drag & Drop -->
+    <script>
+        const canvas = document.getElementById('sandbox-canvas');
+        const ctx = canvas.getContext('2d');
+        const chartCanvas = document.getElementById('chart-canvas');
+        const chartCtx = chartCanvas.getContext('2d');
+
+        // Physics parameters (synced with sliders)
+        let gravity = 9.8;
+        let airDensity = 1.2;
+        let windSpeed = 0;
+        let borderElasticity = 0.6;
+        let timeScale = 1.0;
+
+        let gamePaused = false;
+        let showVectors = true;
+        let showTrails = true;
+
+        // Constants
+        const GROUND_Y = 540; // bottom baseline representing ground
+        const METERS_PER_PIXEL = 0.04; // 1 pixel = 4 cm (so 600px height is 24m)
+        const FPS = 60;
+        const DT = 1 / FPS;
+
+        let activeObjects = [];
+        let selectedObject = null;
+        let draggedObject = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let isMouseDown = false;
+        let lastMouseX = 0;
+        let lastMouseY = 0;
+        let flickVelocityX = 0;
+        let flickVelocityY = 0;
+
+        // Active chart variables
+        let chartType = 'velocity'; // 'height' or 'velocity'
+        let chartHistory = []; // stores points for current selected object
+        let totalSimTime = 0;
+
+        // Preset objects stats
+        const OBJECT_TEMPLATES = {
+            anvil: {
+                name: 'Anvil',
+                mass: 50.0, // kg
+                volume: 0.0064, // m^3 (dense steel, density ~7800kg/m^3)
+                radius: 28, // pixels (approx 1.1m radius representation)
+                dragCoeff: 0.9, // aerodynamic drag coefficient (cube-ish shape)
+                elasticity: 0.08, // dead bounce
+                color: '#64748b',
+                textColor: '#fff',
+                icon: '🛠️',
+                renderType: 'anvil'
+            },
+            bowling: {
+                name: 'Bowling Ball',
+                mass: 7.2, // kg (16 lb ball)
+                volume: 0.005, // m^3 (density ~1440kg/m^3)
+                radius: 22,
+                dragCoeff: 0.47, // smooth sphere
+                elasticity: 0.45, // low-mid bounce
+                color: '#4f46e5',
+                textColor: '#fff',
+                icon: '🎳',
+                renderType: 'bowling'
+            },
+            football: {
+                name: 'Football',
+                mass: 0.43, // kg (regulation NFL ball)
+                volume: 0.0042, // m^3
+                radius: 20,
+                dragCoeff: 0.52, // ellipsoidal shape
+                elasticity: 0.75, // high bouncy rubber bladder
+                color: '#9a3412',
+                textColor: '#fff',
+                icon: '🏈',
+                renderType: 'football'
+            },
+            balloon: {
+                name: 'Helium Balloon',
+                mass: 0.003, // kg (latex shell weight only, extremely light)
+                volume: 0.014, // m^3 (14 liters volume -> provides massive buoyancy!)
+                radius: 24,
+                dragCoeff: 0.47, // sphere-ish
+                elasticity: 0.60,
+                color: '#f87171',
+                textColor: '#fff',
+                icon: '🎈',
+                renderType: 'balloon'
+            },
+            bubble: {
+                name: 'Soap Bubble',
+                mass: 0.0001, // kg (almost zero mass)
+                volume: 0.0008, // m^3
+                radius: 12,
+                dragCoeff: 0.5,
+                elasticity: 0.1,
+                color: 'rgba(56, 189, 248, 0.4)',
+                textColor: '#fff',
+                icon: '🫧',
+                renderType: 'bubble',
+                isPoppable: true
+            },
+            feather: {
+                name: 'Feather',
+                mass: 0.002, // kg
+                volume: 0.0001, // m^3
+                radius: 16,
+                dragCoeff: 1.8, // huge air drag due to shape and fluffiness
+                elasticity: 0.05,
+                color: '#e2e8f0',
+                textColor: '#0f172a',
+                icon: '🪶',
+                renderType: 'feather'
+            }
+        };
+
+        // Class definition for Sandbox Object
+        class PhysicsObject {
+            constructor(x, y, template) {
+                this.id = Math.random().toString(36).substring(2, 9);
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+                
+                // Properties copy
+                this.name = template.name;
+                this.mass = template.mass;
+                this.volume = template.volume;
+                this.radius = template.radius;
+                this.dragCoeff = template.dragCoeff;
+                this.elasticity = template.elasticity;
+                this.color = template.color;
+                this.textColor = template.textColor;
+                this.icon = template.icon;
+                this.renderType = template.renderType;
+                this.isPoppable = template.isPoppable || false;
+
+                // Forces recorded for display vector arrows
+                this.fg = 0; // gravity force
+                this.fb = 0; // buoyancy force
+                this.fdx = 0; // drag force X
+                this.fdy = 0; // drag force Y
+                
+                this.trail = [];
+                this.isDragging = false;
+            }
+
+            // Calculate cross-sectional area based on radius in pixels -> convert to meters
+            getCrossSectionalArea() {
+                const r_meters = this.radius * METERS_PER_PIXEL;
+                return Math.PI * r_meters * r_meters;
+            }
+
+            update(dt) {
+                if (this.isDragging) return;
+
+                const g_accel = gravity; // m/s^2
+                
+                // 1. GRAVITY FORCE: Fg = mass * g (downwards)
+                this.fg = this.mass * g_accel;
+
+                // 2. BUOYANCY FORCE (Archimedes' Principle): Fb = fluid_density * displaced_volume * g (upwards)
+                // Buoyancy acts in opposite direction of gravity field
+                this.fb = airDensity * this.volume * g_accel;
+
+                // 3. FLUID DRAG FORCE: Fd = 0.5 * rho * v^2 * Cd * Area (opposes relative velocity)
+                // We use relative velocity to account for wind
+                const vx_meters = this.vx * METERS_PER_PIXEL;
+                const vy_meters = this.vy * METERS_PER_PIXEL;
+                const rel_vx = vx_meters - windSpeed; // relative speed X to wind
+                const rel_vy = vy_meters;             // relative speed Y to air
+
+                const rel_speed = Math.hypot(rel_vx, rel_vy);
+                const area = this.getCrossSectionalArea();
+
+                if (rel_speed > 0.001 && airDensity > 0) {
+                    const dragMag = 0.5 * airDensity * rel_speed * rel_speed * this.dragCoeff * area;
+                    // Project force vectors in opposition of relative speed
+                    this.fdx = -dragMag * (rel_vx / rel_speed);
+                    this.fdy = -dragMag * (rel_vy / rel_speed);
+                } else {
+                    this.fdx = 0;
+                    this.fdy = 0;
+                }
+
+                // 4. NET FORCES SUMMATION (directions: positive is down/right)
+                const netForceX = this.fdx;
+                const netForceY = this.fg - this.fb + this.fdy;
+
+                // 5. ACCELERATION: F = m * a  =>  a = F / m
+                const ax_meters = netForceX / this.mass;
+                const ay_meters = netForceY / this.mass;
+
+                // 6. INTEGRATE VELOCITY (Convert m/s^2 accel to pixels/s)
+                const ax_pixels = ax_meters / METERS_PER_PIXEL;
+                const ay_pixels = ay_meters / METERS_PER_PIXEL;
+
+                this.vx += ax_pixels * dt;
+                this.vy += ay_pixels * dt;
+
+                // 7. INTEGRATE POSITION
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+
+                // 8. Trail recording
+                if (showTrails) {
+                    this.trail.push({ x: this.x, y: this.y });
+                    if (this.trail.length > 50) this.trail.shift();
+                } else {
+                    this.trail = [];
+                }
+
+                // Bounds check - Collide Ground
+                const groundLimit = GROUND_Y - this.radius;
+                if (this.y >= groundLimit) {
+                    this.y = groundLimit;
+                    
+                    // Bounce along normal: speed * combined coefficient of restitution
+                    const combinedCOR = this.elasticity * borderElasticity;
+                    
+                    if (Math.abs(this.vy) > 15) {
+                        synth.playImpact(this.mass, this.vy);
+                    }
+                    
+                    this.vy = -this.vy * combinedCOR;
+                    this.vx *= 0.94; // ground rolling friction
+
+                    // Pop bubble if it hits ground with some speed
+                    if (this.isPoppable && Math.abs(this.vy) > 10) {
+                        this.pop();
+                    }
+                }
+
+                // Side walls collision
+                const leftLimit = this.radius;
+                const rightLimit = canvas.width - this.radius;
+                if (this.x < leftLimit) {
+                    this.x = leftLimit;
+                    this.vx = -this.vx * borderElasticity;
+                    if (this.isPoppable) this.pop();
+                } else if (this.x > rightLimit) {
+                    this.x = rightLimit;
+                    this.vx = -this.vx * borderElasticity;
+                    if (this.isPoppable) this.pop();
+                }
+
+                // Ceiling bounds
+                const ceilingLimit = this.radius;
+                if (this.y < ceilingLimit) {
+                    this.y = ceilingLimit;
+                    this.vy = -this.vy * borderElasticity;
+                    if (this.isPoppable) this.pop();
+                }
+            }
+
+            pop() {
+                synth.playPop();
+                // Spawn a few soap drop particles
+                for (let i = 0; i < 8; i++) {
+                    activeParticles.push(new PopParticle(this.x, this.y, this.color));
+                }
+                // Mark for deletion
+                this.markedForDeletion = true;
+            }
+
+            draw(ctx) {
+                // Draw trails
+                if (showTrails && this.trail.length > 1) {
+                    ctx.save();
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 2;
+                    ctx.globalAlpha = 0.25;
+                    ctx.setLineDash([2, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                    for (let i = 1; i < this.trail.length; i++) {
+                        ctx.lineTo(this.trail[i].x, this.trail[i].y);
+                    }
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                // Draw main body shape
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                // Add glassmorphic glowing circle backdrop
+                const highlightGrad = ctx.createRadialGradient(0, 0, 1, 0, 0, this.radius);
+                highlightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+                highlightGrad.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+                ctx.fillStyle = highlightGrad;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Object-specific vector design drawings
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = selectedObject === this ? 3 : 2;
+
+                // Drop shadows of glow
+                if (selectedObject === this) {
+                    ctx.shadowColor = this.color;
+                    ctx.shadowBlur = 12;
+                }
+
+                if (this.renderType === 'anvil') {
+                    // Draw a vector steel anvil
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    // Flat top plate
+                    ctx.moveTo(-24, -12);
+                    ctx.lineTo(12, -12);
+                    // Horn curved tip
+                    ctx.quadraticCurveTo(28, -12, 28, -4);
+                    ctx.quadraticCurveTo(18, -4, 12, 0);
+                    // Base slope
+                    ctx.lineTo(20, 16);
+                    ctx.lineTo(-20, 16);
+                    ctx.lineTo(-12, 0);
+                    // Tail block
+                    ctx.lineTo(-24, -2);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                } else if (this.renderType === 'bowling') {
+                    // Draw bowling ball
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Holes
+                    ctx.fillStyle = '#05070c';
+                    ctx.beginPath();
+                    ctx.arc(-5, -6, 3, 0, Math.PI*2);
+                    ctx.arc(5, -6, 3, 0, Math.PI*2);
+                    ctx.arc(0, 2, 3, 0, Math.PI*2);
+                    ctx.fill();
+                } else if (this.renderType === 'football') {
+                    // Draw football ellipsoid shape
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    // Oval approximation
+                    ctx.ellipse(0, 0, this.radius * 1.25, this.radius * 0.8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Laces
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(-12, 0);
+                    ctx.lineTo(12, 0);
+                    // vertical cross laces
+                    for (let x = -8; x <= 8; x += 4) {
+                        ctx.moveTo(x, -3);
+                        ctx.lineTo(x, 3);
+                    }
+                    ctx.stroke();
+                } else if (this.renderType === 'balloon') {
+                    // Draw balloon string
+                    ctx.save();
+                    ctx.shadowBlur = 0; // disable string shadow
+                    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.moveTo(0, this.radius);
+                    ctx.bezierCurveTo(-5, this.radius + 10, 5, this.radius + 20, 0, this.radius + 35);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Balloon body (egg shape)
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.ellipse(0, -2, this.radius * 0.9, this.radius * 1.1, 0, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Little triangle knot at base
+                    ctx.beginPath();
+                    ctx.moveTo(0, this.radius - 2);
+                    ctx.lineTo(-4, this.radius + 2);
+                    ctx.lineTo(4, this.radius + 2);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Reflection highlight
+                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    ctx.beginPath();
+                    ctx.ellipse(-8, -10, 4, 8, Math.PI/4, 0, Math.PI*2);
+                    ctx.fill();
+                } else if (this.renderType === 'bubble') {
+                    // Shiny Soap Bubble
+                    ctx.strokeStyle = this.color;
+                    ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Shiny reflection glint
+                    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius - 3, -Math.PI*0.8, -Math.PI*0.2);
+                    ctx.stroke();
+                } else if (this.renderType === 'feather') {
+                    // Feather shape (barb + shaft)
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.moveTo(-this.radius, this.radius);
+                    ctx.quadraticCurveTo(0, -this.radius, this.radius, -this.radius);
+                    ctx.quadraticCurveTo(this.radius * 0.4, 0, -this.radius, this.radius);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Shaft
+                    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(-this.radius * 1.1, this.radius * 1.1);
+                    ctx.lineTo(this.radius, -this.radius);
+                    ctx.stroke();
+                } else {
+                    // Default circle placeholder
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+
+                // Draw Forces Vector Arrows
+                if (showVectors) {
+                    this.drawVectorArrows(ctx);
+                }
+            }
+
+            // Draw dynamic force vector arrows overlaid on the objects
+            drawVectorArrows(ctx) {
+                // Vector scaling factor (translates force in Newtons to pixel arrows)
+                const arrowScale = 1.8;
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                // 1. Gravity Vector (Red arrow pointing straight down)
+                const fgLen = this.fg * arrowScale;
+                if (fgLen > 2) {
+                    this.drawArrow(ctx, 0, 0, 0, fgLen, '#ef4444', 3, 'Fg');
+                }
+
+                // 2. Buoyancy Vector (Green arrow pointing straight up)
+                const fbLen = this.fb * arrowScale;
+                if (fbLen > 2) {
+                    this.drawArrow(ctx, 0, 0, 0, -fbLen, '#10b981', 3, 'Fb');
+                }
+
+                // 3. Fluid Drag Vector (Blue arrow opposing velocity)
+                const fdxLen = this.fdx * arrowScale * 4; // amplified slightly for visual clarity
+                const fdyLen = this.fdy * arrowScale * 4;
+                if (Math.hypot(fdxLen, fdyLen) > 2) {
+                    this.drawArrow(ctx, 0, 0, fdxLen, fdyLen, '#38bdf8', 2.5, 'Fd');
+                }
+
+                ctx.restore();
+            }
+
+            drawArrow(ctx, fromX, fromY, toX, toY, color, width = 2, label = '') {
+                ctx.save();
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = width;
+
+                // Draw shaft
+                ctx.beginPath();
+                ctx.moveTo(fromX, fromY);
+                ctx.lineTo(toX, toY);
+                ctx.stroke();
+
+                // Draw arrowhead
+                const angle = Math.atan2(toY - fromY, toX - fromX);
+                const headlen = 8; // length of head in pixels
+                ctx.beginPath();
+                ctx.moveTo(toX, toY);
+                ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+                ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+                ctx.closePath();
+                ctx.fill();
+
+                // Draw label at tip of arrow
+                if (label) {
+                    ctx.font = 'bold 10px sans-serif';
+                    ctx.fillText(label, toX + 5 * Math.cos(angle), toY + 5 * Math.sin(angle) + 3);
+                }
+
+                ctx.restore();
+            }
+        }
+
+        // Pop Bubble Particle
+        class PopParticle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 50 + Math.random() * 100;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.alpha = 1.0;
+                this.decay = 0.03 + Math.random() * 0.04;
+                this.color = color;
+                this.size = 2 + Math.random() * 3;
+            }
+
+            update(dt) {
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.alpha -= this.decay;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        let activeParticles = [];
+
+        // UI Event Listeners & Sliders configuration
+        function updateSliders() {
+            gravity = parseFloat(document.getElementById('slide-gravity').value);
+            document.getElementById('val-gravity').innerText = gravity.toFixed(1);
+
+            airDensity = parseFloat(document.getElementById('slide-density').value);
+            document.getElementById('val-density').innerText = airDensity.toFixed(1);
+
+            windSpeed = parseFloat(document.getElementById('slide-wind').value);
+            document.getElementById('val-wind').innerText = windSpeed;
+
+            borderElasticity = parseFloat(document.getElementById('slide-bounce').value);
+            document.getElementById('val-bounce').innerText = borderElasticity.toFixed(2);
+
+            timeScale = parseFloat(document.getElementById('slide-timescale').value);
+            document.getElementById('val-timescale').innerText = timeScale.toFixed(1);
+
+            // Update Badge headers
+            updateBadgeHUD();
+        }
+
+        function updateBadgeHUD() {
+            const envText = document.getElementById('hud-env');
+            if (gravity === 0 && airDensity === 0) {
+                envText.innerText = "Vacuum Orbit (0G)";
+            } else if (gravity === 0) {
+                envText.innerText = "Zero-G Chamber";
+            } else if (airDensity === 0) {
+                envText.innerText = `Vacuum Chamber (${gravity} m/s²)`;
+            } else if (gravity === 9.8 && airDensity === 1.2) {
+                envText.innerText = "Earth Atmosphere (Standard)";
+            } else {
+                envText.innerText = `Custom (${gravity} m/s², ρ: ${airDensity})`;
+            }
+
+            const forcesText = document.getElementById('hud-forces');
+            let forcesList = ["Gravity"];
+            if (airDensity > 0) forcesList.push("Drag");
+            if (airDensity > 0) forcesList.push("Buoyancy");
+            if (windSpeed !== 0) forcesList.push("Wind");
+            forcesText.innerText = forcesList.join(" + ");
+        }
+
+        function resetForces() {
+            document.getElementById('slide-gravity').value = 9.8;
+            document.getElementById('slide-density').value = 1.2;
+            document.getElementById('slide-wind').value = 0;
+            document.getElementById('slide-bounce').value = 0.6;
+            document.getElementById('slide-timescale').value = 1.0;
+            updateSliders();
+        }
+
+        function togglePause() {
+            gamePaused = !gamePaused;
+            document.getElementById('btn-pause').innerText = gamePaused ? "Resume Sim" : "Pause Sim";
+        }
+
+        function stepFrame() {
+            if (!gamePaused) togglePause();
+            // Run physics update once
+            updatePhysics(DT);
+        }
+
+        function clearSandbox() {
+            activeObjects = [];
+            selectedObject = null;
+            draggedObject = null;
+            chartHistory = [];
+            clearChart();
+            updateLiveEquations();
+        }
+
+        // Spawn factory
+        function spawnObject(type, x = null, y = null) {
+            const template = OBJECT_TEMPLATES[type];
+            if (!template) return;
+
+            // Spawn at random top-center if x/y are not specified
+            const sx = x !== null ? x : 100 + Math.random() * 400;
+            const sy = y !== null ? y : 80 + Math.random() * 80;
+
+            const newObj = new PhysicsObject(sx, sy, template);
+            activeObjects.push(newObj);
+            
+            // Auto select spawned object
+            selectedObject = newObj;
+            chartHistory = [];
+            updateLiveEquations();
+        }
+
+        // Archimedes buoyancy / Galileo vacuum pre-configured presets
+        function loadPreset(presetName) {
+            clearSandbox();
+            resetForces();
+
+            if (presetName === 'galileo') {
+                // Drop feather & anvil in zero atmosphere vacuum to prove constant acceleration
+                document.getElementById('slide-density').value = 0; // Vacuum!
+                document.getElementById('slide-gravity').value = 9.8;
+                updateSliders();
+                
+                spawnObject('anvil', 300, 60);
+                spawnObject('feather', 500, 60);
+                
+                selectedObject = activeObjects[0]; // anvil
+            } else if (presetName === 'terminal') {
+                // High air resistance dropping bowling ball vs feather to show terminal velocity
+                document.getElementById('slide-density').value = 3.5; // thick fluid
+                document.getElementById('slide-gravity').value = 12.0; // strong gravity
+                updateSliders();
+
+                spawnObject('bowling', 300, 50);
+                spawnObject('feather', 500, 50);
+
+                selectedObject = activeObjects[0];
+                setChartType('velocity');
+            } else if (presetName === 'buoyancy') {
+                // Balloon vs football to show helium buoyancy flotation
+                document.getElementById('slide-density').value = 1.8; // dense atmospheric gas
+                document.getElementById('slide-gravity').value = 9.8;
+                document.getElementById('slide-wind').value = 1.5; // slight right breeze
+                updateSliders();
+
+                spawnObject('balloon', 300, 450); // balloons spawn at bottom
+                spawnObject('football', 500, 80);
+
+                selectedObject = activeObjects[0]; // balloon
+            } else if (presetName === 'space') {
+                // Zero gravity floating drifting physics
+                document.getElementById('slide-gravity').value = 0;
+                document.getElementById('slide-density').value = 0;
+                updateSliders();
+
+                spawnObject('bowling', 250, 300);
+                spawnObject('football', 400, 260);
+                spawnObject('bubble', 550, 340);
+
+                // Give them minor initial drift speed
+                activeObjects[0].vx = 60;
+                activeObjects[0].vy = -20;
+                activeObjects[1].vx = -40;
+                activeObjects[1].vy = 50;
+
+                selectedObject = activeObjects[1]; // football
+            }
+            
+            updateBadgeHUD();
+        }
+
+        // MOUSE / TOUCH EVENTS FOR CANVAS DRAG-AND-DROP
+        canvas.addEventListener('mousedown', onMouseDown);
+        canvas.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+
+        canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+        window.addEventListener('touchend', onTouchEnd);
+
+        function getCanvasMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            // Handle mouse vs touch coordinates
+            const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+            const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+            return {
+                x: (clientX - rect.left) / rect.width * canvas.width,
+                y: (clientY - rect.top) / rect.height * canvas.height
+            };
+        }
+
+        function onMouseDown(e) {
+            const mouse = getCanvasMousePos(e);
+            isMouseDown = true;
+            lastMouseX = mouse.x;
+            lastMouseY = mouse.y;
+            flickVelocityX = 0;
+            flickVelocityY = 0;
+
+            // Check if user clicked an object
+            let clickedObj = null;
+            // Iterate backwards to select the top-most layered object
+            for (let i = activeObjects.length - 1; i >= 0; i--) {
+                const obj = activeObjects[i];
+                const dist = Math.hypot(mouse.x - obj.x, mouse.y - obj.y);
+                if (dist < obj.radius + 8) {
+                    clickedObj = obj;
+                    break;
+                }
+            }
+
+            if (clickedObj) {
+                draggedObject = clickedObj;
+                selectedObject = clickedObj;
+                draggedObject.isDragging = true;
+                draggedObject.vx = 0;
+                draggedObject.vy = 0;
+                draggedObject.trail = [];
+                dragOffsetX = mouse.x - clickedObj.x;
+                dragOffsetY = mouse.y - clickedObj.y;
+                
+                // Reset plot for new selection
+                chartHistory = [];
+                updateLiveEquations();
+            } else {
+                // Deselect if clicking blank canvas
+                selectedObject = null;
+                updateLiveEquations();
+            }
+        }
+
+        function onMouseMove(e) {
+            if (!isMouseDown) return;
+            const mouse = getCanvasMousePos(e);
+
+            // Calculate flick vector speeds
+            flickVelocityX = (mouse.x - lastMouseX) / DT;
+            flickVelocityY = (mouse.y - lastMouseY) / DT;
+
+            lastMouseX = mouse.x;
+            lastMouseY = mouse.y;
+
+            if (draggedObject) {
+                draggedObject.x = mouse.x - dragOffsetX;
+                draggedObject.y = mouse.y - dragOffsetY;
+
+                // Clamp to canvas borders while dragging
+                draggedObject.x = Math.max(draggedObject.radius, Math.min(canvas.width - draggedObject.radius, draggedObject.x));
+                draggedObject.y = Math.max(draggedObject.radius, Math.min(GROUND_Y - draggedObject.radius, draggedObject.y));
+            }
+        }
+
+        function onMouseUp() {
+            isMouseDown = false;
+            if (draggedObject) {
+                draggedObject.isDragging = false;
+                
+                // Apply release flick velocity (cap it so objects don't go hyper-speed)
+                const maxFlick = 800;
+                draggedObject.vx = Math.max(-maxFlick, Math.min(maxFlick, flickVelocityX));
+                draggedObject.vy = Math.max(-maxFlick, Math.min(maxFlick, flickVelocityY));
+                
+                draggedObject = null;
+            }
+        }
+
+        function onTouchStart(e) {
+            e.preventDefault();
+            onMouseDown(e);
+        }
+
+        function onTouchMove(e) {
+            e.preventDefault();
+            onMouseMove(e);
+        }
+
+        function onTouchEnd() {
+            onMouseUp();
+        }
+
+        // CIRCLE-CIRCLE COLLISIONS (Elastic interaction resolution)
+        function resolveCollisions() {
+            if (activeObjects.length < 2) return;
+
+            for (let i = 0; i < activeObjects.length; i++) {
+                const o1 = activeObjects[i];
+                if (o1.isDragging) continue;
+
+                for (let j = i + 1; j < activeObjects.length; j++) {
+                    const o2 = activeObjects[j];
+                    if (o2.isDragging) continue;
+
+                    const dx = o2.x - o1.x;
+                    const dy = o2.y - o1.y;
+                    const dist = Math.hypot(dx, dy);
+                    const minDist = o1.radius + o2.radius;
+
+                    if (dist < minDist) {
+                        // 1. Collision normal
+                        const nx = dx / dist;
+                        const ny = dy / dist;
+
+                        // 2. Separate overlapping bodies (mass weighted projection)
+                        const overlap = minDist - dist;
+                        const mSum = o1.mass + o2.mass;
+                        
+                        // Push them apart
+                        o1.x -= overlap * nx * (o2.mass / mSum);
+                        o1.y -= overlap * ny * (o2.mass / mSum);
+                        o2.x += overlap * nx * (o1.mass / mSum);
+                        o2.y += overlap * ny * (o1.mass / mSum);
+
+                        // 3. Elastic impulse bounce swapping
+                        const rvx = o2.vx - o1.vx;
+                        const rvy = o2.vy - o1.vy;
+                        
+                        // Relative speed projection along normal
+                        const vNormal = rvx * nx + rvy * ny;
+
+                        // Only bounce if they are moving towards each other
+                        if (vNormal < 0) {
+                            // Combined coefficient of restitution
+                            const e = Math.min(o1.elasticity, o2.elasticity);
+                            const impulseScalar = -(1 + e) * vNormal / (1 / o1.mass + 1 / o2.mass);
+
+                            // Apply impulse
+                            o1.vx -= (impulseScalar * nx) / o1.mass;
+                            o1.vy -= (impulseScalar * ny) / o1.mass;
+                            o2.vx += (impulseScalar * nx) / o2.mass;
+                            o2.vy += (impulseScalar * ny) / o2.mass;
+
+                            // Play bump sound based on collision speed
+                            const bumpVel = Math.abs(vNormal) * METERS_PER_PIXEL;
+                            if (bumpVel > 0.2) {
+                                synth.playImpact(Math.max(o1.mass, o2.mass), bumpVel * 10);
+                            }
+
+                            // Bubbles pop on heavy impacts
+                            if (o1.isPoppable && bumpVel > 0.8) o1.pop();
+                            if (o2.isPoppable && bumpVel > 0.8) o2.pop();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Live physics step integration
+        function updatePhysics(dt) {
+            // Delete popped bubbles
+            activeObjects = activeObjects.filter(obj => !obj.markedForDeletion);
+
+            // Update all physics states
+            activeObjects.forEach(obj => obj.update(dt));
+
+            // Resolve circle-circle contact collision responses
+            resolveCollisions();
+
+            // Record data plots for oscilloscope chart
+            if (selectedObject && !selectedObject.isDragging) {
+                totalSimTime += dt;
+                
+                let plotVal = 0;
+                if (chartType === 'velocity') {
+                    // Velocity in m/s (absolute magnitude or vertical vy)
+                    plotVal = -selectedObject.vy * METERS_PER_PIXEL; // Negate to show upwards motion properly
+                } else {
+                    // Height in meters from ground line
+                    plotVal = (GROUND_Y - selectedObject.y) * METERS_PER_PIXEL;
+                }
+
+                chartHistory.push({
+                    t: totalSimTime,
+                    v: plotVal
+                });
+
+                // Cap history length for rendering
+                if (chartHistory.length > 250) {
+                    chartHistory.shift();
+                }
+            } else {
+                totalSimTime = 0;
+            }
+
+            // Update equations card
+            updateLiveEquations();
+        }
+
+        // Live equations layout solver
+        function updateLiveEquations() {
+            const container = document.getElementById('calc-body');
+            if (!selectedObject) {
+                container.innerHTML = `No object selected.<br><span style="color:#64748b;">Click on any falling body in the sandbox to inspect forces and equations in real-time.</span>`;
+                return;
+            }
+
+            const area = selectedObject.getCrossSectionalArea();
+            const mass = selectedObject.mass;
+            const vol = selectedObject.volume;
+            
+            // Live calculated values in Newtons (N)
+            const g_force = selectedObject.fg;
+            const b_force = selectedObject.fb;
+            const drag_mag = Math.hypot(selectedObject.fdx, selectedObject.fdy);
+            
+            // Relative speed
+            const speed_ms = Math.hypot(selectedObject.vx, selectedObject.vy) * METERS_PER_PIXEL;
+            
+            // Terminal velocity calculation
+            let termVelText = "N/A (Space)";
+            if (gravity > 0 && airDensity > 0) {
+                // If buoyancy exceeds gravity, terminal velocity is upwards (negative)
+                const effectiveMassAccel = Math.abs(mass * gravity - airDensity * vol * gravity);
+                const termSpeed = Math.sqrt((2 * effectiveMassAccel) / (airDensity * selectedObject.dragCoeff * area));
+                termVelText = `${termSpeed.toFixed(2)} m/s`;
+            }
+
+            container.innerHTML = `
+                <div>Object: <span class="dynamic-value">${selectedObject.name}</span></div>
+                <div>Mass (m): <span class="dynamic-value">${mass.toFixed(3)} kg</span></div>
+                <div>Volume (V): <span class="dynamic-value">${vol.toFixed(4)} m³</span></div>
+                <div>Cross Area (A): <span class="dynamic-value">${area.toFixed(4)} m²</span></div>
+                <div style="margin-top:6px; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px;">
+                    Fg (Gravity): <span class="dynamic-value" style="color:#ef4444;">${g_force.toFixed(2)} N</span>
+                </div>
+                <div>
+                    Fb (Buoyancy): <span class="dynamic-value" style="color:#10b981;">${b_force.toFixed(2)} N</span>
+                </div>
+                <div>
+                    Fd (Air Drag): <span class="dynamic-value" style="color:#0ea5e9;">${drag_mag.toFixed(2)} N</span>
+                </div>
+                <div style="margin-top:6px; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px;">
+                    Current Speed: <span class="dynamic-value" style="color:#fbbf24;">${speed_ms.toFixed(2)} m/s</span>
+                </div>
+                <div>
+                    Terminal Speed (V_t): <span class="dynamic-value" style="color:#e879f9;">${termVelText}</span>
+                </div>
+            `;
+        }
+
+        // Draw grids & pitch heights
+        function drawScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw educational height rulers
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            const stepY = 50;
+            ctx.fillStyle = '#64748b';
+            ctx.font = '9px monospace';
+            
+            // Horizontal lines with height measurements
+            for (let y = stepY; y < GROUND_Y; y += stepY) {
+                ctx.beginPath();
+                ctx.moveTo(50, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+
+                // Height from ground in meters
+                const h_meters = (GROUND_Y - y) * METERS_PER_PIXEL;
+                ctx.fillText(`${h_meters.toFixed(1)}m`, 12, y + 3);
+            }
+
+            // Draw grid vertical pillars
+            for (let x = 100; x < canvas.width; x += 100) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, GROUND_Y);
+                ctx.stroke();
+            }
+
+            // Draw Ground Platform (Frosted steel-like look)
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, GROUND_Y, canvas.width, canvas.height - GROUND_Y);
+
+            // Draw glowing ground green border line
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(0, GROUND_Y);
+            ctx.lineTo(canvas.width, GROUND_Y);
+            ctx.stroke();
+
+            // Draw background indicator info
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.font = '11px sans-serif';
+            ctx.fillText("Physics Lab Drop Zone", canvas.width / 2 - 60, GROUND_Y + 30);
+            
+            // Draw all active objects
+            activeObjects.forEach(obj => obj.draw(ctx));
+
+            // Draw particles
+            activeParticles.forEach(p => p.draw(ctx));
+        }
+
+        // Oscilloscope graph plotter drawer
+        function drawChart() {
+            chartCtx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+
+            // Draw graph grids
+            chartCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            chartCtx.lineWidth = 1;
+            for (let i = 20; i < chartCanvas.height; i += 20) {
+                chartCtx.beginPath();
+                chartCtx.moveTo(0, i);
+                chartCtx.lineTo(chartCanvas.width, i);
+                chartCtx.stroke();
+            }
+
+            if (!selectedObject || chartHistory.length === 0) {
+                chartCtx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                chartCtx.font = '10px sans-serif';
+                chartCtx.fillText("Waiting for active data...", 80, 60);
+                return;
+            }
+
+            // Draw curves
+            chartCtx.strokeStyle = chartType === 'velocity' ? '#38bdf8' : '#10b981';
+            chartCtx.lineWidth = 2.2;
+            chartCtx.beginPath();
+
+            // Find max bounds in history to auto-scale Y axis
+            let maxVal = 0.1;
+            let minVal = 0;
+            chartHistory.forEach(pt => {
+                if (Math.abs(pt.v) > maxVal) maxVal = Math.abs(pt.v);
+                if (pt.v < minVal) minVal = pt.v;
+            });
+            const yRange = maxVal - minVal;
+
+            chartHistory.forEach((pt, idx) => {
+                // X coordinates map from index ratio
+                const cx = (idx / 250) * chartCanvas.width;
+                // Y coordinates map to canvas size
+                const normalized = (pt.v - minVal) / yRange;
+                const cy = chartCanvas.height - 15 - normalized * (chartCanvas.height - 30);
+                
+                if (idx === 0) {
+                    chartCtx.moveTo(cx, cy);
+                } else {
+                    chartCtx.lineTo(cx, cy);
+                }
+            });
+            chartCtx.stroke();
+
+            // Labels
+            chartCtx.fillStyle = '#94a3b8';
+            chartCtx.font = '9px monospace';
+            chartCtx.fillText(chartType === 'velocity' ? 'Velocity (m/s)' : 'Height (m)', 10, 15);
+            chartCtx.fillText(`Max: ${maxVal.toFixed(1)}`, chartCanvas.width - 70, 15);
+        }
+
+        function setChartType(type) {
+            chartType = type;
+            chartHistory = [];
+            document.getElementById('chart-y-height').style.borderColor = type === 'height' ? 'var(--info)' : 'var(--border-color)';
+            document.getElementById('chart-y-velocity').style.borderColor = type === 'velocity' ? 'var(--info)' : 'var(--border-color)';
+        }
+
+        function clearChart() {
+            chartHistory = [];
+        }
+
+        // Particles manager update
+        function updateParticles(dt) {
+            activeParticles.forEach(p => p.update(dt));
+            activeParticles = activeParticles.filter(p => p.alpha > 0);
+        }
+
+        // Toggles mapping
+        document.getElementById('toggle-vectors').addEventListener('change', (e) => {
+            showVectors = e.target.checked;
+        });
+
+        document.getElementById('toggle-trails').addEventListener('change', (e) => {
+            showTrails = e.target.checked;
+        });
+
+        // Frame update loop
+        function mainLoop() {
+            if (!gamePaused) {
+                // TimeScale factor allows fluid slow motion
+                const scaledDt = DT * timeScale;
+                
+                // Physics sub-stepping for collision stability
+                const subSteps = 3;
+                const stepDt = scaledDt / subSteps;
+                for (let i = 0; i < subSteps; i++) {
+                    updatePhysics(stepDt);
+                }
+
+                updateParticles(scaledDt);
+            }
+
+            drawScene();
+            drawChart();
+            requestAnimationFrame(mainLoop);
+        }
+
+        // Initialize sandbox with a couple of balls
+        resetForces();
+        loadPreset('buoyancy'); // load default scenario
+        setChartType('velocity');
+
+        mainLoop();
+    </script>
+</body>
+</html>
