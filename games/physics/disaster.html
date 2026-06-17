@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumLab: Disaster Survival 🌋</title>
+    <!-- Google Fonts Outfit & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Three.js and OrbitControls CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg-color: #f1f5f9;
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(15, 23, 42, 0.08);
+            --accent-glow: rgba(239, 68, 68, 0.15);
+            
+            --primary: #ef4444;
+            --primary-hover: #dc2626;
+            --success: #10b981;
+            --success-hover: #059669;
+            --info: #0ea5e9;
+            --warning: #f59e0b;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --panel-title-color: #1e3a8a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.04) 0, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.03) 0, transparent 50%);
+            min-height: 100vh;
+            color: var(--text-main);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 30px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 1.6rem;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .logo h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ef4444, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-badge {
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 6px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            background: rgba(15, 23, 42, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: rgba(15, 23, 42, 0.08);
+            border-color: rgba(15, 23, 42, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:hover {
+            background: var(--success-hover);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Workspace layout (Left sidebar, rest is 3D canvas) */
+        .workspace {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 16px;
+            padding: 16px;
+            flex-grow: 1;
+            width: 100vw;
+            height: calc(100vh - 65px);
+            position: relative;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            overflow-y: auto;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--panel-title-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .info-card {
+            background: rgba(15, 23, 42, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* 3D Canvas Container */
+        .canvas-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        #sandbox-3d {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            outline: none;
+        }
+
+        /* Laser badge and other overlays on Canvas */
+        .canvas-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Big Banner overlay for phases */
+        .status-banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(15, 23, 42, 0.9);
+            color: #fff;
+            padding: 24px 48px;
+            border-radius: 16px;
+            text-align: center;
+            z-index: 20;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -45%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        .status-banner h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #f59e0b, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-banner p {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        /* Hotbar overlay at bottom of canvas */
+        .hotbar-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 16px;
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            z-index: 5;
+            align-items: center;
+        }
+
+        .hotbar-item {
+            width: 68px;
+            height: 68px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 2px;
+        }
+
+        .hotbar-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-4px) scale(1.05);
+            border-color: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+        }
+
+        .hotbar-item.active {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .hotbar-item .icon {
+            font-size: 1.4rem;
+        }
+
+        .hotbar-item .label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .hotbar-item .count-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--text-main);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid #fff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hotbar-item.active .label {
+            color: #ef4444;
+        }
+
+        .hotbar-separator {
+            width: 1px;
+            height: 40px;
+            background: var(--border-color);
+            margin: 0 4px;
+        }
+
+        /* Disaster evaluation panel/overlay */
+        .overlay-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .laser-badge-red {
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .laser-badge-green {
+            border-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(15, 23, 42, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* Log items */
+        .log-box {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            height: 140px;
+            background: rgba(15, 23, 42, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: var(--text-muted);
+        }
+
+        .log-box::-webkit-scrollbar {
+            width: 4px;
+        }
+        .log-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .log-box::-webkit-scrollbar-thumb {
+            background: rgba(15, 23, 42, 0.1);
+            border-radius: 2px;
+        }
+
+        .log-item {
+            line-height: 1.4;
+        }
+
+        .log-item.red { color: #dc2626; }
+        .log-item.green { color: #059669; }
+        .log-item.orange { color: #d97706; }
+        .log-item.blue { color: #0284c7; }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">🌋</div>
+            <h1>QuantumLab: Disaster Survival</h1>
+            <span class="logo-badge">3D Physics Puzzle</span>
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="btn">
+                <span>⚛️ Back to Physics Lab</span>
+            </a>
+            <button class="btn btn-primary" id="btn-start" onclick="triggerEarlyDisaster()">Start Disaster ⚡</button>
+            <button class="btn" id="btn-reset" onclick="resetGame()">Reset 🔄</button>
+        </div>
+    </header>
+
+    <!-- Main Grid Workspace -->
+    <div class="workspace">
+
+        <!-- LEFT SIDEBAR: Instructions & Real-time stats -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>🎮 How to Play</span>
+                <span style="font-size: 1.2rem;">🏗️</span>
+            </div>
+            <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
+                You have <strong>2 minutes</strong> to build a structure. Choose blocks from the hotbar and click on the grid or other blocks to place them. Drag blocks to adjust your design.
+            </p>
+            <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
+                Try to keep blocks stacked above the <strong>Laser Height Line (4m)</strong>. When time runs out, a random natural disaster will strike!
+            </p>
+
+            <div class="panel-title">
+                <span>⏱️ Simulation Phase</span>
+                <span style="font-size: 1.2rem;" id="phase-icon">⏳</span>
+            </div>
+            <div class="overlay-card" style="align-items: center; justify-content: center; padding: 20px;">
+                <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Time Remaining</span>
+                <span style="font-size: 2.2rem; font-weight: 800; font-family: 'JetBrains Mono', monospace;" id="timer-display">02:00</span>
+                <div class="progress-bar-container" style="height: 6px;">
+                    <div class="progress-bar-fill" id="timer-bar" style="background: var(--success); width: 100%;"></div>
+                </div>
+            </div>
+
+            <div class="panel-title">
+                <span>📊 Structure Integrity</span>
+                <span style="font-size: 1.2rem;">📈</span>
+            </div>
+            <div class="info-card">
+                <div class="info-row">
+                    <span class="info-label">Active Block Count:</span>
+                    <span class="info-value" id="stats-blocks">0 / 40</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Structure Height:</span>
+                    <span class="info-value" id="stats-height">0.00m</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Laser Cleared:</span>
+                    <span class="info-value" id="stats-laser-cleared" style="color: var(--danger);">NO</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Survival Rate:</span>
+                    <span class="info-value" id="stats-survival">100%</span>
+                </div>
+            </div>
+
+            <div class="panel-title">
+                <span>📋 Event Log</span>
+                <span style="font-size: 1.2rem;">📰</span>
+            </div>
+            <div class="log-box" id="log-container">
+                <div class="log-item green">[System] Game initialized. Build phase started.</div>
+            </div>
+        </div>
+
+        <!-- RIGHT AREA: Three.js Canvas with Hotbar Overlay -->
+        <div class="canvas-container">
+            <div id="sandbox-3d" tabindex="0"></div>
+
+            <!-- Overlays -->
+            <div class="canvas-badge laser-badge-red" id="laser-badge">
+                <span style="display:inline-block; width:8px; height:8px; background: currentColor; border-radius:50%; box-shadow: 0 0 8px currentColor;"></span>
+                <span>Laser Target: 4.00m</span>
+            </div>
+
+            <!-- Status Banner Overlay -->
+            <div class="status-banner" id="status-banner">
+                <h2 id="banner-title">EARTHQUAKE STRIKES!</h2>
+                <p id="banner-desc">The ground shakes violently. Hold on to your blocks!</p>
+            </div>
+
+            <!-- Bottom Hotbar -->
+            <div class="hotbar-container">
+                <!-- Move/Pointer Tool -->
+                <div class="hotbar-item active" id="tool-pointer" onclick="selectTool('pointer')">
+                    <span class="icon">🖐️</span>
+                    <span class="label">Move</span>
+                </div>
+                <div class="hotbar-separator"></div>
+                <!-- Building Blocks -->
+                <div class="hotbar-item" id="tool-wood" onclick="selectTool('wood')">
+                    <span class="icon">🧱</span>
+                    <span class="label">Wood Plank</span>
+                    <span class="count-badge" id="count-wood">15</span>
+                </div>
+                <div class="hotbar-item" id="tool-concrete" onclick="selectTool('concrete')">
+                    <span class="icon">🪨</span>
+                    <span class="label">Concrete</span>
+                    <span class="count-badge" id="count-concrete">10</span>
+                </div>
+                <div class="hotbar-item" id="tool-steel" onclick="selectTool('steel')">
+                    <span class="icon">🪙</span>
+                    <span class="label">Steel Beam</span>
+                    <span class="count-badge" id="count-steel">8</span>
+                </div>
+                <div class="hotbar-item" id="tool-glass" onclick="selectTool('glass')">
+                    <span class="icon">🧊</span>
+                    <span class="label">Glass Panel</span>
+                    <span class="count-badge" id="count-glass">8</span>
+                </div>
+                <div class="hotbar-item" id="tool-stone" onclick="selectTool('stone')">
+                    <span class="icon">🏛️</span>
+                    <span class="label">Pillar</span>
+                    <span class="count-badge" id="count-stone">6</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Disaster Web Audio Synthesizer -->
+    <script>
+        class DisasterSynth {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playSpawn() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(330, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(660, this.ctx.currentTime + 0.1);
+
+                gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.12);
+            }
+
+            playImpact(mass) {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const filter = this.ctx.createBiquadFilter();
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                if (mass > 5) {
+                    // Steel / Heavy Concrete
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(90, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(10, this.ctx.currentTime + 0.25);
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(250, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
+                } else if (mass > 1.5) {
+                    // Concrete / Stone
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.15);
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(150, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.18);
+                } else {
+                    // Wood
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.1);
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(400, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+                }
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+
+            playGlassShatter() {
+                this.init();
+                if (!this.ctx) return;
+                // Play quick random high pitched noise bursts
+                for (let i = 0; i < 6; i++) {
+                    const timeOffset = i * 0.03;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.type = 'triangle';
+                    const pitch = 2000 + Math.random() * 2000;
+                    osc.frequency.setValueAtTime(pitch, this.ctx.currentTime + timeOffset);
+                    osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + timeOffset + 0.08);
+
+                    gain.gain.setValueAtTime(0.08, this.ctx.currentTime + timeOffset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + timeOffset + 0.08);
+
+                    osc.start(this.ctx.currentTime + timeOffset);
+                    osc.stop(this.ctx.currentTime + timeOffset + 0.08);
+                }
+            }
+
+            playExplosion() {
+                this.init();
+                if (!this.ctx) return;
+                // Bass sweep + noise sweep
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const filter = this.ctx.createBiquadFilter();
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(20, this.ctx.currentTime + 0.8);
+
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(300, this.ctx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.8);
+
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.9);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.9);
+            }
+
+            playEarthquakeStart() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(55, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(35, this.ctx.currentTime + 2.0);
+
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 2.0);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 2.0);
+            }
+
+            playFanfare(win) {
+                this.init();
+                if (!this.ctx) return;
+                const notes = win ? [261.63, 329.63, 392.00, 523.25] : [196.00, 185.00, 174.61, 146.83];
+                const type = win ? 'sine' : 'sawtooth';
+                const dur = win ? 0.25 : 0.4;
+
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.15);
+
+                    gain.gain.setValueAtTime(0.15, this.ctx.currentTime + idx * 0.15);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.15 + dur);
+
+                    osc.start(this.ctx.currentTime + idx * 0.15);
+                    osc.stop(this.ctx.currentTime + idx * 0.15 + dur);
+                });
+            }
+        }
+
+        const synth = new DisasterSynth();
+    </script>
+
+    <!-- Main Game Physics & WebGL Code -->
+    <script>
+        // Game variables
+        let gamePhase = 'build'; // 'build', 'disaster', 'evaluation'
+        let selectedToolType = 'pointer'; // 'pointer', 'wood', 'concrete', 'steel', 'glass', 'stone'
+        
+        let buildTimeRemaining = 120; // 2 minutes
+        let timerInterval = null;
+        let gameTime = 0; // Total time tracker during disasters
+        let activeDisasterType = null;
+        let disasterDuration = 15; // seconds
+        
+        let initialObjectCount = 0; // block count when disaster starts
+        let peakHeightReached = 0;
+        let isDisasterActive = false;
+
+        // Block limits
+        const blockInventory = {
+            wood: { name: 'Wood Plank', count: 15, max: 15 },
+            concrete: { name: 'Concrete Cube', count: 10, max: 10 },
+            steel: { name: 'Steel Beam', count: 8, max: 8 },
+            glass: { name: 'Glass Panel', count: 8, max: 8 },
+            stone: { name: 'Stone Pillar', count: 6, max: 6 }
+        };
+
+        // Disaster presets
+        const DISASTERS = ['earthquake', 'meteor', 'tornado', 'tsunami'];
+        const DISASTER_INFO = {
+            earthquake: {
+                title: 'EARTHQUAKE STRIKES! 🪨',
+                desc: 'A Magnitude 9.0 earthquake is causing massive tectonic rumbles. Ground shaking commenced!'
+            },
+            meteor: {
+                title: 'METEOR SHOWER! ☄️',
+                desc: 'Fiery meteors are raining down from orbit. Take cover from direct strikes!'
+            },
+            tornado: {
+                title: 'CAT 5 TORNADO! 🌪️',
+                desc: 'A violent cyclone is traversing the landscape, creating massive atmospheric pull.'
+            },
+            tsunami: {
+                title: 'FLOOD / TSUNAMI! 🌊',
+                desc: 'Tidal waves are rising! Light structures will float away. Water levels increasing.'
+            }
+        };
+
+        // Three.js scene setup
+        const container3d = document.getElementById('sandbox-3d');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf1f5f9);
+        scene.fog = new THREE.FogExp2(0xf1f5f9, 0.015);
+
+        const camera = new THREE.PerspectiveCamera(45, container3d.clientWidth / container3d.clientHeight, 0.1, 100);
+        camera.position.set(0, 10, 22);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(container3d.clientWidth, container3d.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container3d.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.maxPolarAngle = Math.PI / 2 - 0.02; // Don't go below floor
+        controls.minDistance = 5;
+        controls.maxDistance = 40;
+        controls.target.set(0, 4, 0);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(12, 25, 10);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 40;
+        const d = 12;
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+        dirLight.shadow.bias = -0.0005;
+        scene.add(dirLight);
+
+        // Sky background light
+        const skyLight = new THREE.HemisphereLight(0xffffff, 0xe2e8f0, 0.4);
+        scene.add(skyLight);
+
+        // Ground base
+        const groundGeo = new THREE.BoxGeometry(16, 1, 16);
+        const groundMat = new THREE.MeshStandardMaterial({ 
+            color: 0xffffff, 
+            roughness: 0.8,
+            metalness: 0.1 
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.position.y = -0.5;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Ground Grid Helper
+        const gridHelper = new THREE.GridHelper(16, 16, 0xef4444, 0xcbd5e1);
+        gridHelper.position.y = 0.01;
+        scene.add(gridHelper);
+
+        // Target height line helper (translucent plane at Y = 4.0)
+        const laserGeo = new THREE.PlaneGeometry(16, 16);
+        const laserMat = new THREE.MeshBasicMaterial({ 
+            color: 0xef4444, 
+            transparent: true, 
+            opacity: 0.06, 
+            side: THREE.DoubleSide 
+        });
+        const laserMesh = new THREE.Mesh(laserGeo, laserMat);
+        laserMesh.rotation.x = -Math.PI / 2;
+        laserMesh.position.y = 4.0;
+        scene.add(laserMesh);
+
+        // Dynamic laser ring guide at Y = 4.0
+        const laserLineGeo = new THREE.BufferGeometry();
+        const laserPoints = [];
+        for (let theta = 0; theta <= Math.PI*2; theta += 0.1) {
+            laserPoints.push(new THREE.Vector3(Math.cos(theta)*8, 4.0, Math.sin(theta)*8));
+        }
+        laserLineGeo.setFromPoints(laserPoints);
+        const laserLineMat = new THREE.LineBasicMaterial({ color: 0xef4444, linewidth: 2 });
+        const laserLine = new THREE.Line(laserLineGeo, laserLineMat);
+        scene.add(laserLine);
+
+        // Ghost Preview Mesh (Translucent mesh representing block before placement)
+        let ghostMesh = null;
+        let isGhostVisible = false;
+
+        // Block templates definitions
+        const BLOCK_TEMPLATES = {
+            wood: {
+                name: 'Wood Plank',
+                width: 2.0, height: 0.4, depth: 0.8,
+                mass: 0.8, volume: 0.002, elasticity: 0.3,
+                color: 0xd97706, roughness: 0.7,
+                buildGeometry: () => new THREE.BoxGeometry(2.0, 0.4, 0.8)
+            },
+            concrete: {
+                name: 'Concrete Cube',
+                width: 1.0, height: 1.0, depth: 1.0,
+                mass: 2.4, volume: 0.001, elasticity: 0.1,
+                color: 0x94a3b8, roughness: 0.9,
+                buildGeometry: () => new THREE.BoxGeometry(1.0, 1.0, 1.0)
+            },
+            steel: {
+                name: 'Steel Beam',
+                width: 3.5, height: 0.4, depth: 0.4,
+                mass: 7.8, volume: 0.0006, elasticity: 0.2,
+                color: 0x475569, metalness: 0.6, roughness: 0.3,
+                buildGeometry: () => new THREE.BoxGeometry(3.5, 0.4, 0.4)
+            },
+            glass: {
+                name: 'Glass Panel',
+                width: 2.0, height: 1.5, depth: 0.15,
+                mass: 0.5, volume: 0.0002, elasticity: 0.1,
+                color: 0x38bdf8, transparent: true, opacity: 0.4, roughness: 0.15,
+                fragile: true,
+                buildGeometry: () => new THREE.BoxGeometry(2.0, 1.5, 0.15)
+            },
+            stone: {
+                name: 'Stone Pillar',
+                width: 0.6, height: 3.0, depth: 0.6,
+                mass: 3.5, volume: 0.0008, elasticity: 0.15,
+                color: 0xe2e8f0, roughness: 0.8,
+                buildGeometry: () => new THREE.CylinderGeometry(0.3, 0.3, 3.0, 16)
+            }
+        };
+
+        // Physics variables
+        let activeObjects3D = [];
+        let selectedObject3D = null;
+        let draggedObject3D = null;
+        const DT = 1 / 60;
+        let isMouseDown = false;
+        
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const dragPlane = new THREE.Plane();
+        const planeNormal = new THREE.Vector3();
+        const planeIntersection = new THREE.Vector3();
+        const lastInteractionPoint = new THREE.Vector3();
+        const flickVelocity = new THREE.Vector3();
+
+        // Screen shake intensity
+        let cameraRumbleIntensity = 0;
+
+        // Particle systems
+        let activeParticles3D = [];
+
+        // Disaster specific meshes
+        let waterMesh = null;
+        let tornadoMesh = null;
+        let activeMeteors = [];
+        let activeTargets = [];
+        let tornadoPathAngle = 0;
+
+        // Custom particles class
+        class Particle3D {
+            constructor(x, y, z, color, size = 0.1) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.color = color;
+                
+                this.vx = (Math.random() - 0.5) * 6;
+                this.vy = (Math.random() - 0.2) * 6 + 2;
+                this.vz = (Math.random() - 0.5) * 6;
+                
+                this.alpha = 1.0;
+                this.decay = 0.03 + Math.random() * 0.03;
+                
+                const geo = new THREE.DodecahedronGeometry(size, 0);
+                const mat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 1.0 });
+                this.mesh = new THREE.Mesh(geo, mat);
+                this.mesh.position.set(x, y, z);
+                scene.add(this.mesh);
+            }
+
+            update(dt) {
+                this.vy -= 9.8 * dt; // gravity
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.z += this.vz * dt;
+                
+                this.alpha -= this.decay;
+                this.mesh.position.set(this.x, this.y, this.z);
+                this.mesh.material.opacity = Math.max(0, this.alpha);
+                
+                if (this.alpha <= 0) {
+                    scene.remove(this.mesh);
+                    this.mesh.geometry.dispose();
+                    this.mesh.material.dispose();
+                }
+            }
+        }
+
+        // Physics block object
+        class PhysicsObject3D {
+            constructor(x, y, z, type, template) {
+                this.type = type;
+                this.name = template.name;
+                this.mass = template.mass;
+                this.volume = template.volume;
+                this.elasticity = template.elasticity;
+                this.fragile = template.fragile || false;
+                this.color = template.color;
+
+                // Box dimensions mapping
+                this.width = template.width;
+                this.height = template.height;
+                this.depth = template.depth;
+
+                this.halfWidth = this.width / 2;
+                this.halfHeight = this.height / 2;
+                this.halfDepth = this.depth / 2;
+
+                // Positions
+                this.x = x;
+                this.y = y;
+                this.z = z;
+
+                // Velocities
+                this.vx = 0;
+                this.vy = 0;
+                this.vz = 0;
+
+                this.isDragging = false;
+                this.markedForDeletion = false;
+
+                // Build Three.js representation
+                const geo = template.buildGeometry();
+                const matParams = {
+                    color: template.color,
+                    roughness: template.roughness || 0.5,
+                    metalness: template.metalness || 0.0
+                };
+                if (template.transparent) {
+                    matParams.transparent = true;
+                    matParams.opacity = template.opacity;
+                }
+                const mat = new THREE.MeshStandardMaterial(matParams);
+                this.mesh = new THREE.Mesh(geo, mat);
+                this.mesh.position.set(this.x, this.y, this.z);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+                scene.add(this.mesh);
+
+                // OutlineHelper for Selection
+                const outlineGeo = new THREE.BoxHelper(this.mesh, 0xef4444);
+                this.outline = outlineGeo;
+                this.outline.visible = false;
+                scene.add(this.outline);
+            }
+
+            update(dt) {
+                if (this.isDragging) {
+                    this.mesh.position.set(this.x, this.y, this.z);
+                    this.outline.update();
+                    return;
+                }
+
+                // 1. Apply gravity
+                this.vy -= 9.8 * dt;
+
+                // 2. Apply Buoyancy if tsunami active and submerged
+                if (activeDisasterType === 'tsunami' && waterMesh) {
+                    const waterLevel = waterMesh.position.y;
+                    const bottomY = this.y - this.halfHeight;
+                    const topY = this.y + this.halfHeight;
+                    
+                    if (waterLevel > bottomY) {
+                        const submergedHeight = Math.min(this.height, waterLevel - bottomY);
+                        const submergedRatio = submergedHeight / this.height;
+                        
+                        // Fb = Density * Volume * ratio * g
+                        const waterDensity = 1200.0; // Dense waves
+                        const fb = waterDensity * this.volume * submergedRatio * 9.8;
+                        const buoyancyAccel = fb / this.mass;
+                        this.vy += buoyancyAccel * dt;
+
+                        // Wave push drift (from left to right along x)
+                        this.vx += 3.5 * submergedRatio * dt;
+                        // Water drag friction
+                        this.vx *= 0.94;
+                        this.vy *= 0.94;
+                        this.vz *= 0.94;
+                    }
+                }
+
+                // 3. Apply air drag
+                this.vx *= 0.99;
+                this.vy *= 0.99;
+                this.vz *= 0.99;
+
+                // Apply velocity integration
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+                this.z += this.vz * dt;
+
+                // Ground limit boundary collision
+                const floorLimit = this.halfHeight;
+                if (this.y <= floorLimit) {
+                    this.y = floorLimit;
+                    
+                    const impactVel = Math.abs(this.vy);
+                    if (impactVel > 0.4) {
+                        synth.playImpact(this.mass);
+                        if (this.fragile && impactVel > 2.2) {
+                            this.shatter();
+                            return;
+                        }
+                    }
+                    
+                    this.vy = -this.vy * this.elasticity * 0.5; // bounce decay
+                    this.vx *= 0.85; // friction
+                    this.vz *= 0.85;
+                }
+
+                // Wall bounds (x: -8 to 8, z: -8 to 8)
+                const limitX = 8.0 - this.halfWidth;
+                if (Math.abs(this.x) > limitX) {
+                    this.x = Math.sign(this.x) * limitX;
+                    this.vx = -this.vx * this.elasticity;
+                }
+                const limitZ = 8.0 - this.halfDepth;
+                if (Math.abs(this.z) > limitZ) {
+                    this.z = Math.sign(this.z) * limitZ;
+                    this.vz = -this.vz * this.elasticity;
+                }
+
+                // Update mesh positions
+                this.mesh.position.set(this.x, this.y, this.z);
+                this.outline.update();
+            }
+
+            shatter() {
+                this.markedForDeletion = true;
+                synth.playGlassShatter();
+                addLog(`[Collapse] Glass Panel shattered under high stress!`, 'red');
+                // Spawn glass particles
+                for (let i = 0; i < 22; i++) {
+                    const p = new Particle3D(this.x, this.y, this.z, 0x38bdf8, 0.06);
+                    activeParticles3D.push(p);
+                }
+                this.destroy();
+            }
+
+            destroy() {
+                scene.remove(this.mesh);
+                scene.remove(this.outline);
+                this.mesh.geometry.dispose();
+                this.mesh.material.dispose();
+                this.outline.geometry.dispose();
+                this.outline.material.dispose();
+            }
+        }
+
+        // Resolves 3D box stacking and collision resolution (AABB)
+        function resolveBoxCollisions() {
+            if (activeObjects3D.length < 2) return;
+
+            for (let i = 0; i < activeObjects3D.length; i++) {
+                const o1 = activeObjects3D[i];
+                if (o1.isDragging || o1.markedForDeletion) continue;
+
+                for (let j = i + 1; j < activeObjects3D.length; j++) {
+                    const o2 = activeObjects3D[j];
+                    if (o2.isDragging || o2.markedForDeletion) continue;
+
+                    // AABB Collision check
+                    const overlapX = (o1.halfWidth + o2.halfWidth) - Math.abs(o2.x - o1.x);
+                    const overlapY = (o1.halfHeight + o2.halfHeight) - Math.abs(o2.y - o1.y);
+                    const overlapZ = (o1.halfDepth + o2.halfDepth) - Math.abs(o2.z - o1.z);
+
+                    if (overlapX > 0 && overlapY > 0 && overlapZ > 0) {
+                        // Collision detected! Push apart on the axis of minimum overlap
+                        let axis = 'y';
+                        let minOverlap = overlapY;
+
+                        if (overlapX < minOverlap) {
+                            minOverlap = overlapX;
+                            axis = 'x';
+                        }
+                        if (overlapZ < minOverlap) {
+                            minOverlap = overlapZ;
+                            axis = 'z';
+                        }
+
+                        const mSum = o1.mass + o2.mass;
+                        let sign = 0;
+
+                        if (axis === 'x') {
+                            sign = o2.x > o1.x ? 1 : -1;
+                            o1.x -= minOverlap * sign * (o2.mass / mSum);
+                            o2.x += minOverlap * sign * (o1.mass / mSum);
+
+                            // Elastic velocity response
+                            const relV = o2.vx - o1.vx;
+                            if (relV * sign < 0) {
+                                const e = Math.min(o1.elasticity, o2.elasticity);
+                                const impulse = -(1 + e) * relV / (1 / o1.mass + 1 / o2.mass);
+                                o1.vx -= (impulse * sign) / o1.mass;
+                                o2.vx += (impulse * sign) / o2.mass;
+                                
+                                if (Math.abs(relV) > 0.4) {
+                                    synth.playImpact(Math.max(o1.mass, o2.mass));
+                                    if (o1.fragile && Math.abs(relV) > 2.0) { o1.shatter(); return; }
+                                    if (o2.fragile && Math.abs(relV) > 2.0) { o2.shatter(); return; }
+                                }
+                            }
+                        } else if (axis === 'y') {
+                            sign = o2.y > o1.y ? 1 : -1;
+                            o1.y -= minOverlap * sign * (o2.mass / mSum);
+                            o2.y += minOverlap * sign * (o1.mass / mSum);
+
+                            // Elastic velocity response
+                            const relV = o2.vy - o1.vy;
+                            if (relV * sign < 0) {
+                                const e = Math.min(o1.elasticity, o2.elasticity);
+                                const impulse = -(1 + e) * relV / (1 / o1.mass + 1 / o2.mass);
+                                o1.vy -= (impulse * sign) / o1.mass;
+                                o2.vy += (impulse * sign) / o2.mass;
+
+                                // Friction on stacking contact to prevent sliding
+                                const frictionFactor = 0.75;
+                                o1.vx *= frictionFactor;
+                                o1.vz *= frictionFactor;
+                                o2.vx *= frictionFactor;
+                                o2.vz *= frictionFactor;
+
+                                if (Math.abs(relV) > 0.4) {
+                                    synth.playImpact(Math.max(o1.mass, o2.mass));
+                                    if (o1.fragile && Math.abs(relV) > 2.0) { o1.shatter(); return; }
+                                    if (o2.fragile && Math.abs(relV) > 2.0) { o2.shatter(); return; }
+                                }
+                            }
+                        } else {
+                            sign = o2.z > o1.z ? 1 : -1;
+                            o1.z -= minOverlap * sign * (o2.mass / mSum);
+                            o2.z += minOverlap * sign * (o1.mass / mSum);
+
+                            // Elastic velocity response
+                            const relV = o2.vz - o1.vz;
+                            if (relV * sign < 0) {
+                                const e = Math.min(o1.elasticity, o2.elasticity);
+                                const impulse = -(1 + e) * relV / (1 / o1.mass + 1 / o2.mass);
+                                o1.vz -= (impulse * sign) / o1.mass;
+                                o2.vz += (impulse * sign) / o2.mass;
+
+                                if (Math.abs(relV) > 0.4) {
+                                    synth.playImpact(Math.max(o1.mass, o2.mass));
+                                    if (o1.fragile && Math.abs(relV) > 2.0) { o1.shatter(); return; }
+                                    if (o2.fragile && Math.abs(relV) > 2.0) { o2.shatter(); return; }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Add event message to log HUD
+        function addLog(text, colorClass = '') {
+            const container = document.getElementById('log-container');
+            const item = document.createElement('div');
+            item.className = `log-item ${colorClass}`;
+            item.innerText = `[${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}] ${text}`;
+            container.appendChild(item);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Set tool selection in UI
+        function selectTool(toolType) {
+            selectedToolType = toolType;
+            document.querySelectorAll('.hotbar-item').forEach(el => el.classList.remove('active'));
+            
+            let btnId = 'tool-pointer';
+            if (toolType !== 'pointer') {
+                btnId = `tool-${toolType}`;
+            }
+            document.getElementById(btnId).classList.add('active');
+
+            // Remove previous ghost mesh
+            removeGhostMesh();
+
+            // Create new ghost preview mesh if block type selected
+            if (toolType !== 'pointer') {
+                createGhostMesh(toolType);
+            }
+        }
+
+        function createGhostMesh(type) {
+            const temp = BLOCK_TEMPLATES[type];
+            if (!temp) return;
+
+            const geo = temp.buildGeometry();
+            const mat = new THREE.MeshBasicMaterial({ 
+                color: temp.color, 
+                transparent: true, 
+                opacity: 0.4,
+                wireframe: false 
+            });
+            ghostMesh = new THREE.Mesh(geo, mat);
+            ghostMesh.visible = false;
+            scene.add(ghostMesh);
+            isGhostVisible = true;
+        }
+
+        function removeGhostMesh() {
+            if (ghostMesh) {
+                scene.remove(ghostMesh);
+                ghostMesh.geometry.dispose();
+                ghostMesh.material.dispose();
+                ghostMesh = null;
+            }
+            isGhostVisible = false;
+        }
+
+        function updateGhostPreview(e) {
+            if (!isGhostVisible || !ghostMesh) return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // Raycast against the ground or other blocks
+            const blocks = activeObjects3D.map(o => o.mesh);
+            blocks.push(ground);
+
+            const intersects = raycaster.intersectObjects(blocks, true);
+
+            if (intersects.length > 0) {
+                const hit = intersects[0];
+                const pt = hit.point;
+                const normal = hit.face.normal.clone();
+                normal.transformDirection(hit.object.matrixWorld); // world coordinates normal
+
+                const temp = BLOCK_TEMPLATES[selectedToolType];
+                
+                // Align block preview
+                ghostMesh.position.copy(pt);
+                
+                // Offset along hit normal so it sits flush on top of normal
+                const offset = (normal.x * temp.width / 2) + (normal.y * temp.height / 2) + (normal.z * temp.depth / 2);
+                ghostMesh.position.addScaledVector(normal, offset);
+
+                // Snap positions slightly for cleaner building
+                ghostMesh.position.x = Math.round(ghostMesh.position.x * 4) / 4;
+                ghostMesh.position.z = Math.round(ghostMesh.position.z * 4) / 4;
+                if (normal.y > 0.8) {
+                    // Snapping flat surfaces
+                    ghostMesh.position.y = Math.round(ghostMesh.position.y * 20) / 20;
+                }
+
+                // Bound checks
+                const limitX = 8.0 - temp.width/2;
+                const limitZ = 8.0 - temp.depth/2;
+                ghostMesh.position.x = Math.max(-limitX, Math.min(limitX, ghostMesh.position.x));
+                ghostMesh.position.y = Math.max(temp.height/2, ghostMesh.position.y);
+                ghostMesh.position.z = Math.max(-limitZ, Math.min(limitZ, ghostMesh.position.z));
+
+                ghostMesh.visible = true;
+            } else {
+                ghostMesh.visible = false;
+            }
+        }
+
+        // Spawn a block in 3D
+        function spawnBlock3D(type, pos) {
+            if (activeObjects3D.length >= 40) {
+                addLog(`[Error] Max block limit (40) reached. Cannot spawn more blocks.`, 'orange');
+                return;
+            }
+
+            const inv = blockInventory[type];
+            if (inv.count <= 0) {
+                addLog(`[Error] No remaining ${inv.name} blocks!`, 'orange');
+                return;
+            }
+
+            inv.count--;
+            document.getElementById(`count-${type}`).innerText = inv.count;
+
+            const template = BLOCK_TEMPLATES[type];
+            const newObj = new PhysicsObject3D(pos.x, pos.y, pos.z, type, template);
+            
+            // Add slight upward spawning animation/velocity
+            newObj.vy = 0.5;
+
+            activeObjects3D.push(newObj);
+            selectObject(newObj);
+            
+            synth.playSpawn();
+            addLog(`[Placed] ${template.name} added at coordinates (${pos.x.toFixed(1)}, ${pos.y.toFixed(1)}, ${pos.z.toFixed(1)}).`, 'green');
+
+            // Update UI blocks count
+            document.getElementById('stats-blocks').innerText = `${activeObjects3D.length} / 40`;
+        }
+
+        function selectObject(obj) {
+            activeObjects3D.forEach(o => o.outline.visible = false);
+            selectedObject3D = obj;
+            if (selectedObject3D) {
+                selectedObject3D.outline.visible = true;
+            }
+        }
+
+        // Selection & Dragging handlers
+        function onDocumentMouseDown(e) {
+            if (gamePhase === 'evaluation') return;
+            e.preventDefault();
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            // If a block placement tool is active, place a block on empty click
+            if (selectedToolType !== 'pointer' && ghostMesh && ghostMesh.visible) {
+                spawnBlock3D(selectedToolType, ghostMesh.position);
+                updateGhostPreview(e);
+                return;
+            }
+
+            // Otherwise, click & drag handler
+            const meshes = activeObjects3D.map(o => o.mesh);
+            const intersects = raycaster.intersectObjects(meshes, true);
+
+            if (intersects.length > 0) {
+                let hitMesh = intersects[0].object;
+                while (hitMesh.parent && hitMesh.parent !== scene) {
+                    hitMesh = hitMesh.parent;
+                }
+
+                const clickedObj = activeObjects3D.find(o => o.mesh === hitMesh);
+                
+                if (clickedObj) {
+                    isMouseDown = true;
+                    draggedObject3D = clickedObj;
+                    draggedObject3D.isDragging = true;
+                    
+                    draggedObject3D.vx = 0;
+                    draggedObject3D.vy = 0;
+                    draggedObject3D.vz = 0;
+
+                    camera.getWorldDirection(planeNormal);
+                    planeNormal.negate();
+                    dragPlane.setFromNormalAndCoplanarPoint(planeNormal, draggedObject3D.mesh.position);
+
+                    if (raycaster.ray.intersectPlane(dragPlane, planeIntersection)) {
+                        lastInteractionPoint.copy(planeIntersection);
+                    }
+
+                    selectObject(clickedObj);
+                    controls.enabled = false;
+                }
+            } else {
+                selectObject(null);
+            }
+        }
+
+        function onDocumentMouseMove(e) {
+            // Update placement ghost preview
+            if (selectedToolType !== 'pointer') {
+                updateGhostPreview(e);
+                return;
+            }
+
+            if (!isMouseDown || !draggedObject3D) return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+
+            if (raycaster.ray.intersectPlane(dragPlane, planeIntersection)) {
+                draggedObject3D.x = planeIntersection.x;
+                draggedObject3D.y = planeIntersection.y;
+                draggedObject3D.z = planeIntersection.z;
+
+                // Restrict within bounding box
+                const limitX = 8 - draggedObject3D.halfWidth;
+                const limitZ = 8 - draggedObject3D.halfDepth;
+                draggedObject3D.x = Math.max(-limitX, Math.min(limitX, draggedObject3D.x));
+                draggedObject3D.y = Math.max(draggedObject3D.halfHeight, draggedObject3D.y);
+                draggedObject3D.z = Math.max(-limitZ, Math.min(limitZ, draggedObject3D.z));
+            }
+        }
+
+        function onDocumentMouseUp() {
+            isMouseDown = false;
+            if (draggedObject3D) {
+                draggedObject3D.isDragging = false;
+                draggedObject3D = null;
+            }
+            controls.enabled = true;
+        }
+
+        // Add listeners
+        container3d.addEventListener('mousedown', onDocumentMouseDown);
+        container3d.addEventListener('mousemove', onDocumentMouseMove);
+        window.addEventListener('mouseup', onDocumentMouseUp);
+
+        // Core Build Phase Timer
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (gamePhase === 'build') {
+                    buildTimeRemaining--;
+                    updateTimerUI();
+                    
+                    if (buildTimeRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        startDisasterPhase();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const minutes = Math.floor(buildTimeRemaining / 60);
+            const seconds = buildTimeRemaining % 60;
+            const strTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer-display').innerText = strTime;
+
+            const pct = (buildTimeRemaining / 120) * 100;
+            const bar = document.getElementById('timer-bar');
+            bar.style.width = `${pct}%`;
+
+            if (buildTimeRemaining > 45) {
+                bar.style.background = 'var(--success)';
+            } else if (buildTimeRemaining > 15) {
+                bar.style.background = 'var(--warning)';
+            } else {
+                bar.style.background = 'var(--primary)';
+            }
+        }
+
+        // Trigger early disaster button click
+        function triggerEarlyDisaster() {
+            if (gamePhase !== 'build') return;
+            clearInterval(timerInterval);
+            startDisasterPhase();
+        }
+
+        // Start Natural Disaster Simulation Phase
+        function startDisasterPhase() {
+            gamePhase = 'disaster';
+            isDisasterActive = true;
+            gameTime = 0;
+            initialObjectCount = activeObjects3D.length;
+            
+            // Auto-deselect tool
+            selectTool('pointer');
+            document.getElementById('btn-start').disabled = true;
+
+            // Choose random disaster
+            activeDisasterType = DISASTERS[Math.floor(Math.random() * DISASTERS.length)];
+            const info = DISASTER_INFO[activeDisasterType];
+
+            // UI updates
+            document.getElementById('phase-icon').innerText = '🌪️';
+            document.getElementById('timer-display').innerText = 'DISASTER!';
+            document.getElementById('timer-bar').style.width = '100%';
+            document.getElementById('timer-bar').style.background = 'var(--primary)';
+
+            // Display big status banner overlay
+            const banner = document.getElementById('status-banner');
+            document.getElementById('banner-title').innerText = info.title;
+            document.getElementById('banner-desc').innerText = info.desc;
+            banner.style.display = 'flex';
+
+            addLog(`[Alert] Build phase ended. Starting disaster: ${info.title}`, 'red');
+
+            // Apply disaster setup
+            setupDisasterEnvironments();
+
+            // Clear banner after 4.5 seconds
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 4500);
+        }
+
+        function setupDisasterEnvironments() {
+            if (activeDisasterType === 'earthquake') {
+                synth.playEarthquakeStart();
+                cameraRumbleIntensity = 1.2;
+                scene.background.setHex(0xfdba74); // Dusty orange sky
+                scene.fog.color.setHex(0xfdba74);
+                renderer.setClearColor(0xfdba74);
+            } else if (activeDisasterType === 'meteor') {
+                cameraRumbleIntensity = 0.5;
+                scene.background.setHex(0x475569); // Dark storm sky
+                scene.fog.color.setHex(0x475569);
+                renderer.setClearColor(0x475569);
+            } else if (activeDisasterType === 'tornado') {
+                cameraRumbleIntensity = 0.2;
+                scene.background.setHex(0x334155); // Purple dark sky
+                scene.fog.color.setHex(0x334155);
+                renderer.setClearColor(0x334155);
+
+                // Build spinning tornado cone mesh
+                const tornGeo = new THREE.CylinderGeometry(2.5, 0.3, 13, 16, 1, true);
+                const tornMat = new THREE.MeshBasicMaterial({ 
+                    color: 0x64748b, 
+                    transparent: true, 
+                    opacity: 0.32, 
+                    wireframe: true 
+                });
+                tornadoMesh = new THREE.Mesh(tornGeo, tornMat);
+                tornadoMesh.position.set(0, 6.5, 0);
+                scene.add(tornadoMesh);
+            } else if (activeDisasterType === 'tsunami') {
+                scene.background.setHex(0x7dd3fc); // Blue ocean sky
+                scene.fog.color.setHex(0x7dd3fc);
+                renderer.setClearColor(0x7dd3fc);
+
+                // Build rising water mesh
+                const waterGeo = new THREE.PlaneGeometry(30, 30);
+                const waterMat = new THREE.MeshStandardMaterial({ 
+                    color: 0x0ea5e9, 
+                    transparent: true, 
+                    opacity: 0.65, 
+                    roughness: 0.1,
+                    metalness: 0.1
+                });
+                waterMesh = new THREE.Mesh(waterGeo, waterMat);
+                waterMesh.rotation.x = -Math.PI / 2;
+                waterMesh.position.y = -0.5; // Starts under ground floor
+                scene.add(waterMesh);
+            }
+        }
+
+        // Apply dynamic real-time forces from active disasters
+        function updateDisasterLogic(dt) {
+            gameTime += dt;
+
+            // Check if disaster has ended
+            if (gameTime >= disasterDuration) {
+                endDisasterPhase();
+                return;
+            }
+
+            // Display count-down style text in log
+            const timeVal = (disasterDuration - gameTime).toFixed(1);
+            document.getElementById('timer-display').innerText = `${timeVal}s`;
+            document.getElementById('timer-bar').style.width = `${((disasterDuration - gameTime) / disasterDuration) * 100}%`;
+
+            if (activeDisasterType === 'earthquake') {
+                // Earthquake shaking oscillation
+                const shakeFreqX = 24.0;
+                const shakeFreqZ = 18.0;
+                const amplitude = 5.8;
+
+                // Move ground mesh cosmetically
+                ground.position.x = Math.sin(gameTime * shakeFreqX) * 0.15;
+                ground.position.z = Math.cos(gameTime * shakeFreqZ) * 0.12;
+                gridHelper.position.x = ground.position.x;
+                gridHelper.position.z = ground.position.z;
+
+                // Apply earthquake lateral acceleration force vectors directly to blocks
+                activeObjects3D.forEach(obj => {
+                    if (obj.isDragging) return;
+                    obj.vx += Math.sin(gameTime * shakeFreqX) * amplitude * dt;
+                    obj.vz += Math.cos(gameTime * shakeFreqZ) * (amplitude - 1) * dt;
+                    
+                    // Minor vertical jump
+                    if (Math.random() < 0.08) {
+                        obj.vy += (Math.random() - 0.2) * 1.8 * dt;
+                    }
+                });
+
+                // Tectonic rumble sound
+                if (Math.random() < 0.05) {
+                    synth.playImpact(8);
+                }
+
+                // Shake camera continuously
+                cameraRumbleIntensity = Math.max(cameraRumbleIntensity, 0.45);
+            } 
+            else if (activeDisasterType === 'meteor') {
+                // Periodically spawn meteors aiming at coordinates
+                if (Math.floor(gameTime * 3) !== Math.floor((gameTime - dt) * 3)) {
+                    // Spawn warning target reticle
+                    let targetX = (Math.random() - 0.5) * 11;
+                    let targetZ = (Math.random() - 0.5) * 11;
+                    let targetY = 0.05;
+
+                    // Try to aim on top of blocks if available
+                    if (activeObjects3D.length > 0) {
+                        const randomObj = activeObjects3D[Math.floor(Math.random() * activeObjects3D.length)];
+                        targetX = randomObj.x + (Math.random() - 0.5) * 1.5;
+                        targetZ = randomObj.z + (Math.random() - 0.5) * 1.5;
+                        targetY = Math.max(0.05, randomObj.y + randomObj.halfHeight);
+                    }
+
+                    // Target indicator ring mesh
+                    const ringGeo = new THREE.RingGeometry(0.1, 0.8, 16);
+                    const ringMat = new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide });
+                    const targetMesh = new THREE.Mesh(ringGeo, ringMat);
+                    targetMesh.rotation.x = -Math.PI / 2;
+                    targetMesh.position.set(targetX, targetY + 0.02, targetZ);
+                    scene.add(targetMesh);
+
+                    // Meteor mesh sphere
+                    const metGeo = new THREE.SphereGeometry(0.4, 12, 12);
+                    const metMat = new THREE.MeshBasicMaterial({ color: 0xf97316 });
+                    const meteorMesh = new THREE.Mesh(metGeo, metMat);
+                    // Spawns high in air
+                    meteorMesh.position.set(targetX + (Math.random() - 0.5) * 6, 16.0, targetZ + (Math.random() - 0.5) * 6);
+                    scene.add(meteorMesh);
+
+                    activeTargets.push({
+                        mesh: targetMesh,
+                        x: targetX,
+                        y: targetY,
+                        z: targetZ,
+                        spawnTime: gameTime
+                    });
+
+                    activeMeteors.push({
+                        mesh: meteorMesh,
+                        tx: targetX,
+                        ty: targetY,
+                        tz: targetZ,
+                        sx: meteorMesh.position.x,
+                        sy: meteorMesh.position.y,
+                        sz: meteorMesh.position.z,
+                        spawnTime: gameTime
+                    });
+
+                    addLog(`[Warning] T-Minus 1.5s: Meteor incoming at (${targetX.toFixed(1)}, ${targetZ.toFixed(1)})`, 'orange');
+                }
+
+                // Update active meteors flight path
+                for (let i = activeMeteors.length - 1; i >= 0; i--) {
+                    const met = activeMeteors[i];
+                    const elapsed = gameTime - met.spawnTime;
+                    const duration = 1.5; // 1.5 seconds travel flight time
+                    const pct = Math.min(1.0, elapsed / duration);
+
+                    // Interpolate position
+                    met.mesh.position.x = THREE.MathUtils.lerp(met.sx, met.tx, pct);
+                    met.mesh.position.y = THREE.MathUtils.lerp(met.sy, met.ty, pct);
+                    met.mesh.position.z = THREE.MathUtils.lerp(met.sz, met.tz, pct);
+
+                    // On impact
+                    if (pct >= 1.0) {
+                        // Explode!
+                        triggerMeteorExplosion(met.tx, met.ty, met.tz);
+                        
+                        // Clean up meshes
+                        scene.remove(met.mesh);
+                        met.mesh.geometry.dispose();
+                        met.mesh.material.dispose();
+                        activeMeteors.splice(i, 1);
+
+                        // Clean up matching target indicators
+                        const tgtIdx = activeTargets.findIndex(t => t.x === met.tx && t.z === met.tz);
+                        if (tgtIdx !== -1) {
+                            const tgt = activeTargets[tgtIdx];
+                            scene.remove(tgt.mesh);
+                            tgt.mesh.geometry.dispose();
+                            tgt.mesh.material.dispose();
+                            activeTargets.splice(tgtIdx, 1);
+                        }
+                    }
+                }
+            } 
+            else if (activeDisasterType === 'tornado') {
+                // Swirl tornado around coordinates in a circle path
+                tornadoPathAngle += dt * 0.95;
+                const pathRadius = 4.5;
+                const tx = Math.sin(tornadoPathAngle) * pathRadius;
+                const tz = Math.cos(tornadoPathAngle * 0.7) * pathRadius;
+
+                if (tornadoMesh) {
+                    tornadoMesh.position.x = tx;
+                    tornadoMesh.position.z = tz;
+                    tornadoMesh.rotation.y += dt * 10; // fast rotation
+                }
+
+                // Apply vortex suction wind force vectors to all blocks
+                activeObjects3D.forEach(obj => {
+                    if (obj.isDragging) return;
+                    
+                    const dx = obj.x - tx;
+                    const dz = obj.z - tz;
+                    const distH = Math.hypot(dx, dz); // horizontal distance
+
+                    if (distH < 6.0) {
+                        // Swirl vector (perpendicular)
+                        const swirlX = -dz / (distH + 0.1);
+                        const swirlZ = dx / (distH + 0.1);
+
+                        // Pull vector
+                        const pullX = -dx / (distH + 0.1);
+                        const pullZ = -dz / (distH + 0.1);
+
+                        // Force strength mapping (higher closer to vortex core center)
+                        const strength = (6.0 - distH) * 5.0;
+
+                        // Vortex forces
+                        obj.vx += (swirlX * strength * 0.95 + pullX * strength * 0.4) * dt;
+                        obj.vz += (swirlZ * strength * 0.95 + pullZ * strength * 0.4) * dt;
+                        
+                        // Upward lift suction
+                        obj.vy += (6.0 - distH) * 3.5 * dt / obj.mass;
+                    }
+                });
+
+                // Spawn dust debris particles around the base
+                if (Math.random() < 0.35) {
+                    const p = new Particle3D(tx + (Math.random()-0.5)*2, 0.2, tz + (Math.random()-0.5)*2, 0x64748b, 0.08);
+                    p.vy = 8;
+                    activeParticles3D.push(p);
+                }
+            } 
+            else if (activeDisasterType === 'tsunami') {
+                // Slowly raise water level Y over 11 seconds
+                if (waterMesh) {
+                    if (waterMesh.position.y < 6.5) {
+                        waterMesh.position.y += dt * 0.65;
+                    }
+                    
+                    // Wave rocking effect (cosmetic wave fluctuation)
+                    waterMesh.position.y += Math.sin(gameTime * 3) * 0.012;
+                }
+            }
+        }
+
+        function triggerMeteorExplosion(ex, ey, ez) {
+            synth.playExplosion();
+            cameraRumbleIntensity = 1.0;
+            addLog(`[Meteor] Strike at (${ex.toFixed(1)}, ${ez.toFixed(1)}) caused an explosion!`, 'orange');
+
+            // Apply blast force vectors radiating from epicenter
+            activeObjects3D.forEach(obj => {
+                if (obj.isDragging) return;
+
+                const dx = obj.x - ex;
+                const dy = obj.y - ey;
+                const dz = obj.z - ez;
+                const dist = Math.hypot(dx, dy, dz);
+
+                const blastRadius = 5.5;
+                if (dist < blastRadius) {
+                    const forceScale = (1.0 - dist / blastRadius) * 22.0;
+                    
+                    // Outward unit vectors
+                    const nx = dist > 0.01 ? dx / dist : 0;
+                    const ny = dist > 0.01 ? dy / dist : 1;
+                    const nz = dist > 0.01 ? dz / dist : 0;
+
+                    obj.vx += (nx * forceScale) / obj.mass;
+                    obj.vy += (ny * forceScale + 2.5) / obj.mass;
+                    obj.vz += (nz * forceScale) / obj.mass;
+
+                    // Shatter glass immediately if within close blast radius
+                    if (obj.fragile && dist < 3.2) {
+                        obj.shatter();
+                    }
+                }
+            });
+
+            // Spawn fire particles
+            for (let i = 0; i < 15; i++) {
+                const p = new Particle3D(ex, ey + 0.1, ez, 0xef4444, 0.09);
+                activeParticles3D.push(p);
+            }
+        }
+
+        // Complete Natural Disaster Phase & Start Evaluation Mode
+        function endDisasterPhase() {
+            gamePhase = 'evaluation';
+            isDisasterActive = false;
+            document.getElementById('timer-display').innerText = 'ENDED!';
+            
+            // Clean up storm meshes
+            if (tornadoMesh) {
+                scene.remove(tornadoMesh);
+                tornadoMesh = null;
+            }
+
+            // Remove active targeting markers
+            activeTargets.forEach(t => scene.remove(t.mesh));
+            activeTargets = [];
+            activeMeteors.forEach(m => scene.remove(m.mesh));
+            activeMeteors = [];
+
+            // Reset ground floor positions
+            ground.position.set(0, -0.5, 0);
+            gridHelper.position.set(0, 0.01, 0);
+
+            // Compute survival calculations
+            evaluateStructureSurvival();
+        }
+
+        function evaluateStructureSurvival() {
+            // Filter blocks falling off boundaries or deleted
+            const survivingBlocks = activeObjects3D.filter(obj => obj.y > 0.2 && Math.abs(obj.x) < 8.0 && Math.abs(obj.z) < 8.0 && !obj.markedForDeletion);
+            const remainingCount = survivingBlocks.length;
+            
+            // Survival rate
+            let survivalRatePct = 100;
+            if (initialObjectCount > 0) {
+                survivalRatePct = Math.round((remainingCount / initialObjectCount) * 100);
+            } else {
+                survivalRatePct = 0;
+            }
+
+            // Peak height of surviving structure
+            let currentPeakHeight = 0;
+            survivingBlocks.forEach(obj => {
+                const topY = obj.y + obj.halfHeight;
+                if (topY > currentPeakHeight) {
+                    currentPeakHeight = topY;
+                }
+            });
+
+            // Laser target check
+            const laserCleared = currentPeakHeight >= 4.0;
+
+            // UI updates
+            document.getElementById('stats-height').innerText = `${currentPeakHeight.toFixed(2)}m`;
+            document.getElementById('stats-survival').innerText = `${survivalRatePct}%`;
+            
+            const laserText = document.getElementById('stats-laser-cleared');
+            const badge = document.getElementById('laser-badge');
+
+            if (laserCleared) {
+                laserText.innerText = "YES (CLEARED!)";
+                laserText.style.color = "var(--success)";
+                badge.className = "canvas-badge laser-badge-green";
+            } else {
+                laserText.innerText = "NO (FAILED)";
+                laserText.style.color = "var(--danger)";
+                badge.className = "canvas-badge laser-badge-red";
+            }
+
+            // Display survival banner modal inside log
+            addLog(`========== SURVIVAL REPORT ==========`, 'blue');
+            addLog(`Selected Disaster: ${activeDisasterType.toUpperCase()}`, 'orange');
+            addLog(`Blocks Pre-Disaster: ${initialObjectCount} | Survived: ${remainingCount}`, 'blue');
+            addLog(`Structure Peak Height: ${currentPeakHeight.toFixed(2)}m`, 'blue');
+            addLog(`Laser Target (4m): ${laserCleared ? 'PASSED ✅' : 'FAILED ❌'}`, laserCleared ? 'green' : 'red');
+            addLog(`Structure Survival Rate: ${survivalRatePct}%`, 'blue');
+
+            // Play final fanfare audio context sounds
+            const isWinner = laserCleared && survivalRatePct > 40;
+            synth.playFanfare(isWinner);
+
+            if (isWinner) {
+                addLog(`RESULT: Engineering Success! Your building stood the test of nature. 🏆`, 'green');
+                showBannerResult("SURVIVAL SUCCESS! 🏆", `Your structure survived with ${survivalRatePct}% blocks intact and reached ${currentPeakHeight.toFixed(2)}m!`);
+            } else {
+                addLog(`RESULT: Structural Failure. The building collapsed or sank. 💀`, 'red');
+                showBannerResult("COLLAPSE DETECTED! 💀", `Structure height fell below laser threshold or collapsed. Try reinforcing your base!`);
+            }
+        }
+
+        function showBannerResult(title, desc) {
+            const banner = document.getElementById('status-banner');
+            document.getElementById('banner-title').innerText = title;
+            document.getElementById('banner-desc').innerText = desc;
+            banner.style.display = 'flex';
+        }
+
+        // Full Game resets
+        function resetGame() {
+            // Clear sandbox meshes
+            activeObjects3D.forEach(obj => obj.destroy());
+            activeObjects3D = [];
+            selectedObject3D = null;
+            draggedObject3D = null;
+            peakHeightReached = 0;
+            isDisasterActive = false;
+
+            // Clear weather elements
+            if (waterMesh) {
+                scene.remove(waterMesh);
+                waterMesh = null;
+            }
+            if (tornadoMesh) {
+                scene.remove(tornadoMesh);
+                tornadoMesh = null;
+            }
+            activeTargets.forEach(t => scene.remove(t.mesh));
+            activeTargets = [];
+            activeMeteors.forEach(m => scene.remove(m.mesh));
+            activeMeteors = [];
+
+            // Reset environments
+            scene.background.setHex(0xf1f5f9);
+            scene.fog.color.setHex(0xf1f5f9);
+            renderer.setClearColor(0xf1f5f9);
+            ground.position.set(0, -0.5, 0);
+            gridHelper.position.set(0, 0.01, 0);
+
+            // Restore blocks inventory counts
+            for (const key in blockInventory) {
+                blockInventory[key].count = blockInventory[key].max;
+                document.getElementById(`count-${key}`).innerText = blockInventory[key].count;
+            }
+
+            // Restore defaults
+            buildTimeRemaining = 120;
+            gamePhase = 'build';
+            activeDisasterType = null;
+            document.getElementById('phase-icon').innerText = '⏳';
+            document.getElementById('btn-start').disabled = false;
+            document.getElementById('status-banner').style.display = 'none';
+            document.getElementById('laser-badge').className = "canvas-badge laser-badge-red";
+
+            updateTimerUI();
+            startTimer();
+
+            // Clear Log
+            const container = document.getElementById('log-container');
+            container.innerHTML = `<div class="log-item green">[System] Sandbox reset. Build phase started.</div>`;
+
+            // Reset HUD
+            document.getElementById('stats-blocks').innerText = '0 / 40';
+            document.getElementById('stats-height').innerText = '0.00m';
+            document.getElementById('stats-laser-cleared').innerText = 'NO';
+            document.getElementById('stats-laser-cleared').style.color = "var(--danger)";
+            document.getElementById('stats-survival').innerText = '100%';
+
+            selectTool('pointer');
+        }
+
+        // Initial setup on window load
+        updateTimerUI();
+        startTimer();
+
+        // 3D Rendering Frame loop
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
+            const scaledDt = DT;
+
+            // Update blocks physics if building or disaster active
+            if (gamePhase === 'build' || gamePhase === 'disaster') {
+                const subSteps = 3;
+                const stepDt = scaledDt / subSteps;
+                
+                for (let i = 0; i < subSteps; i++) {
+                    activeObjects3D.forEach(obj => obj.update(stepDt));
+                    resolveBoxCollisions();
+                }
+
+                // Delete object marked for deletion
+                activeObjects3D = activeObjects3D.filter(obj => !obj.markedForDeletion);
+            }
+
+            // Disaster specific loops
+            if (gamePhase === 'disaster') {
+                updateDisasterLogic(scaledDt);
+            }
+
+            // Particles update
+            activeParticles3D.forEach(p => p.update(scaledDt));
+            activeParticles3D = activeParticles3D.filter(p => p.alpha > 0);
+
+            // Calculate peak height of active building structure (real-time build HUD)
+            if (gamePhase === 'build') {
+                let currentHeight = 0;
+                activeObjects3D.forEach(obj => {
+                    const topY = obj.y + obj.halfHeight;
+                    if (topY > currentHeight) {
+                        currentHeight = topY;
+                    }
+                });
+                
+                document.getElementById('stats-height').innerText = `${currentHeight.toFixed(2)}m`;
+                
+                const laserText = document.getElementById('stats-laser-cleared');
+                const badge = document.getElementById('laser-badge');
+
+                if (currentHeight >= 4.0) {
+                    laserText.innerText = "YES (CLEARED!)";
+                    laserText.style.color = "var(--success)";
+                    badge.className = "canvas-badge laser-badge-green";
+                } else {
+                    laserText.innerText = "NO";
+                    laserText.style.color = "var(--danger)";
+                    badge.className = "canvas-badge laser-badge-red";
+                }
+            }
+
+            // Camera shake rumble decay
+            if (cameraRumbleIntensity > 0.01) {
+                const rumbleX = (Math.random() - 0.5) * cameraRumbleIntensity * 0.15;
+                const rumbleY = (Math.random() - 0.5) * cameraRumbleIntensity * 0.15;
+                camera.position.x += rumbleX;
+                camera.position.y += rumbleY;
+                cameraRumbleIntensity *= 0.90; // decay
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Start animation loop
+        animate3D();
+
+        // Responsive window scaling
+        window.addEventListener('resize', () => {
+            camera.aspect = container3d.clientWidth / container3d.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container3d.clientWidth, container3d.clientHeight);
+        });
+
+    </script>
+</body>
+</html>
