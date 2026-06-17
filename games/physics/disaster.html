@@ -497,14 +497,14 @@
         <!-- LEFT SIDEBAR: Instructions & Real-time stats -->
         <div class="panel">
             <div class="panel-title">
-                <span>🎮 How to Play</span>
-                <span style="font-size: 1.2rem;">🏗️</span>
+                <span>🎮 Touchpad Rules</span>
+                <span style="font-size: 1.2rem;">🖐️</span>
             </div>
             <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
-                Select blocks from the hotbar and <strong>Left-Click</strong> on the ground or existing blocks to place.
+                👉 <strong>Tap/Click</strong>: Spawns/builds your selected block shape. You can tap the ground or tap directly on other blocks to stack.
             </p>
             <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
-                <strong>Right-Click & Drag</strong> any block in the scene at any time to move and stack it. (Or left-click drag when the Move tool is active).
+                👉 <strong>Click & Slide (Drag)</strong>: Touch and slide to pick up, lift, and move existing blocks. Works with both standard mouse and touchpads!
             </p>
             <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
                 Clear the <strong>4m Laser Line</strong> before the disaster strikes!
@@ -575,7 +575,7 @@
                 <!-- Move/Pointer Tool -->
                 <div class="hotbar-item active" id="tool-pointer" onclick="selectTool('pointer')">
                     <span class="icon">🖐️</span>
-                    <span class="label">Move</span>
+                    <span class="label">Move Only</span>
                 </div>
                 <div class="hotbar-separator"></div>
                 <!-- Building Blocks -->
@@ -1120,7 +1120,12 @@
         const planeNormal = new THREE.Vector3();
         const planeIntersection = new THREE.Vector3();
         const lastInteractionPoint = new THREE.Vector3();
-        const flickVelocity = new THREE.Vector3();
+
+        // Dragging and Touchpad thresholds helpers
+        let potentialDragObject = null;
+        let dragStartMouseX = 0;
+        let dragStartMouseY = 0;
+        let isDraggingActive = false;
 
         // Screen shake intensity
         let cameraRumbleIntensity = 0;
@@ -1627,11 +1632,10 @@
             }
         }
 
-        // Selection & Dragging handlers (supports immediate right-click drag & drop)
+        // Touchpad friendly gesture handling: Click down triggers potential drag.
+        // If mouse shifts > 6px, it begins dragging. If mouseup fires without movement, it builds/places a block.
         function onDocumentMouseDown(e) {
             if (gamePhase === 'evaluation') return;
-
-            const isRightClick = e.button === 2;
 
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -1643,7 +1647,6 @@
             const meshes = activeObjects3D.map(o => o.mesh);
             const intersects = raycaster.intersectObjects(meshes, true);
 
-            // If player clicked directly on an existing block, ALWAYS pick it up / drag it
             if (intersects.length > 0) {
                 e.preventDefault();
                 let hitMesh = intersects[0].object;
@@ -1654,17 +1657,17 @@
                 const clickedObj = activeObjects3D.find(o => o.mesh === hitMesh);
                 
                 if (clickedObj) {
+                    // Store details for potential drag threshold checks (essential for trackpads)
+                    potentialDragObject = clickedObj;
+                    dragStartMouseX = e.clientX;
+                    dragStartMouseY = e.clientY;
                     isMouseDown = true;
-                    draggedObject3D = clickedObj;
-                    draggedObject3D.isDragging = true;
-                    
-                    draggedObject3D.vx = 0;
-                    draggedObject3D.vy = 0;
-                    draggedObject3D.vz = 0;
+                    isDraggingActive = false;
 
+                    // Set up plane coordinates for dragging intersection checks
                     camera.getWorldDirection(planeNormal);
                     planeNormal.negate();
-                    dragPlane.setFromNormalAndCoplanarPoint(planeNormal, draggedObject3D.mesh.position);
+                    dragPlane.setFromNormalAndCoplanarPoint(planeNormal, potentialDragObject.mesh.position);
 
                     if (raycaster.ray.intersectPlane(dragPlane, planeIntersection)) {
                         lastInteractionPoint.copy(planeIntersection);
@@ -1676,37 +1679,51 @@
                 }
             }
 
-            // If they left-clicked on empty space or ground and a build tool is active, place a block!
-            if (!isRightClick && selectedToolType !== 'pointer' && ghostMesh && ghostMesh.visible) {
+            // Clicked on empty space or ground
+            if (selectedToolType !== 'pointer') {
                 e.preventDefault();
-                spawnBlock3D(selectedToolType, ghostMesh.position);
-                updateGhostPreview(e);
+                if (ghostMesh && ghostMesh.visible) {
+                    spawnBlock3D(selectedToolType, ghostMesh.position);
+                    updateGhostPreview(e);
+                }
             } else {
                 selectObject(null);
             }
         }
 
         function onDocumentMouseMove(e) {
-            // Update placement ghost preview
+            // Update preview ghost position when not dragging
             if (selectedToolType !== 'pointer' && !isMouseDown) {
                 updateGhostPreview(e);
                 return;
             }
 
-            if (!isMouseDown || !draggedObject3D) return;
+            if (!isMouseDown) return;
 
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
             raycaster.setFromCamera(mouse, camera);
 
-            if (raycaster.ray.intersectPlane(dragPlane, planeIntersection)) {
+            // Check if finger moved far enough to confirm it as a drag instead of a tap/place click
+            if (potentialDragObject && !isDraggingActive) {
+                const distanceMoved = Math.hypot(e.clientX - dragStartMouseX, e.clientY - dragStartMouseY);
+                if (distanceMoved > 6) { // 6px threshold
+                    isDraggingActive = true;
+                    draggedObject3D = potentialDragObject;
+                    draggedObject3D.isDragging = true;
+                    draggedObject3D.vx = 0;
+                    draggedObject3D.vy = 0;
+                    draggedObject3D.vz = 0;
+                }
+            }
+
+            if (draggedObject3D && isDraggingActive && raycaster.ray.intersectPlane(dragPlane, planeIntersection)) {
                 draggedObject3D.x = planeIntersection.x;
                 draggedObject3D.y = planeIntersection.y;
                 draggedObject3D.z = planeIntersection.z;
 
-                // Restrict within bounding box
+                // Clamp coordinates inside workspace limits
                 const limitX = 8 - draggedObject3D.halfWidth;
                 const limitZ = 8 - draggedObject3D.halfDepth;
                 draggedObject3D.x = Math.max(-limitX, Math.min(limitX, draggedObject3D.x));
@@ -1715,12 +1732,26 @@
             }
         }
 
-        function onDocumentMouseUp() {
+        function onDocumentMouseUp(e) {
             isMouseDown = false;
+            
+            // If they clicked/tapped a block without moving, treat it as a tap/click to BUILD a new block on top of it
+            if (potentialDragObject && !isDraggingActive) {
+                if (selectedToolType !== 'pointer') {
+                    if (ghostMesh && ghostMesh.visible) {
+                        spawnBlock3D(selectedToolType, ghostMesh.position);
+                        updateGhostPreview(e);
+                    }
+                }
+            }
+
+            // Reset dragging indicators
             if (draggedObject3D) {
                 draggedObject3D.isDragging = false;
                 draggedObject3D = null;
             }
+            potentialDragObject = null;
+            isDraggingActive = false;
             controls.enabled = true;
         }
 
