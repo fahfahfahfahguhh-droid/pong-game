@@ -630,20 +630,20 @@
                     
                     <div class="group-title">🌍 Select Biome & Terrain</div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:6px;">
-                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('earth')">🌍 Earth Meadow</button>
-                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('ocean')">🌊 Deep Ocean</button>
-                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('mars')">🪐 Mars Desert</button>
-                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('jupiter')">⚡ Jupiter Core</button>
-                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('moon')">🌙 Lunar Surface</button>
-                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('space')">🌌 Outer Space Vacuum</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('earth', true)">🌍 Earth Meadow</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('ocean', true)">🌊 Deep Ocean</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('mars', true)">🪐 Mars Desert</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('jupiter', true)">⚡ Jupiter Core</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('moon', true)">🌙 Lunar Surface</button>
+                        <button class="preset-btn" style="padding: 6px; font-size:0.75rem;" onclick="setBiome3D('space', true)">🌌 Outer Space Vacuum</button>
                     </div>
 
                     <div class="group-title">🌦️ Atmospheric Weather</div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-top:6px;">
-                        <button class="preset-btn" id="weather-clear" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('clear')">☀️ Clear Sky</button>
-                        <button class="preset-btn" id="weather-rain" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('rain')">🌧️ Heavy Rain</button>
-                        <button class="preset-btn" id="weather-snow" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('snow')">❄️ Snow Blizzard</button>
-                        <button class="preset-btn" id="weather-meteors" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('meteors')">☄️ Meteor Shower</button>
+                        <button class="preset-btn" id="weather-clear" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('clear', true)">☀️ Clear Sky</button>
+                        <button class="preset-btn" id="weather-rain" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('rain', true)">🌧️ Heavy Rain</button>
+                        <button class="preset-btn" id="weather-snow" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('snow', true)">❄️ Snow Blizzard</button>
+                        <button class="preset-btn" id="weather-meteors" style="padding: 6px; font-size:0.75rem;" onclick="setWeather3D('meteors', true)">☄️ Meteor Shower</button>
                     </div>
 
                     <div class="group-title">🔬 Physics Scenarios (Presets)</div>
@@ -3576,6 +3576,7 @@
 
             // Auto select
             selectObject(newObj);
+            resumeSimulation3D();
         }
 
         function selectObject(obj) {
@@ -3607,7 +3608,7 @@
         }
 
         // BIOME MANAGER
-        function setBiome3D(biomeId) {
+        function setBiome3D(biomeId, autoResume = false) {
             const biome = BIOMES[biomeId];
             if (!biome) return;
 
@@ -3620,6 +3621,10 @@
             ground.material.color.setHex(biome.color);
             scene.fog.color.setHex(biome.fogColor);
             renderer.setClearColor(biome.fogColor);
+
+            if (autoResume) {
+                resumeSimulation3D();
+            }
         }
 
         // WEATHER SYSTEM GLOBALS & LOGIC
@@ -3810,7 +3815,7 @@
             }
         }
 
-        function setWeather3D(type) {
+        function setWeather3D(type, autoResume = false) {
             activeWeatherType = type;
 
             // Clear existing particles
@@ -3850,6 +3855,10 @@
                 const p = new WeatherParticle3D(type, true);
                 weatherParticles.push(p);
                 weatherGroup.add(p.mesh);
+            }
+
+            if (autoResume) {
+                resumeSimulation3D();
             }
         }
 
@@ -3912,6 +3921,13 @@
         function togglePause3D() {
             gamePaused = !gamePaused;
             document.getElementById('btn-pause').innerText = gamePaused ? "Resume Sim" : "Pause Sim";
+        }
+
+        function resumeSimulation3D() {
+            if (gamePaused) {
+                gamePaused = false;
+                document.getElementById('btn-pause').innerText = "Pause Sim";
+            }
         }
 
         function stepFrame3D() {
@@ -4203,6 +4219,7 @@
             }
 
             updateBadgeHUD3D();
+            resumeSimulation3D();
         }
 
         // 3D dragging raycast event logic
