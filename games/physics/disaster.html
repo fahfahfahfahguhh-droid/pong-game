@@ -303,17 +303,31 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(15, 23, 42, 0.08);
             border-radius: 16px;
-            padding: 8px 16px;
+            padding: 10px 18px;
             display: flex;
             gap: 8px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
             z-index: 5;
             align-items: center;
+            max-width: 95%;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .hotbar-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        .hotbar-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .hotbar-container::-webkit-scrollbar-thumb {
+            background: rgba(15, 23, 42, 0.15);
+            border-radius: 2px;
         }
 
         .hotbar-item {
-            width: 68px;
-            height: 68px;
+            width: 66px;
+            height: 66px;
             border-radius: 10px;
             border: 1px solid var(--border-color);
             background: rgba(255, 255, 255, 0.5);
@@ -325,6 +339,7 @@
             position: relative;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             gap: 2px;
+            flex-shrink: 0;
         }
 
         .hotbar-item:hover {
@@ -341,13 +356,15 @@
         }
 
         .hotbar-item .icon {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
         }
 
         .hotbar-item .label {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 700;
             color: var(--text-muted);
+            text-align: center;
+            white-space: nowrap;
         }
 
         .hotbar-item .count-badge {
@@ -377,6 +394,7 @@
             height: 40px;
             background: var(--border-color);
             margin: 0 4px;
+            flex-shrink: 0;
         }
 
         /* Disaster evaluation panel/overlay */
@@ -483,10 +501,13 @@
                 <span style="font-size: 1.2rem;">🏗️</span>
             </div>
             <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
-                You have <strong>2 minutes</strong> to build a structure. Choose blocks from the hotbar and click on the grid or other blocks to place them. Drag blocks to adjust your design.
+                Select blocks from the hotbar and <strong>Left-Click</strong> on the ground or existing blocks to place.
             </p>
             <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
-                Try to keep blocks stacked above the <strong>Laser Height Line (4m)</strong>. When time runs out, a random natural disaster will strike!
+                <strong>Right-Click & Drag</strong> any block in the scene at any time to move and stack it. (Or left-click drag when the Move tool is active).
+            </p>
+            <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
+                Clear the <strong>4m Laser Line</strong> before the disaster strikes!
             </p>
 
             <div class="panel-title">
@@ -582,6 +603,36 @@
                     <span class="icon">🏛️</span>
                     <span class="label">Pillar</span>
                     <span class="count-badge" id="count-stone">6</span>
+                </div>
+                <div class="hotbar-item" id="tool-log" onclick="selectTool('log')">
+                    <span class="icon">🪵</span>
+                    <span class="label">Wood Log</span>
+                    <span class="count-badge" id="count-log">8</span>
+                </div>
+                <div class="hotbar-item" id="tool-slab" onclick="selectTool('slab')">
+                    <span class="icon">🧱</span>
+                    <span class="label">Brick Slab</span>
+                    <span class="count-badge" id="count-slab">10</span>
+                </div>
+                <div class="hotbar-item" id="tool-wedge" onclick="selectTool('wedge')">
+                    <span class="icon">📐</span>
+                    <span class="label">Wedge</span>
+                    <span class="count-badge" id="count-wedge">8</span>
+                </div>
+                <div class="hotbar-item" id="tool-plate" onclick="selectTool('plate')">
+                    <span class="icon">🛡️</span>
+                    <span class="label">Shield Plate</span>
+                    <span class="count-badge" id="count-plate">6</span>
+                </div>
+                <div class="hotbar-item" id="tool-joint" onclick="selectTool('joint')">
+                    <span class="icon">🔩</span>
+                    <span class="label">Steel Joint</span>
+                    <span class="count-badge" id="count-joint">12</span>
+                </div>
+                <div class="hotbar-item" id="tool-window" onclick="selectTool('window')">
+                    <span class="icon">🪟</span>
+                    <span class="label">Window</span>
+                    <span class="count-badge" id="count-window">10</span>
                 </div>
             </div>
         </div>
@@ -769,7 +820,7 @@
     <script>
         // Game variables
         let gamePhase = 'build'; // 'build', 'disaster', 'evaluation'
-        let selectedToolType = 'pointer'; // 'pointer', 'wood', 'concrete', 'steel', 'glass', 'stone'
+        let selectedToolType = 'pointer'; // 'pointer', 'wood', 'concrete', 'steel', 'glass', 'stone', etc.
         
         let buildTimeRemaining = 120; // 2 minutes
         let timerInterval = null;
@@ -787,7 +838,13 @@
             concrete: { name: 'Concrete Cube', count: 10, max: 10 },
             steel: { name: 'Steel Beam', count: 8, max: 8 },
             glass: { name: 'Glass Panel', count: 8, max: 8 },
-            stone: { name: 'Stone Pillar', count: 6, max: 6 }
+            stone: { name: 'Stone Pillar', count: 6, max: 6 },
+            log: { name: 'Wood Log', count: 8, max: 8 },
+            slab: { name: 'Brick Slab', count: 10, max: 10 },
+            wedge: { name: 'Roof Wedge', count: 8, max: 8 },
+            plate: { name: 'Shield Plate', count: 6, max: 6 },
+            joint: { name: 'Steel Joint', count: 12, max: 12 },
+            window: { name: 'Glass Window', count: 10, max: 10 }
         };
 
         // Disaster presets
@@ -930,9 +987,22 @@
                 name: 'Glass Panel',
                 width: 2.0, height: 1.5, depth: 0.15,
                 mass: 0.5, volume: 0.0002, elasticity: 0.1,
-                color: 0x38bdf8, transparent: true, opacity: 0.4, roughness: 0.15,
+                color: 0x38bdf8,
                 fragile: true,
-                buildGeometry: () => new THREE.BoxGeometry(2.0, 1.5, 0.15)
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    const main = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.5, 0.15), new THREE.MeshStandardMaterial({
+                        color: 0x38bdf8,
+                        transparent: true,
+                        opacity: 0.4,
+                        roughness: 0.1
+                    }));
+                    group.add(main);
+                    const edges = new THREE.EdgesGeometry(new THREE.BoxGeometry(2.0, 1.5, 0.15));
+                    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x1e293b }));
+                    group.add(line);
+                    return group;
+                }
             },
             stone: {
                 name: 'Stone Pillar',
@@ -940,6 +1010,100 @@
                 mass: 3.5, volume: 0.0008, elasticity: 0.15,
                 color: 0xe2e8f0, roughness: 0.8,
                 buildGeometry: () => new THREE.CylinderGeometry(0.3, 0.3, 3.0, 16)
+            },
+            log: {
+                name: 'Wood Log',
+                width: 0.8, height: 2.0, depth: 0.8,
+                mass: 1.5, volume: 0.001, elasticity: 0.2,
+                color: 0x854d0e, roughness: 0.85,
+                buildGeometry: () => new THREE.CylinderGeometry(0.4, 0.4, 2.0, 16)
+            },
+            slab: {
+                name: 'Brick Slab',
+                width: 2.0, height: 0.5, depth: 1.0,
+                mass: 1.8, volume: 0.001, elasticity: 0.15,
+                color: 0x991b1b, roughness: 0.8,
+                buildGeometry: () => new THREE.BoxGeometry(2.0, 0.5, 1.0)
+            },
+            wedge: {
+                name: 'Roof Wedge',
+                width: 1.5, height: 1.0, depth: 1.5,
+                mass: 1.2, volume: 0.0006, elasticity: 0.1,
+                color: 0xb45309, roughness: 0.8,
+                buildGeometry: () => {
+                    const geom = new THREE.BufferGeometry();
+                    const hw = 1.5 / 2;
+                    const hh = 1.0 / 2;
+                    const hd = 1.5 / 2;
+                    
+                    const vertices = new Float32Array([
+                        // Bottom base vertices (y = -hh)
+                        -hw, -hh, -hd, // 0
+                         hw, -hh, -hd, // 1
+                         hw, -hh,  hd, // 2
+                        -hw, -hh,  hd, // 3
+                        
+                        // Top peak line vertices (y = hh, x = -hw)
+                        -hw,  hh, -hd, // 4
+                        -hw,  hh,  hd  // 5
+                    ]);
+
+                    const indices = [
+                        // Bottom face
+                        0, 2, 1,
+                        0, 3, 2,
+                        // Sloped face
+                        1, 2, 5,
+                        1, 5, 4,
+                        // Back vertical face (x = -hw)
+                        0, 4, 5,
+                        0, 5, 3,
+                        // Left triangle face (z = -hd)
+                        0, 1, 4,
+                        // Right triangle face (z = hd)
+                        3, 5, 2
+                    ];
+
+                    geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                    geom.setIndex(indices);
+                    geom.computeVertexNormals();
+                    return geom;
+                }
+            },
+            plate: {
+                name: 'Shield Plate',
+                width: 3.0, height: 0.2, depth: 3.0,
+                mass: 5.4, volume: 0.0018, elasticity: 0.2,
+                color: 0x3f3f46, roughness: 0.4, metalness: 0.3,
+                buildGeometry: () => new THREE.BoxGeometry(3.0, 0.2, 3.0)
+            },
+            joint: {
+                name: 'Steel Joint',
+                width: 0.5, height: 0.5, depth: 0.5,
+                mass: 1.5, volume: 0.0001, elasticity: 0.2,
+                color: 0x71717a, roughness: 0.3, metalness: 0.7,
+                buildGeometry: () => new THREE.BoxGeometry(0.5, 0.5, 0.5)
+            },
+            window: {
+                name: 'Glass Window',
+                width: 1.0, height: 1.0, depth: 0.2,
+                mass: 0.4, volume: 0.0002, elasticity: 0.1,
+                color: 0x06b6d4,
+                fragile: true,
+                buildGeometry: () => {
+                    const group = new THREE.Group();
+                    const glass = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.0, 0.2), new THREE.MeshStandardMaterial({
+                        color: 0x06b6d4,
+                        transparent: true,
+                        opacity: 0.45,
+                        roughness: 0.1
+                    }));
+                    group.add(glass);
+                    const edges = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.0, 1.0, 0.2));
+                    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x1e293b }));
+                    group.add(line);
+                    return group;
+                }
             }
         };
 
@@ -1045,21 +1209,35 @@
                 this.markedForDeletion = false;
 
                 // Build Three.js representation
-                const geo = template.buildGeometry();
-                const matParams = {
-                    color: template.color,
-                    roughness: template.roughness || 0.5,
-                    metalness: template.metalness || 0.0
-                };
-                if (template.transparent) {
-                    matParams.transparent = true;
-                    matParams.opacity = template.opacity;
+                const geoOrGroup = template.buildGeometry();
+                if (geoOrGroup instanceof THREE.Group) {
+                    this.mesh = geoOrGroup;
+                } else {
+                    const matParams = {
+                        color: template.color,
+                        roughness: template.roughness || 0.5,
+                        metalness: template.metalness || 0.0
+                    };
+                    if (template.transparent) {
+                        matParams.transparent = true;
+                        matParams.opacity = template.opacity;
+                    }
+                    const mat = new THREE.MeshStandardMaterial(matParams);
+                    this.mesh = new THREE.Mesh(geoOrGroup, mat);
                 }
-                const mat = new THREE.MeshStandardMaterial(matParams);
-                this.mesh = new THREE.Mesh(geo, mat);
+                
                 this.mesh.position.set(this.x, this.y, this.z);
                 this.mesh.castShadow = true;
                 this.mesh.receiveShadow = true;
+
+                // Traverse group children to enable shadows
+                this.mesh.traverse(child => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+
                 scene.add(this.mesh);
 
                 // OutlineHelper for Selection
@@ -1153,10 +1331,10 @@
             shatter() {
                 this.markedForDeletion = true;
                 synth.playGlassShatter();
-                addLog(`[Collapse] Glass Panel shattered under high stress!`, 'red');
-                // Spawn glass particles
+                addLog(`[Collapse] Fragile block shattered under impact!`, 'red');
+                // Spawn particles
                 for (let i = 0; i < 22; i++) {
-                    const p = new Particle3D(this.x, this.y, this.z, 0x38bdf8, 0.06);
+                    const p = new Particle3D(this.x, this.y, this.z, this.color, 0.06);
                     activeParticles3D.push(p);
                 }
                 this.destroy();
@@ -1165,10 +1343,15 @@
             destroy() {
                 scene.remove(this.mesh);
                 scene.remove(this.outline);
-                this.mesh.geometry.dispose();
-                this.mesh.material.dispose();
                 this.outline.geometry.dispose();
                 this.outline.material.dispose();
+                // Traverse children to dispose
+                this.mesh.traverse(child => {
+                    if (child.isMesh) {
+                        child.geometry.dispose();
+                        child.material.dispose();
+                    }
+                });
             }
         }
 
@@ -1295,7 +1478,8 @@
             if (toolType !== 'pointer') {
                 btnId = `tool-${toolType}`;
             }
-            document.getElementById(btnId).classList.add('active');
+            const activeBtn = document.getElementById(btnId);
+            if (activeBtn) activeBtn.classList.add('active');
 
             // Remove previous ghost mesh
             removeGhostMesh();
@@ -1310,14 +1494,27 @@
             const temp = BLOCK_TEMPLATES[type];
             if (!temp) return;
 
-            const geo = temp.buildGeometry();
-            const mat = new THREE.MeshBasicMaterial({ 
-                color: temp.color, 
-                transparent: true, 
-                opacity: 0.4,
-                wireframe: false 
-            });
-            ghostMesh = new THREE.Mesh(geo, mat);
+            const geoOrGroup = temp.buildGeometry();
+            if (geoOrGroup instanceof THREE.Group) {
+                // Clone the group and make materials translucent
+                ghostMesh = geoOrGroup.clone();
+                ghostMesh.traverse(child => {
+                    if (child.isMesh) {
+                        child.material = new THREE.MeshBasicMaterial({
+                            color: temp.color,
+                            transparent: true,
+                            opacity: 0.4
+                        });
+                    }
+                });
+            } else {
+                const mat = new THREE.MeshBasicMaterial({ 
+                    color: temp.color, 
+                    transparent: true, 
+                    opacity: 0.4
+                });
+                ghostMesh = new THREE.Mesh(geoOrGroup, mat);
+            }
             ghostMesh.visible = false;
             scene.add(ghostMesh);
             isGhostVisible = true;
@@ -1326,8 +1523,13 @@
         function removeGhostMesh() {
             if (ghostMesh) {
                 scene.remove(ghostMesh);
-                ghostMesh.geometry.dispose();
-                ghostMesh.material.dispose();
+                // Traverse children to dispose
+                ghostMesh.traverse(child => {
+                    if (child.isMesh) {
+                        child.geometry.dispose();
+                        child.material.dispose();
+                    }
+                });
                 ghostMesh = null;
             }
             isGhostVisible = false;
@@ -1398,7 +1600,8 @@
             }
 
             inv.count--;
-            document.getElementById(`count-${type}`).innerText = inv.count;
+            const countBadge = document.getElementById(`count-${type}`);
+            if (countBadge) countBadge.innerText = inv.count;
 
             const template = BLOCK_TEMPLATES[type];
             const newObj = new PhysicsObject3D(pos.x, pos.y, pos.z, type, template);
@@ -1424,10 +1627,11 @@
             }
         }
 
-        // Selection & Dragging handlers
+        // Selection & Dragging handlers (supports immediate right-click drag & drop)
         function onDocumentMouseDown(e) {
             if (gamePhase === 'evaluation') return;
-            e.preventDefault();
+
+            const isRightClick = e.button === 2;
 
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -1435,18 +1639,13 @@
 
             raycaster.setFromCamera(mouse, camera);
 
-            // If a block placement tool is active, place a block on empty click
-            if (selectedToolType !== 'pointer' && ghostMesh && ghostMesh.visible) {
-                spawnBlock3D(selectedToolType, ghostMesh.position);
-                updateGhostPreview(e);
-                return;
-            }
-
-            // Otherwise, click & drag handler
+            // Raycast against existing blocks
             const meshes = activeObjects3D.map(o => o.mesh);
             const intersects = raycaster.intersectObjects(meshes, true);
 
+            // If player clicked directly on an existing block, ALWAYS pick it up / drag it
             if (intersects.length > 0) {
+                e.preventDefault();
                 let hitMesh = intersects[0].object;
                 while (hitMesh.parent && hitMesh.parent !== scene) {
                     hitMesh = hitMesh.parent;
@@ -1473,7 +1672,15 @@
 
                     selectObject(clickedObj);
                     controls.enabled = false;
+                    return;
                 }
+            }
+
+            // If they left-clicked on empty space or ground and a build tool is active, place a block!
+            if (!isRightClick && selectedToolType !== 'pointer' && ghostMesh && ghostMesh.visible) {
+                e.preventDefault();
+                spawnBlock3D(selectedToolType, ghostMesh.position);
+                updateGhostPreview(e);
             } else {
                 selectObject(null);
             }
@@ -1481,7 +1688,7 @@
 
         function onDocumentMouseMove(e) {
             // Update placement ghost preview
-            if (selectedToolType !== 'pointer') {
+            if (selectedToolType !== 'pointer' && !isMouseDown) {
                 updateGhostPreview(e);
                 return;
             }
@@ -1521,6 +1728,7 @@
         container3d.addEventListener('mousedown', onDocumentMouseDown);
         container3d.addEventListener('mousemove', onDocumentMouseMove);
         window.addEventListener('mouseup', onDocumentMouseUp);
+        container3d.addEventListener('contextmenu', e => e.preventDefault()); // prevent right-click context menu
 
         // Core Build Phase Timer
         function startTimer() {
@@ -2021,7 +2229,8 @@
             // Restore blocks inventory counts
             for (const key in blockInventory) {
                 blockInventory[key].count = blockInventory[key].max;
-                document.getElementById(`count-${key}`).innerText = blockInventory[key].count;
+                const countBadge = document.getElementById(`count-${key}`);
+                if (countBadge) countBadge.innerText = blockInventory[key].count;
             }
 
             // Restore defaults
@@ -2071,7 +2280,11 @@
                 }
 
                 // Delete object marked for deletion
+                const originalLength = activeObjects3D.length;
                 activeObjects3D = activeObjects3D.filter(obj => !obj.markedForDeletion);
+                if (activeObjects3D.length !== originalLength) {
+                    document.getElementById('stats-blocks').innerText = `${activeObjects3D.length} / 40`;
+                }
             }
 
             // Disaster specific loops
