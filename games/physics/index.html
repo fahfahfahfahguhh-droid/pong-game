@@ -1321,7 +1321,7 @@
             const gltfLoader = new THREE.GLTFLoader();
             const binaryString = atob(b64Data);
 
-            if (id === 'f1car') {
+            if (id === 'f1car' || id === 'bird') {
                 const len = binaryString.length;
                 const bytes = new Uint8Array(len);
                 for (let i = 0; i < len; i++) {
