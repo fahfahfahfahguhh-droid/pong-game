@@ -11,6 +11,8 @@
     <!-- Three.js and OrbitControls CDNs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
  
     <style>
         :root {
@@ -1279,6 +1281,147 @@
         }
         scene.add(ticksGroup);
 
+        // MODEL PRELOADER LOGIC (CORS-immune local file loaders)
+        const LOADED_MODELS = {};
+        const modelList = [
+            { id: 'bird', script: 'assets/model_bird.js' },
+            { id: 'squirrel', script: 'assets/model_squirrel.js' },
+            { id: 'fish', script: 'assets/model_fish.js' },
+            { id: 'elephant', script: 'assets/model_elephant.js' },
+            { id: 'aircraft', script: 'assets/model_aircraft.js' },
+            { id: 'submarine', script: 'assets/model_submarine.js' },
+            { id: 'hotair', script: 'assets/model_hotair.js' },
+            { id: 'f1car', script: 'assets/model_f1car.js' }
+        ];
+
+        function loadModelScripts() {
+            modelList.forEach(item => {
+                const script = document.createElement('script');
+                script.src = item.script;
+                script.onload = () => {
+                    parseModelData(item.id);
+                };
+                script.onerror = (err) => {
+                    console.warn(`Failed to load script for ${item.id}:`, err);
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        function parseModelData(id) {
+            const uId = id.toUpperCase();
+            const dataName = `MODEL_DATA_${uId}`;
+            const b64Data = window[dataName];
+            if (!b64Data) return;
+
+            const objLoader = new THREE.OBJLoader();
+            const gltfLoader = new THREE.GLTFLoader();
+            const binaryString = atob(b64Data);
+
+            if (id === 'f1car') {
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const buffer = bytes.buffer;
+
+                gltfLoader.parse(buffer, '', (gltf) => {
+                    const model = gltf.scene;
+                    const box = new THREE.Box3().setFromObject(model);
+                    const size = box.getSize(new THREE.Vector3());
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    
+                    const template = TEMPLATES_3D[id];
+                    const radius = template ? template.radius : 0.7;
+                    const scaleFactor = (radius * 2.0) / maxDim;
+                    model.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                    
+                    const center = box.getCenter(new THREE.Vector3());
+                    model.position.sub(center.multiplyScalar(scaleFactor));
+                    
+                    const parent = new THREE.Group();
+                    parent.add(model);
+                    
+                    parent.traverse(child => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+
+                    LOADED_MODELS[id] = parent;
+                }, (err) => {
+                    console.error(`Error parsing GLB for ${id}:`, err);
+                });
+            } else {
+                try {
+                    const objText = binaryString;
+                    const obj = objLoader.parse(objText);
+                    
+                    const box = new THREE.Box3().setFromObject(obj);
+                    const size = box.getSize(new THREE.Vector3());
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    
+                    const template = TEMPLATES_3D[id];
+                    const radius = template ? template.radius : 0.5;
+                    const scaleFactor = (radius * 2.0) / maxDim;
+                    obj.scale.set(scaleFactor, scaleFactor, scaleFactor);
+                    
+                    const center = box.getCenter(new THREE.Vector3());
+                    obj.position.sub(center.multiplyScalar(scaleFactor));
+
+                    obj.traverse(child => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                            if (child.material) {
+                                child.material = child.material.clone();
+                                if (id === 'bird') {
+                                    if (child.name.toLowerCase().includes('head') || child.name.toLowerCase().includes('eye')) {
+                                        child.material.color.setHex(0xffffff);
+                                    } else if (child.name.toLowerCase().includes('beak') || child.name.toLowerCase().includes('claw')) {
+                                        child.material.color.setHex(0xeab308);
+                                    } else {
+                                        child.material.color.setHex(0x451a03);
+                                    }
+                                } else if (id === 'squirrel') {
+                                    child.material.color.setHex(0xd97706);
+                                    child.material.roughness = 0.8;
+                                } else if (id === 'elephant') {
+                                    child.material.color.setHex(0x6b7280);
+                                    child.material.roughness = 0.9;
+                                } else if (id === 'aircraft') {
+                                    child.material.color.setHex(0x94a3b8);
+                                    child.material.roughness = 0.25;
+                                    child.material.metalness = 0.8;
+                                } else if (id === 'submarine') {
+                                    child.material.color.setHex(0x1e293b);
+                                    child.material.roughness = 0.35;
+                                    child.material.metalness = 0.75;
+                                } else if (id === 'fish') {
+                                    child.material.color.setHex(0xf97316);
+                                    child.material.roughness = 0.15;
+                                    child.material.metalness = 0.6;
+                                } else if (id === 'hotair') {
+                                    child.material.color.setHex(0xdc2626);
+                                    if (child.name.toLowerCase().includes('basket')) {
+                                        child.material.color.setHex(0xb45309);
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    const parent = new THREE.Group();
+                    parent.add(obj);
+                    LOADED_MODELS[id] = parent;
+                } catch (err) {
+                    console.error(`Error parsing OBJ for ${id}:`, err);
+                }
+            }
+        }
+
         // Physics constants (synced with sliders)
         let gravity = 9.8;
         let airDensity = 1.2;
@@ -1674,6 +1817,9 @@
                 elasticity: 0.35,
                 color: 0xd97706,
                 buildGeometry: () => {
+                    if (LOADED_MODELS['bird']) {
+                        return LOADED_MODELS['bird'].clone();
+                    }
                     const group = new THREE.Group();
                     
                     const bodyTex = createProceduralTexture('eagle_body');
@@ -1887,6 +2033,9 @@
                 elasticity: 0.15,
                 color: 0xf97316,
                 buildGeometry: () => {
+                    if (LOADED_MODELS['fish']) {
+                        return LOADED_MODELS['fish'].clone();
+                    }
                     const group = new THREE.Group();
                     
                     const scaleTex = createProceduralTexture('fish_scales');
@@ -2071,6 +2220,9 @@
                 dragCoeff: 0.60,
                 color: 0xd97706,
                 buildGeometry: () => {
+                    if (LOADED_MODELS['squirrel']) {
+                        return LOADED_MODELS['squirrel'].clone();
+                    }
                     const group = new THREE.Group();
                     
                     const furTex = createProceduralTexture('squirrel_fur');
@@ -2289,6 +2441,9 @@
                 elasticity: 0.10,
                 color: 0x94a3b8,
                 buildGeometry: () => {
+                    if (LOADED_MODELS['elephant']) {
+                        return LOADED_MODELS['elephant'].clone();
+                    }
                     const group = new THREE.Group();
                     
                     const skinTex = createProceduralTexture('elephant_skin');
@@ -2491,6 +2646,9 @@
                 elasticity: 0.20,
                 color: 0xef4444,
                 buildGeometry: () => {
+                    if (LOADED_MODELS['f1car']) {
+                        return LOADED_MODELS['f1car'].clone();
+                    }
                     const group = new THREE.Group();
                     const liveryTex = createProceduralTexture('f1_livery');
                     const metalMat = new THREE.MeshStandardMaterial({ map: liveryTex, roughness: 0.2, metalness: 0.8 });
@@ -2600,6 +2758,9 @@
                 elasticity: 0.10,
                 color: 0x94a3b8,
                 buildGeometry: () => {
+                    if (LOADED_MODELS['aircraft']) {
+                        return LOADED_MODELS['aircraft'].clone();
+                    }
                     const group = new THREE.Group();
                     
                     const panelTex = createProceduralTexture('jet_panels');
@@ -2694,6 +2855,9 @@
                 elasticity: 0.10,
                 color: 0xfacc15,
                 buildGeometry: () => {
+                    if (LOADED_MODELS['submarine']) {
+                        return LOADED_MODELS['submarine'].clone();
+                    }
                     const group = new THREE.Group();
                     
                     const subTex = createProceduralTexture('sub_details');
@@ -2779,6 +2943,9 @@
                 elasticity: 0.30,
                 color: 0xef4444,
                 buildGeometry: () => {
+                    if (LOADED_MODELS['hotair']) {
+                        return LOADED_MODELS['hotair'].clone();
+                    }
                     const group = new THREE.Group();
                     
                     const stripesTex = createProceduralTexture('balloon_stripes');
@@ -4201,6 +4368,7 @@
         }
 
         // Init Setup
+        loadModelScripts();
         resetSliders3D();
         setBiome3D('earth');
         setWeather3D('clear');
