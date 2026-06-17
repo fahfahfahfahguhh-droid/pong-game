@@ -501,10 +501,10 @@
                 <span style="font-size: 1.2rem;">🖐️</span>
             </div>
             <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
-                👉 <strong>Tap/Click</strong>: Spawns/builds your selected block shape. You can tap the ground or tap directly on other blocks to stack.
+                👉 <strong>Double-Tap/Double-Click</strong>: Spawns and builds your selected block shape. Double-tap empty space or existing blocks to stack them!
             </p>
             <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
-                👉 <strong>Click & Slide (Drag)</strong>: Touch and slide to pick up, lift, and move existing blocks. Works with both standard mouse and touchpads!
+                👉 <strong>Tap/Click & Slide (Drag)</strong>: Touch/click and slide anywhere on a block to pick it up, lift, and move it instantly.
             </p>
             <p style="font-size: 0.8rem; line-height: 1.4; color: var(--text-muted);">
                 Clear the <strong>4m Laser Line</strong> before the disaster strikes!
@@ -1632,10 +1632,39 @@
             }
         }
 
+        // Track double-tap/double-click details for touchpad users
+        let lastMouseDownTime = 0;
+        let lastMouseDownX = 0;
+        let lastMouseDownY = 0;
+
         // Touchpad friendly gesture handling: Click down triggers potential drag.
-        // If mouse shifts > 6px, it begins dragging. If mouseup fires without movement, it builds/places a block.
         function onDocumentMouseDown(e) {
             if (gamePhase === 'evaluation') return;
+
+            const now = Date.now();
+            const timeDiff = now - lastMouseDownTime;
+            const dist = Math.hypot(e.clientX - lastMouseDownX, e.clientY - lastMouseDownY);
+
+            // Double tap/double click detection: 350ms window, 25px radius
+            if (timeDiff < 350 && dist < 25) {
+                if (selectedToolType !== 'pointer' && ghostMesh && ghostMesh.visible) {
+                    e.preventDefault();
+                    spawnBlock3D(selectedToolType, ghostMesh.position);
+                    updateGhostPreview(e);
+                    
+                    // Reset tap details and state to prevent immediate drag starting on the new block
+                    lastMouseDownTime = 0;
+                    isMouseDown = false;
+                    potentialDragObject = null;
+                    isDraggingActive = false;
+                    controls.enabled = true;
+                    return;
+                }
+            }
+
+            lastMouseDownTime = now;
+            lastMouseDownX = e.clientX;
+            lastMouseDownY = e.clientY;
 
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -1657,7 +1686,7 @@
                 const clickedObj = activeObjects3D.find(o => o.mesh === hitMesh);
                 
                 if (clickedObj) {
-                    // Store details for potential drag threshold checks (essential for trackpads)
+                    // Touchpad optimization: Store details for drag threshold check
                     potentialDragObject = clickedObj;
                     dragStartMouseX = e.clientX;
                     dragStartMouseY = e.clientY;
@@ -1676,15 +1705,6 @@
                     selectObject(clickedObj);
                     controls.enabled = false;
                     return;
-                }
-            }
-
-            // Clicked on empty space or ground
-            if (selectedToolType !== 'pointer') {
-                e.preventDefault();
-                if (ghostMesh && ghostMesh.visible) {
-                    spawnBlock3D(selectedToolType, ghostMesh.position);
-                    updateGhostPreview(e);
                 }
             } else {
                 selectObject(null);
@@ -1705,7 +1725,7 @@
             mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
 
-            // Check if finger moved far enough to confirm it as a drag instead of a tap/place click
+            // Check if finger moved far enough to confirm it as a drag
             if (potentialDragObject && !isDraggingActive) {
                 const distanceMoved = Math.hypot(e.clientX - dragStartMouseX, e.clientY - dragStartMouseY);
                 if (distanceMoved > 6) { // 6px threshold
@@ -1735,17 +1755,7 @@
         function onDocumentMouseUp(e) {
             isMouseDown = false;
             
-            // If they clicked/tapped a block without moving, treat it as a tap/click to BUILD a new block on top of it
-            if (potentialDragObject && !isDraggingActive) {
-                if (selectedToolType !== 'pointer') {
-                    if (ghostMesh && ghostMesh.visible) {
-                        spawnBlock3D(selectedToolType, ghostMesh.position);
-                        updateGhostPreview(e);
-                    }
-                }
-            }
-
-            // Reset dragging indicators
+            // Clean up dragging states
             if (draggedObject3D) {
                 draggedObject3D.isDragging = false;
                 draggedObject3D = null;
