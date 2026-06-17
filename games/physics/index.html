@@ -819,7 +819,7 @@
             <!-- Simulation Controls HUD -->
             <div class="canvas-controls-bottom">
                 <div class="control-group-row">
-                    <button class="btn btn-primary" id="btn-pause" onclick="togglePause3D()">Pause Sim</button>
+                    <button class="btn btn-primary" id="btn-pause" onclick="togglePause3D()">Resume Sim</button>
                     <button class="btn" onclick="stepFrame3D()">Step Frame ⏭️</button>
                     <button class="btn" onclick="resetSliders3D()">Reset Sliders 🔄</button>
                 </div>
@@ -1430,7 +1430,7 @@
         let borderElasticity = 0.6;
         let timeScale = 1.0;
 
-        let gamePaused = false;
+        let gamePaused = true;
         let showVectors = true;
         let showTrails = true;
 
